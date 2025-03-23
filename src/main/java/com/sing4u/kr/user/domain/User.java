@@ -1,9 +1,11 @@
 package com.sing4u.kr.user.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.UUID;
 
+@Getter
 @Entity
 @Access(AccessType.FIELD)
 @Table(name = "users")
@@ -13,7 +15,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    public void updateProfile(String username, String email) {
+    private String nickname;
+
+    @Column(unique = true)
+    private String email;
+
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
+    public static User create() {
+        User user = new User();
+        return user;
+    }
+
+    public void updateProfile(String nickname) {
+
     }
 
     public void changeRole(Object newRole) {
