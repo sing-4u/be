@@ -24,46 +24,40 @@ public class RequestPeriod {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
+    @Enumerated(EnumType.STRING)
+    private RequestPeriodStatus requestPeriodStatus;
+
     private LocalDateTime createdAt = LocalDateTime.now();
+
 
     protected RequestPeriod() {
     }
 
-    public static RequestPeriod create(UUID artistId, LocalDateTime start, LocalDateTime end) {
-        if (start.isAfter(end)) {
-            throw new ApiException(ExceptionCode.BAD_REQUEST, "시작일은 종료일보다 앞서야 합니다.");
-        }
+    public static RequestPeriod create(UUID artistId, LocalDateTime start) {
+        if(start == null) throw new ApiException(ExceptionCode.BAD_REQUEST, "시작일은 필수 값입니다.");
         RequestPeriod period = new RequestPeriod();
         period.artistId = artistId;
         period.startAt = start;
-        period.endAt = end;
         period.createdAt = LocalDateTime.now();
+        period.requestPeriodStatus = RequestPeriodStatus.OPEN;
         return period;
     }
 
-    public boolean isOpen(LocalDateTime now) {
-        return now.isAfter(startAt) && now.isBefore(endAt);
+    public boolean isOpen() {
+        return this.requestPeriodStatus == RequestPeriodStatus.OPEN;
     }
 
-    public boolean isOpenAt(LocalDateTime time) {
-        return time.isAfter(startAt) && time.isBefore(endAt);
-    }
-
-    public boolean isExpiredAt(LocalDateTime time) {
-        return time.isAfter(endAt);
-    }
-
-    public boolean hasStartedAt(LocalDateTime time) {
-        return time.isAfter(startAt);
-    }
-
-    public boolean isCurrent(LocalDateTime time) {
-        return isOpenAt(time);
+    public void close() {
+        if(this.requestPeriodStatus != RequestPeriodStatus.OPEN) throw new ApiException(ExceptionCode.BAD_REQUEST, "이미 종료되었습니다.");
+        this.requestPeriodStatus = RequestPeriodStatus.CLOSED;
+        this.endAt = LocalDateTime.now();
     }
 
     public UUID getId() {
         return this.id;
     }
+
+
 
     public UUID artistIdentifier() {
         return this.artistId;
@@ -77,7 +71,7 @@ public class RequestPeriod {
         return this.endAt;
     }
 
-    public LocalDateTime createdOn() {
-        return this.createdAt;
+    public RequestPeriodStatus status() {
+        return this.requestPeriodStatus;
     }
 }

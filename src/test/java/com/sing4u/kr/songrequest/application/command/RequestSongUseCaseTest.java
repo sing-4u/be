@@ -48,7 +48,7 @@ class RequestSongUseCaseTest {
         );
 
         LocalDateTime now = LocalDateTime.now();
-        RequestPeriod period = RequestPeriod.create(UUID.randomUUID(), now.minusDays(1), now.plusDays(1));
+        RequestPeriod period = RequestPeriod.create(UUID.randomUUID(), now.minusDays(1));
         when(periodRepository.findById(periodId)).thenReturn(Optional.of(period));
 
         SongRequest saved = SongRequest.create(requesterId, periodId, songTitle, artistName, null);
@@ -87,7 +87,7 @@ class RequestSongUseCaseTest {
                 UUID.randomUUID(), periodId, "노래", "가수", null
         );
 
-        RequestPeriod expired = RequestPeriod.create(UUID.randomUUID(), LocalDateTime.now().minusDays(3), LocalDateTime.now().minusDays(1));
+        RequestPeriod expired = RequestPeriod.create(UUID.randomUUID(), LocalDateTime.now().minusDays(3));
         when(periodRepository.findById(periodId)).thenReturn(Optional.of(expired));
 
         // when & then

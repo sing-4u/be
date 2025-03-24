@@ -5,6 +5,5 @@ import java.util.UUID;
 
 public record CreateRequestPeriodCommand(
     UUID artistId,
-    LocalDateTime startAt,
-    LocalDateTime endAt
+    LocalDateTime startAt
 ) {}

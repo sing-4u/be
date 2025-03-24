@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +26,7 @@ public class RequestSongUseCase {
         RequestPeriod period = periodRepository.findById(command.requestPeriodId())
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "신청곡 기간이 존재하지 않습니다."));
 
-        if (!period.isCurrent(LocalDateTime.now())) {
+        if (!period.isOpen()) {
             throw new ApiException(ExceptionCode.BAD_REQUEST, "신청 가능 기간이 아닙니다.");
         }
 
