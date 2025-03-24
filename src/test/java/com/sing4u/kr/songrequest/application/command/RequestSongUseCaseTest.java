@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -44,14 +45,14 @@ class RequestSongUseCaseTest {
         String artistName = "태연";
 
         RequestSongCommand command = new RequestSongCommand(
-                requesterId, periodId, songTitle, artistName, null
+                requesterId, periodId, songTitle, artistName
         );
 
         LocalDateTime now = LocalDateTime.now();
         RequestPeriod period = RequestPeriod.create(UUID.randomUUID(), now.minusDays(1));
         when(periodRepository.findById(periodId)).thenReturn(Optional.of(period));
 
-        SongRequest saved = SongRequest.create(requesterId, periodId, songTitle, artistName, null);
+        SongRequest saved = SongRequest.create(requesterId, periodId, songTitle, artistName);
         when(songRequestRepository.save(any())).thenReturn(saved);
 
         // when
@@ -68,7 +69,7 @@ class RequestSongUseCaseTest {
         // given
         UUID periodId = UUID.randomUUID();
         RequestSongCommand command = new RequestSongCommand(
-                UUID.randomUUID(), periodId, "노래", "가수", null
+                UUID.randomUUID(), periodId, "노래", "가수"
         );
 
         when(periodRepository.findById(periodId)).thenReturn(Optional.empty());
@@ -84,10 +85,13 @@ class RequestSongUseCaseTest {
         // given
         UUID periodId = UUID.randomUUID();
         RequestSongCommand command = new RequestSongCommand(
-                UUID.randomUUID(), periodId, "노래", "가수", null
+                UUID.randomUUID(), periodId, "노래", "가수"
         );
 
         RequestPeriod expired = RequestPeriod.create(UUID.randomUUID(), LocalDateTime.now().minusDays(3));
+        expired.close();
+        ReflectionTestUtils.setField(expired, "id", periodId);
+
         when(periodRepository.findById(periodId)).thenReturn(Optional.of(expired));
 
         // when & then

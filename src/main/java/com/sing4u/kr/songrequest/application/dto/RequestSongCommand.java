@@ -6,6 +6,5 @@ public record RequestSongCommand(
     UUID requesterId,
     UUID requestPeriodId,
     String songTitle,
-    String artistName,
-    String message
+    String artistName
 ) {}

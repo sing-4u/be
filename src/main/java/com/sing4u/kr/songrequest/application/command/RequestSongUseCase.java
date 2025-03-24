@@ -34,8 +34,7 @@ public class RequestSongUseCase {
                 command.requesterId(),
                 command.requestPeriodId(),
                 command.songTitle(),
-                command.artistName(),
-                command.message()
+                command.artistName()
         );
 
         return SongRequestResponse.from(requestRepository.save(request));

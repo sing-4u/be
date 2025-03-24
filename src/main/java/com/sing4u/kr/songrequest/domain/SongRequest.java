@@ -31,7 +31,7 @@ public class SongRequest {
 
     protected SongRequest() {}
 
-    public static SongRequest create(UUID requesterId, UUID requestPeriodId, String songTitle, String artistName, String message) {
+    public static SongRequest create(UUID requesterId, UUID requestPeriodId, String songTitle, String artistName) {
         SongRequest sr = new SongRequest();
         sr.requesterId = requesterId;
         sr.requestPeriodId = requestPeriodId;
