@@ -30,6 +30,10 @@ public class User {
         return user;
     }
 
+    public static User createGoogleUser() {
+        return null;
+    }
+
     public void updateProfile(String nickname) {
 
     }

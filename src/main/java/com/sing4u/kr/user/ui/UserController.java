@@ -1,8 +1,10 @@
 package com.sing4u.kr.user.ui;
 
-import com.sing4u.kr.user.application.command.CreateUserUseCase;
-import com.sing4u.kr.user.application.command.UpdateUserUseCase;
-import com.sing4u.kr.user.application.dto.UserCommand;
+import com.sing4u.kr.common.response.PagingResponse;
+import com.sing4u.kr.user.application.command.DeleteUserUseCase;
+import com.sing4u.kr.user.application.command.UpdateEmailUseCase;
+import com.sing4u.kr.user.application.command.UpdateNicknameUseCase;
+import com.sing4u.kr.user.application.command.UpdatePasswordUseCase;
 import com.sing4u.kr.user.application.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,36 +16,39 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final CreateUserUseCase createUserUseCase;
-    private final UpdateUserUseCase updateUserUseCase;
+
+    private final UpdateNicknameUseCase updateNicknameUseCase;
+    private final UpdateEmailUseCase updateEmailUseCase;
+    private final UpdatePasswordUseCase updatePasswordUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getUserList() {
+    public ResponseEntity<PagingResponse<UserResponse>> getUserList() {
         return null;
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserCommand userCommand) {
-        return ResponseEntity.ok(createUserUseCase.execute(userCommand));
-    }
-
-    @GetMapping
-    public ResponseEntity<UserResponse> emailCheck(@RequestBody UserCommand userCommand) {
+    @GetMapping("/info")
+    public ResponseEntity<UserResponse> getMyInfo() {
         return null;
     }
 
-    @PatchMapping
-    public ResponseEntity<UserResponse> updateEmail(@RequestBody UserCommand userCommand) {
+    @PatchMapping("/nickname")
+    public ResponseEntity<Void> updateNickname() {
         return null;
     }
 
-    @PatchMapping
-    public ResponseEntity<UserResponse> updatePassword(@RequestBody UserCommand userCommand) {
+    @PatchMapping("/email")
+    public ResponseEntity<Void> updateEmail() {
+        return null;
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Void> updatePassword() {
         return null;
     }
 
     @DeleteMapping
-    public ResponseEntity<UserResponse> deleteUser() {
+    public ResponseEntity<Void> deleteUser() {
         return null;
     }
 }

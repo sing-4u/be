@@ -1,4 +1,4 @@
-package com.sing4u.kr.user.infra;
+package com.sing4u.kr.user.domain;
 
 import jakarta.persistence.*;
 
