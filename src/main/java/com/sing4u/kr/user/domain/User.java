@@ -15,6 +15,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String profileImageUrl;
+
     private String nickname;
 
     @Column(unique = true)
@@ -25,6 +27,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Enumerated(EnumType.STRING)
+    private SignupType signupType;
+
     public static User create() {
         User user = new User();
         return user;
@@ -34,8 +39,13 @@ public class User {
         return null;
     }
 
-    public void updateProfile(String nickname) {
+    public void updateProfileImage(String profileImageUrl) {
+    }
 
+    public void updateNickname(String nickname) {
+    }
+
+    public void updateEmail(String email) {
     }
 
     public void changeRole(Object newRole) {
@@ -57,5 +67,13 @@ public class User {
 
     public boolean isUser() {
         return true;
+    }
+
+    public boolean isLocalUser() {
+        return this.signupType == SignupType.LOCAL;
+    }
+
+    public boolean isSocialUser() {
+        return this.signupType != SignupType.LOCAL;
     }
 }

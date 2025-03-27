@@ -32,6 +32,11 @@ public class UserController {
         return null;
     }
 
+    @PatchMapping("/profile-image")
+    public ResponseEntity<Void> updateProfileImage() {
+        return null;
+    }
+
     @PatchMapping("/nickname")
     public ResponseEntity<Void> updateNickname() {
         return null;
