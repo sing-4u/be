@@ -30,25 +30,37 @@ public class User {
     @Enumerated(EnumType.STRING)
     private SignupType signupType;
 
-    public static User create() {
-        User user = new User();
-        return user;
-    }
+    public User() {}
 
-    public static User createGoogleUser() {
-        return null;
+    public User(UUID id, String email, String nickname, String password, SignupType signupType, UserRole role) {
+        if (email == null || nickname == null || signupType == null || role == null) {
+            throw new IllegalArgumentException("필수 값 누락");
+        }
+        this.id = id;
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.signupType = signupType;
+        this.userRole = role;
     }
 
     public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void updateNickname(String nickname) {
+        if (nickname == null || nickname.isBlank()) {
+            throw new IllegalArgumentException("닉네임은 필수입니다.");
+        }
+        this.nickname = nickname;
     }
 
     public void updateEmail(String email) {
+        this.email = email;
     }
 
-    public void changeRole(Object newRole) {
+    public void changeRole(UserRole newRole) {
+        this.userRole = newRole;
     }
 
     public void addSongRequestSession(Object session) {
@@ -62,11 +74,11 @@ public class User {
     }
 
     public boolean isArtist() {
-        return true;
+        return this.userRole == UserRole.ARTIST;
     }
 
     public boolean isUser() {
-        return true;
+        return this.userRole == UserRole.USER;
     }
 
     public boolean isLocalUser() {

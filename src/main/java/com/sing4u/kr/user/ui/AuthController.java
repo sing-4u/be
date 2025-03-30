@@ -2,6 +2,8 @@ package com.sing4u.kr.user.ui;
 
 import com.sing4u.kr.user.application.command.*;
 import com.sing4u.kr.user.application.dto.TokenResponse;
+import com.sing4u.kr.user.infra.GoogleOAuthClient;
+import com.sing4u.kr.user.infra.GoogleOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,34 +18,41 @@ public class AuthController {
     private final GoogleLoginUseCase googleLoginUseCase;
     private final SendResetCodeUseCase sendResetCodeUseCase;
     private final VerifyResetCodeUseCase verifyResetCodeUseCase;
+    private final GoogleOAuthClient googleOAuthClient;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup() {
-        return null;
+    public ResponseEntity<Void> signup(@RequestBody SignupRequest request) {
+        signupUseCase.execute(request);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/signup/google")
-    public ResponseEntity<TokenResponse> googleSignup() {
-        return null;
+    public ResponseEntity<TokenResponse> googleSignup(@RequestBody GoogleTokenRequest request) {
+        GoogleOAuthUserInfo userInfo = googleOAuthClient.getUserInfo(request.accessToken());
+        String token = googleSignupUseCase.execute(userInfo.email(), userInfo.name());
+        return ResponseEntity.ok(new TokenResponse(token));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login() {
-        return null;
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+        String token = loginUseCase.execute(request);
+        return ResponseEntity.ok(new TokenResponse(token));
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<TokenResponse> googleLogin() {
-        return null;
+    public ResponseEntity<TokenResponse> googleLogin(@RequestBody GoogleTokenRequest request) {
+        GoogleOAuthUserInfo userInfo = googleOAuthClient.getUserInfo(request.accessToken());
+        String token = googleLoginUseCase.execute(userInfo.email());
+        return ResponseEntity.ok(new TokenResponse(token));
     }
 
     @PostMapping("/password/reset-code")
     public ResponseEntity<Void> sendResetCode() {
-        return null;
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/password/verify-code")
     public ResponseEntity<Void> verifyResetCode() {
-        return null;
+        return ResponseEntity.ok().build();
     }
 }
