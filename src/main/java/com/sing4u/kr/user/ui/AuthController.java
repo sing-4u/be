@@ -1,7 +1,9 @@
 package com.sing4u.kr.user.ui;
 
 import com.sing4u.kr.user.application.command.*;
+import com.sing4u.kr.user.application.dto.LoginCommand;
 import com.sing4u.kr.user.application.dto.TokenResponse;
+import com.sing4u.kr.user.application.dto.UserCommand;
 import com.sing4u.kr.user.infra.GoogleOAuthClient;
 import com.sing4u.kr.user.infra.GoogleOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +23,12 @@ public class AuthController {
     private final GoogleOAuthClient googleOAuthClient;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup(@RequestBody SignupRequest request) {
-        signupUseCase.execute(request);
+    public ResponseEntity<Void> signup(@RequestBody UserCommand command) {
+        signupUseCase.execute(command);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/signup/google")
+/*    @PostMapping("/signup/google")
     public ResponseEntity<TokenResponse> googleSignup(@RequestBody GoogleTokenRequest request) {
         GoogleOAuthUserInfo userInfo = googleOAuthClient.getUserInfo(request.accessToken());
         String token = googleSignupUseCase.execute(userInfo.email(), userInfo.name());
@@ -34,9 +36,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
-        String token = loginUseCase.execute(request);
-        return ResponseEntity.ok(new TokenResponse(token));
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginCommand command) {
+        TokenResponse token = loginUseCase.execute(command);
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/login/google")
@@ -54,5 +56,5 @@ public class AuthController {
     @PostMapping("/password/verify-code")
     public ResponseEntity<Void> verifyResetCode() {
         return ResponseEntity.ok().build();
-    }
+    }*/
 }

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public record UserCommand(
         UUID id,
+        String nickname,
         String email,
         String password,
         UserRole userRole
