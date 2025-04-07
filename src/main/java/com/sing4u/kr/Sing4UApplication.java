@@ -10,4 +10,8 @@ public class Sing4UApplication {
 		SpringApplication.run(Sing4UApplication.class, args);
 	}
 
+
+
+
+
 }
