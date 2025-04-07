@@ -1,6 +1,7 @@
 package com.sing4u.kr.user.application.command;
 
 import com.sing4u.kr.common.security.JwtTokenProvider;
+import com.sing4u.kr.user.application.dto.TokenResponse;
 import com.sing4u.kr.user.application.dto.UserCommand;
 import com.sing4u.kr.user.domain.SignupType;
 import com.sing4u.kr.user.domain.User;
@@ -19,7 +20,7 @@ public class SignupUseCase {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public String execute(UserCommand command) {
+    public TokenResponse execute(UserCommand command) {
         if (userRepository.findByEmail(command.email()).isPresent()) {
             throw new IllegalStateException("이미 가입된 이메일입니다.");
         }
@@ -37,6 +38,9 @@ public class SignupUseCase {
 
         userRepository.save(user);
 
-        return jwtTokenProvider.generateToken(user.getEmail());
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+
+        return new TokenResponse(accessToken, refreshToken);
     }
 }

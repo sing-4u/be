@@ -30,6 +30,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private SignupType signupType;
 
+    private String refreshToken;
+
     public User() {}
 
     public User(UUID id, String email, String nickname, String password, SignupType signupType, UserRole role) {
@@ -87,5 +89,17 @@ public class User {
 
     public boolean isSocialUser() {
         return this.signupType != SignupType.LOCAL;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void clearRefreshToken() {
+        this.refreshToken = null;
+    }
+
+    public boolean hasValidRefreshToken(String token) {
+        return this.refreshToken != null && this.refreshToken.equals(token);
     }
 }

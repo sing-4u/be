@@ -32,7 +32,7 @@ public class GoogleSignupUseCase {
 
         userRepository.save(user);
 
-        return jwtTokenProvider.generateToken(user.getEmail());
+        return null;
     }
 }
 

@@ -28,6 +28,6 @@ public class LoginUseCase {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return new TokenResponse(jwtTokenProvider.generateToken(command.email()), jwtTokenProvider.generateToken(command.email()) );
+        return null;
     }
 }

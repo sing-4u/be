@@ -2,6 +2,7 @@ package com.sing4u.kr.songrequest.infra;
 
 import com.sing4u.kr.songrequest.domain.SongRequest;
 import com.sing4u.kr.songrequest.domain.SongRequestRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,13 +11,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@RequiredArgsConstructor
 public class SongRequestRepositoryImpl implements SongRequestRepository {
 
-    private final JpaSongRequestRepository jpa;
-
-    public SongRequestRepositoryImpl(JpaSongRequestRepository jpa) {
-        this.jpa = jpa;
-    }
+    private final SongRequestJpaRepository jpa;
 
     @Override
     public SongRequest save(SongRequest request) {

@@ -1,6 +1,7 @@
 package com.sing4u.kr.songrequest.application.query.dao;
 
 import com.sing4u.kr.songrequest.application.query.dto.RequestPeriodView;
+import com.sing4u.kr.songrequest.domain.RequestPeriod;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -8,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface RequestPeriodDao extends Repository<RequestPeriodView, UUID> {
+public interface RequestPeriodDao extends Repository<RequestPeriod, UUID> {
 
     @Query("""
         SELECT new com.sing4u.kr.songrequest.application.query.dto.RequestPeriodView(

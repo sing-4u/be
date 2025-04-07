@@ -20,6 +20,6 @@ public class GoogleLoginUseCase {
     public String execute(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        return jwtTokenProvider.generateToken(user.getEmail());
+        return null;
     }
 }
