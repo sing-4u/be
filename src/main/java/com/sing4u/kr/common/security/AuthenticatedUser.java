@@ -1,7 +1,6 @@
 package com.sing4u.kr.common.security;
 
-import com.sing4u.kr.user.domain.User;
-import lombok.AllArgsConstructor;
+import com.sing4u.kr.user.domain.OldUser;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,13 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 public class AuthenticatedUser implements UserDetails {
-    private final User user;
+    private final OldUser user;
 
-    public AuthenticatedUser(User user) {
+    public AuthenticatedUser(OldUser user) {
         this.user = user;
     }
 
@@ -39,6 +37,6 @@ public class AuthenticatedUser implements UserDetails {
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
 
-    public User getDomainUser() { return user; }
+    public OldUser getDomainUser() { return user; }
 }
 

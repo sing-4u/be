@@ -1,7 +1,7 @@
 package com.sing4u.kr.user.infra;
 
-import com.sing4u.kr.user.domain.User;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUser;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -11,36 +11,36 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl implements OldUserRepository {
     private final UserJpaRepository jpa;
 
     @Override
-    public List<User> getUsers() {
+    public List<OldUser> getUsers() {
         return List.of();
     }
 
     @Override
-    public User save(User user) {
+    public OldUser save(OldUser user) {
         return null;
     }
 
     @Override
-    public User updateProfile(User user) {
+    public OldUser updateProfile(OldUser user) {
         return null;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<OldUser> findById(UUID id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<OldUser> findByEmail(String email) {
         return Optional.empty();
     }
 
     @Override
-    public void deleteById(User user) {
+    public void deleteById(OldUser user) {
         jpa.deleteById(user.getId());
     }
 

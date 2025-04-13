@@ -1,8 +1,8 @@
 package com.sing4u.kr.user.application.command;
 
 import com.sing4u.kr.common.security.JwtTokenProvider;
-import com.sing4u.kr.user.domain.User;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUser;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GoogleLoginUseCase {
 
-    private final UserRepository userRepository;
+    private final OldUserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     public boolean existsByEmail(String email) {
@@ -18,7 +18,7 @@ public class GoogleLoginUseCase {
     }
 
     public String execute(String email) {
-        User user = userRepository.findByEmail(email)
+        OldUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         return null;
     }

@@ -2,8 +2,8 @@ package com.sing4u.kr.user.application.command;
 
 import com.sing4u.kr.common.security.JwtTokenProvider;
 import com.sing4u.kr.user.application.dto.UserCommand;
-import com.sing4u.kr.user.domain.User;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUser;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import com.sing4u.kr.user.domain.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.*;
 class SignupUseCaseTest {
 
     @Mock
-    UserRepository userRepository;
+    OldUserRepository userRepository;
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -61,7 +60,7 @@ class SignupUseCaseTest {
 
         // then
         assertThat(result).isEqualTo(token);
-        verify(userRepository).save(any(User.class));
+        verify(userRepository).save(any(OldUser.class));
         verify(passwordEncoder).encode(rawPassword);
         verify(jwtTokenProvider).generateToken(email);
     }
@@ -77,7 +76,7 @@ class SignupUseCaseTest {
         String token = "access.jwt.token";
         UserCommand command = new UserCommand(uuid, nickname, email, rawPassword, UserRole.USER);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(OldUser.class)));
 
         // when & then
         assertThatThrownBy(() -> signupUseCase.execute(command))

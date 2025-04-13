@@ -3,8 +3,8 @@ package com.sing4u.kr.user.application.command;
 import com.sing4u.kr.common.security.JwtTokenProvider;
 import com.sing4u.kr.user.application.dto.LoginCommand;
 import com.sing4u.kr.user.application.dto.TokenResponse;
-import com.sing4u.kr.user.domain.User;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUser;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LoginUseCase {
-    private final UserRepository userRepository;
+    private final OldUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     public TokenResponse execute(LoginCommand command) {
-        User user = userRepository.findByEmail(command.email())
+        OldUser user = userRepository.findByEmail(command.email())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
         if (!user.isLocalUser()) {

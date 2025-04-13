@@ -2,13 +2,11 @@ package com.sing4u.kr.user.ui;
 
 import com.sing4u.kr.common.security.JwtTokenProvider;
 import com.sing4u.kr.user.application.command.*;
-import com.sing4u.kr.user.application.dto.LoginCommand;
 import com.sing4u.kr.user.application.dto.TokenResponse;
 import com.sing4u.kr.user.application.dto.UserCommand;
-import com.sing4u.kr.user.domain.User;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUser;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import com.sing4u.kr.user.infra.GoogleOAuthClient;
-import com.sing4u.kr.user.infra.GoogleOAuthUserInfo;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +30,7 @@ public class AuthController {
     private final VerifyResetCodeUseCase verifyResetCodeUseCase;
     private final GoogleOAuthClient googleOAuthClient;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final OldUserRepository userRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(@RequestBody UserCommand command) {
@@ -80,7 +78,7 @@ public class AuthController {
         }
 
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
-        User user = userRepository.findByEmail(email)
+        OldUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // AccessToken은 무조건 새로 발급

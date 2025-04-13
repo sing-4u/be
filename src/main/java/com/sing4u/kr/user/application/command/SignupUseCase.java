@@ -4,8 +4,8 @@ import com.sing4u.kr.common.security.JwtTokenProvider;
 import com.sing4u.kr.user.application.dto.TokenResponse;
 import com.sing4u.kr.user.application.dto.UserCommand;
 import com.sing4u.kr.user.domain.SignupType;
-import com.sing4u.kr.user.domain.User;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUser;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import com.sing4u.kr.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class SignupUseCase {
-    private final UserRepository userRepository;
+    private final OldUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -27,7 +27,7 @@ public class SignupUseCase {
 
         String encodedPassword = passwordEncoder.encode(command.password());
 
-        User user = new User(
+        OldUser user = new OldUser(
                 UUID.randomUUID(),
                 command.email(),
                 command.nickname(),

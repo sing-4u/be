@@ -3,7 +3,7 @@ package com.sing4u.kr.common.security;
 
 import com.sing4u.kr.user.application.command.GoogleLoginUseCase;
 import com.sing4u.kr.user.application.command.GoogleSignupUseCase;
-import com.sing4u.kr.user.domain.UserRepository;
+import com.sing4u.kr.user.domain.OldUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class GoogleLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final GoogleLoginUseCase googleLoginUseCase;
     private final GoogleSignupUseCase googleSignupUseCase;
-    private final UserRepository userRepository;
+    private final OldUserRepository userRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

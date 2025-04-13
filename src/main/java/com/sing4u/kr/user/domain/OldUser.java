@@ -9,7 +9,7 @@ import java.util.UUID;
 @Entity
 @Access(AccessType.FIELD)
 @Table(name = "users")
-public class User {
+public class OldUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,9 +32,9 @@ public class User {
 
     private String refreshToken;
 
-    public User() {}
+    public OldUser() {}
 
-    public User(UUID id, String email, String nickname, String password, SignupType signupType, UserRole role) {
+    public OldUser(UUID id, String email, String nickname, String password, SignupType signupType, UserRole role) {
         if (email == null || nickname == null || signupType == null || role == null) {
             throw new IllegalArgumentException("필수 값 누락");
         }

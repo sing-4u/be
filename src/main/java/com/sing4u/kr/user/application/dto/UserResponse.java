@@ -1,6 +1,6 @@
 package com.sing4u.kr.user.application.dto;
 
-import com.sing4u.kr.user.domain.User;
+import com.sing4u.kr.user.domain.OldUser;
 import com.sing4u.kr.user.domain.UserRole;
 
 import java.util.UUID;
@@ -12,7 +12,7 @@ public record UserResponse(
         UserRole userRole,
         String profileImageUrl
 ) {
-    public static UserResponse from(User user) {
+    public static UserResponse from(OldUser user) {
         return new UserResponse(
                 user.getId(),
                 user.getNickname(),
