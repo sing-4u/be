@@ -1,16 +1,20 @@
 package com.sing4u.kr.user.service;
 
-import com.sing4u.kr.user.dto.UserDto;
+import com.sing4u.kr.user.dto.request.UserCreateRequest;
+import com.sing4u.kr.user.dto.request.UserUpdateRequest;
+import com.sing4u.kr.user.dto.response.UserCreateResponse;
+import com.sing4u.kr.user.dto.response.UserDetailResponse;
+import com.sing4u.kr.user.dto.response.UserListResponse;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.reopository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -20,67 +24,57 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserDto createUser(UserDto dto) {
-        User user = User.of(dto.getEmail(), dto.getNickname(), passwordEncoder.encode(dto.getPassword()));
-        return toDto(userRepository.save(user));
+    public UserCreateResponse createUser(UserCreateRequest request) {
+        User user = User.of(request.getEmail(), request.getNickname(), passwordEncoder.encode(request.getPassword()), request.getAccountType());
+        return UserCreateResponse.from(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Slice<UserListResponse> getUserListSearch(String keyword, Pageable pageable) {
+        return userRepository.searchByNickname(keyword, pageable)
+                .map(UserListResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserDto> getUserById(Long id) {
+    public UserDetailResponse getUserById(Long id) {
         return userRepository.findById(id)
-                .map(this::toDto);
+                .map(UserDetailResponse::from).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
     @Transactional
-    public UserDto updateNickname(Long id, UserDto dto) {
+    public UserDetailResponse updateNickname(Long id, UserUpdateRequest request) {
         User user = getEntityOrThrow(id);
-        user.updateNickname(dto.getNickname());
-        return toDto(user);
+        user.updateNickname(request.getNickname());
+        return UserDetailResponse.from(user);
     }
 
     @Transactional
-    public UserDto updateEmail(Long id, UserDto dto) {
+    public UserDetailResponse updateEmail(Long id, UserUpdateRequest request) {
         User user = getEntityOrThrow(id);
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        user.updateEmail(dto.getEmail());
-        return toDto(user);
+        user.updateEmail(request.getEmail());
+        return UserDetailResponse.from(user);
     }
 
     @Transactional
-    public UserDto updatePassword(Long id, UserDto dto) {
+    public UserDetailResponse updatePassword(Long id, UserUpdateRequest request) {
         User user = getEntityOrThrow(id);
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
-        return toDto(user);
+        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+        return UserDetailResponse.from(user);
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        User user = getEntityOrThrow(id);
-        userRepository.delete(user);
-    }
-
-    private UserDto toDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .build();
+        userRepository.softDeleteById(id, LocalDateTime.now());
     }
 
     private User getEntityOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 }

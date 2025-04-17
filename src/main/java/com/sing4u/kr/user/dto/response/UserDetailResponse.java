@@ -1,0 +1,43 @@
+package com.sing4u.kr.user.dto.response;
+
+import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.AccountType;
+import com.sing4u.kr.user.entity.enums.ActivityPlatformType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserDetailResponse {
+    private Long id;
+    private String nickname;
+    private String email;
+    private AccountType accountType;
+    private String profileImage;
+    private String introduction;
+    private String mainCoverUrl;
+    private String activityPlatformUrl;
+    private ActivityPlatformType activityPlatformType;
+    private LocalDateTime updatedAt;
+
+    public static UserDetailResponse from(User user) {
+        return UserDetailResponse.builder()
+                .id(user.getId())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .accountType(user.getAccountType())
+                .profileImage(user.getProfileImage())
+                .introduction(user.getIntroduction())
+                .mainCoverUrl(user.getMainCoverUrl())
+                .activityPlatformUrl(user.getActivityPlatformUrl())
+                .activityPlatformType(user.getActivityPlatformType())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
+}
