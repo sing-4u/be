@@ -1,0 +1,62 @@
+package com.sing4u.kr.application.utils;
+
+import lombok.experimental.UtilityClass;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sing4u.kr.application.model.DefaultUserDetail;
+import com.sing4u.kr.common.enums.ResponseCode;
+import com.sing4u.kr.common.exception.ApiException;
+import com.sing4u.kr.user.enums.UserRole;
+
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
+@UtilityClass
+public class SecurityContextUtils {
+    public static void setSecurityContext(Long accountId, List<UserRole> roles) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        for (UserRole role : emptyIfNull(roles)) {
+            SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(toGrantedAuthority(role));
+            authorities.add(simpleGrantedAuthority);
+        }
+
+        DefaultUserDetail userDetail = DefaultUserDetail.of(accountId, authorities);
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    }
+
+    private String toGrantedAuthority(UserRole role) {
+        return String.format("ROLE_%s", role);
+    }
+
+    public Long getAccountId(Authentication authentication) {
+        if (authentication == null) {
+            throw new ApiException(ResponseCode.ERROR_NO_AUTHORIZED);
+        }
+
+        if (!DefaultUserDetail.class.isInstance(authentication.getPrincipal())) {
+            throw new ApiException(ResponseCode.ERROR_NO_AUTHORIZED);
+        }
+
+        DefaultUserDetail customUserDetail = DefaultUserDetail.class.cast(authentication.getPrincipal());
+        return customUserDetail.getId();
+    }
+
+    public Long getAccountId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return getAccountId(authentication);
+    }
+}

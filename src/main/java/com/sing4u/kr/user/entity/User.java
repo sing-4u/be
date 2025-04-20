@@ -1,6 +1,6 @@
 package com.sing4u.kr.user.entity;
 
-import com.sing4u.kr.user.entity.enums.AccountType;
+import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.entity.enums.ActivityPlatformType;
 import com.sing4u.kr.user.entity.enums.SocialType;
 import jakarta.persistence.*;
@@ -40,7 +40,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", length = 20, nullable = false)
-    private AccountType accountType;
+    private UserType userType;
 
     @Column(name = "profile_image", length = 255)
     private String profileImage;
@@ -69,12 +69,12 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public static User of(String nickname, String email, String password, AccountType accountType) {
+    public static User of(String nickname, String email, String password, UserType userType) {
         return User.builder()
                 .nickname(nickname)
                 .email(email)
                 .password(password)
-                .accountType(accountType)
+                .userType(userType)
                 .build();
     }
 
@@ -82,8 +82,8 @@ public class User {
         return this.deletedAt != null;
     }
 
-    public void updateAccountType(AccountType accountType) {
-        this.accountType = accountType;
+    public void updateAccountType(UserType userType) {
+        this.userType = userType;
     }
 
     public void updateProfile(String profileImage, String introduction, String mainCoverUrl,
