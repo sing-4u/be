@@ -1,7 +1,7 @@
 package com.sing4u.kr.user.dto.response;
 
 import com.sing4u.kr.user.entity.User;
-import com.sing4u.kr.user.entity.enums.AccountType;
+import com.sing4u.kr.user.entity.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class UserCreateResponse {
     private Long id;
     private String email;
     private String nickname;
-    private AccountType accountType;
+    private UserType userType;
     private LocalDateTime createdAt;
 
     public static UserCreateResponse from(User user) {
@@ -25,7 +25,7 @@ public class UserCreateResponse {
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .accountType(user.getAccountType())
+                .userType(user.getUserType())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

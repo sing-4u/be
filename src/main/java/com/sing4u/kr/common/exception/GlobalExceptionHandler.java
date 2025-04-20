@@ -1,41 +1,126 @@
 package com.sing4u.kr.common.exception;
 
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+
+import java.net.URISyntaxException;
 import java.util.stream.Collectors;
 
+import com.sing4u.kr.common.dto.ResponseResult;
+import com.sing4u.kr.common.enums.ResponseCode;
+import com.sing4u.kr.jwt.exceptions.ExpiredTokenException;
+import com.sing4u.kr.jwt.exceptions.InvalidTokenException;
+
+import static com.sing4u.kr.common.enums.ResponseCode.ERROR_INTERNAL_SERVER;
+import static com.sing4u.kr.common.enums.ResponseCode.ERROR_WRONG_PARAMETERS;
+
+@SuppressWarnings("rawtypes")
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex) {
-        return ResponseEntity
-                .status(ex.getStatus())
-                .body(ErrorResponse.of(ex));
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = {
+            MethodArgumentNotValidException.class,
+            HttpMessageNotReadableException.class,
+            IllegalStateException.class,
+            ConstraintViolationException.class,
+            BindException.class,
+            MethodArgumentTypeMismatchException.class,
+            HttpRequestMethodNotSupportedException.class,
+            NumberFormatException.class,
+            URISyntaxException.class,
+            MissingServletRequestParameterException.class,
+            MissingServletRequestPartException.class
+    })
+    public ResponseResult handleWrongParametersException(Exception e) {
+        log.warn("WrongParametersException: ", e);
+        return new ResponseResult<>(ERROR_WRONG_PARAMETERS.getCode(), ERROR_WRONG_PARAMETERS.getMessage(), null);
     }
 
-    // Validation 관련 스프링 내장 예외 처리
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
-        String errorDetails = ex.getBindingResult().getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
-
-        ApiException apiException = new ApiException(ExceptionCode.VALIDATION_ERROR, errorDetails);
-        return ResponseEntity
-                .status(apiException.getStatus())
-                .body(ErrorResponse.of(apiException));
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseResult handleAccessDeniedException(AccessDeniedException e) {
+        log.error("AccessDeniedException: ", e);
+        return new ResponseResult<>(ResponseCode.ERROR_NO_AUTHORIZED.getCode(), ResponseCode.ERROR_NO_AUTHORIZED.getMessage(), null);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        ApiException apiException = new ApiException(ExceptionCode.INTERNAL_SERVER_ERROR, ex.getMessage());
-        return ResponseEntity
-                .status(apiException.getStatus())
-                .body(ErrorResponse.of(apiException));
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = InsufficientAuthenticationException.class)
+    public ResponseResult handleInsufficientAuthenticationException(InsufficientAuthenticationException e) {
+        log.warn("InsufficientAuthenticationException: ", e);
+        return new ResponseResult<>(ResponseCode.ERROR_INVALID_TOKEN.getCode(), ResponseCode.ERROR_INVALID_TOKEN.getMessage(), null);
+    }
+
+    /**
+     * 지정된 권한을 통과하지 못했을 때
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = AuthenticationCredentialsNotFoundException.class)
+    public ResponseResult handleAuthenticationCredentialsNotFoundException(
+            AuthenticationCredentialsNotFoundException e) {
+        log.error("AuthenticationCredentialsNotFoundException: ", e);
+        return new ResponseResult<>(ResponseCode.ERROR_NO_AUTHORIZED.getCode(), ResponseCode.ERROR_NO_AUTHORIZED.getMessage(), null);
+    }
+
+    /**
+     * 권한 및 토큰 관련 에러
+     *
+     * @return ResponseObject
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = {InvalidTokenException.class})
+    public ResponseResult handleNoAuthorizedException(ApiException e) {
+        log.error("AuthorizedException: ", e);
+        return new ResponseResult<>(e.getCode(), e.getMessage(), null);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = {ExpiredTokenException.class})
+    public ResponseResult handleExpiredTokenException(ExpiredTokenException e) {
+        log.warn("ExpiredTokenException: ", e);
+        return new ResponseResult<>(e.getCode(), e.getMessage(), null);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = {
+            Exception400.class,
+    })
+    public ResponseResult handleException400(ApiException e) {
+        log.error("", e);
+        return new ResponseResult<>(e.getCode(), e.getMessage(), null);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(value = {
+            Exception409.class,
+    })
+    public ResponseResult handleException409(ApiException e) {
+        log.error("", e);
+        return new ResponseResult<>(e.getCode(), e.getMessage(), null);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(value = RuntimeException.class)
+    public ResponseResult handleRuntimeException(RuntimeException e) {
+        log.error("", e);
+
+        return new ResponseResult<>(ERROR_INTERNAL_SERVER.getCode(), ERROR_INTERNAL_SERVER.getMessage(), null);
     }
 }

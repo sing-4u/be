@@ -3,7 +3,7 @@ package com.sing4u.kr.user.service;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
-import com.sing4u.kr.user.reopository.UserRepository;
+import com.sing4u.kr.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -20,7 +20,7 @@ public class UserService {
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
-        User user = User.of(request.getEmail(), request.getNickname(), passwordEncoder.encode(request.getPassword()), request.getAccountType());
+        User user = User.of(request.getEmail(), request.getNickname(), passwordEncoder.encode(request.getPassword()), request.getUserType());
         return UserCreateResponse.from(userRepository.save(user));
     }
 
@@ -39,7 +39,7 @@ public class UserService {
     @Transactional
     public void updateAccountType(Long id, UserUpdateAccountTypeRequest request) {
         User user = getEntityOrThrow(id);
-        user.updateAccountType(request.getAccountType());
+        user.updateAccountType(request.getUserType());
         userRepository.save(user);
     }
 

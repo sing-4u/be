@@ -1,8 +1,10 @@
 package com.sing4u.kr.user.dto.response;
 
 import com.sing4u.kr.user.entity.User;
-import com.sing4u.kr.user.entity.enums.AccountType;
+import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.entity.enums.ActivityPlatformType;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +20,7 @@ public class UserProfileResponse {
     private Long id;
     private String nickname;
     private String email;
-    private AccountType accountType;
+    private UserType userType;
     private String profileImage;
     private String introduction;
     private String mainCoverUrl;
@@ -31,7 +33,7 @@ public class UserProfileResponse {
                 .id(user.getId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
-                .accountType(user.getAccountType())
+                .userType(user.getUserType())
                 .profileImage(user.getProfileImage())
                 .introduction(user.getIntroduction())
                 .mainCoverUrl(user.getMainCoverUrl())
