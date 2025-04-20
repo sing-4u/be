@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDetailResponse {
+public class UserProfileResponse {
     private Long id;
     private String nickname;
     private String email;
@@ -26,8 +26,8 @@ public class UserDetailResponse {
     private ActivityPlatformType activityPlatformType;
     private LocalDateTime updatedAt;
 
-    public static UserDetailResponse from(User user) {
-        return UserDetailResponse.builder()
+    public static UserProfileResponse from(User user) {
+        return UserProfileResponse.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())

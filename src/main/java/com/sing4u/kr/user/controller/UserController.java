@@ -1,10 +1,7 @@
 package com.sing4u.kr.user.controller;
 
-import com.sing4u.kr.user.dto.request.UserCreateRequest;
-import com.sing4u.kr.user.dto.request.UserUpdateRequest;
-import com.sing4u.kr.user.dto.response.UserCreateResponse;
-import com.sing4u.kr.user.dto.response.UserDetailResponse;
-import com.sing4u.kr.user.dto.response.UserListResponse;
+import com.sing4u.kr.user.dto.request.*;
+import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -35,22 +32,28 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDetailResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserProfileResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PutMapping("/{id}/nickname")
-    public ResponseEntity<UserDetailResponse> updateNickname(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
-        return ResponseEntity.ok(userService.updateNickname(id, request));
+    @PutMapping("/{id}/accountType")
+    public ResponseEntity<Void> updateAccountType(@PathVariable Long id, @RequestBody UserUpdateAccountTypeRequest request) {
+        userService.updateAccountType(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<UserProfileResponse> updateProfile(@PathVariable Long id, @RequestBody UserUpdateProfileRequest request) {
+        return ResponseEntity.ok(userService.updateProfile(id, request));
     }
 
     @PutMapping("/{id}/email")
-    public ResponseEntity<UserDetailResponse> updateEmail(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
+    public ResponseEntity<UserUpdateEmailResponse> updateEmail(@PathVariable Long id, @RequestBody UserUpdateEmailRequest request) {
         return ResponseEntity.ok(userService.updateEmail(id, request));
     }
 
     @PutMapping("/{id}/password")
-    public ResponseEntity<UserDetailResponse> updatePassword(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
+    public ResponseEntity<UserUpdatePasswordResponse> updatePassword(@PathVariable Long id, @RequestBody UserUpdatePasswordRequest request) {
         return ResponseEntity.ok(userService.updatePassword(id, request));
     }
 

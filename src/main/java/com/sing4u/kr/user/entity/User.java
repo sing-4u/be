@@ -82,8 +82,17 @@ public class User {
         return this.deletedAt != null;
     }
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
+    public void updateAccountType(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    public void updateProfile(String profileImage, String introduction, String mainCoverUrl,
+                              String activityPlatformUrl, ActivityPlatformType activityPlatformType) {
+        this.profileImage = profileImage;
+        this.introduction = introduction;
+        this.mainCoverUrl = mainCoverUrl;
+        this.activityPlatformUrl = activityPlatformUrl;
+        this.activityPlatformType = activityPlatformType;
     }
 
     public void updateEmail(String email) {
@@ -94,20 +103,7 @@ public class User {
         this.password = password;
     }
 
-    public void updateProfileImage(String profileImage) {
-        this.profileImage = profileImage;
-    }
-
-    public void updateIntroduction(String introduction) {
-        this.introduction = introduction;
-    }
-
-    public void updateMainCoverUrl(String mainCoverUrl) {
-        this.mainCoverUrl = mainCoverUrl;
-    }
-
-    public void updateActivityPlatform(String url, ActivityPlatformType type) {
-        this.activityPlatformUrl = url;
-        this.activityPlatformType = type;
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

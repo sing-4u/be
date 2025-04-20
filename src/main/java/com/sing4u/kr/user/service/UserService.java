@@ -1,10 +1,7 @@
 package com.sing4u.kr.user.service;
 
-import com.sing4u.kr.user.dto.request.UserCreateRequest;
-import com.sing4u.kr.user.dto.request.UserUpdateRequest;
-import com.sing4u.kr.user.dto.response.UserCreateResponse;
-import com.sing4u.kr.user.dto.response.UserDetailResponse;
-import com.sing4u.kr.user.dto.response.UserListResponse;
+import com.sing4u.kr.user.dto.request.*;
+import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.reopository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +10,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -36,41 +31,59 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetailResponse getUserById(Long id) {
+    public UserProfileResponse getUserById(Long id) {
         return userRepository.findById(id)
-                .map(UserDetailResponse::from).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .map(UserProfileResponse::from).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
     @Transactional
-    public UserDetailResponse updateNickname(Long id, UserUpdateRequest request) {
+    public void updateAccountType(Long id, UserUpdateAccountTypeRequest request) {
         User user = getEntityOrThrow(id);
-        user.updateNickname(request.getNickname());
-        return UserDetailResponse.from(user);
+        user.updateAccountType(request.getAccountType());
+        userRepository.save(user);
     }
 
     @Transactional
-    public UserDetailResponse updateEmail(Long id, UserUpdateRequest request) {
+    public UserProfileResponse updateProfile(Long id, UserUpdateProfileRequest request) {
+        User user = getEntityOrThrow(id);
+        user.updateProfile(
+                request.getProfileImage(),
+                request.getIntroduction(),
+                request.getMainCoverUrl(),
+                request.getActivityPlatformUrl(),
+                request.getActivityPlatformType()
+        );
+        userRepository.save(user);
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
+    public UserUpdateEmailResponse updateEmail(Long id, UserUpdateEmailRequest request) {
         User user = getEntityOrThrow(id);
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         user.updateEmail(request.getEmail());
-        return UserDetailResponse.from(user);
+        userRepository.save(user);
+        return UserUpdateEmailResponse.from(user);
     }
 
     @Transactional
-    public UserDetailResponse updatePassword(Long id, UserUpdateRequest request) {
+    public UserUpdatePasswordResponse updatePassword(Long id, UserUpdatePasswordRequest request) {
         User user = getEntityOrThrow(id);
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
-        return UserDetailResponse.from(user);
+        userRepository.save(user);
+        return UserUpdatePasswordResponse.from(user);
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        userRepository.softDeleteById(id, LocalDateTime.now());
+        User user = getEntityOrThrow(id);
+        user.updateDeletedAt();
+        userRepository.save(user);
     }
 
     private User getEntityOrThrow(Long id) {

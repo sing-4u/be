@@ -9,9 +9,5 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 public interface UserRepository extends JpaRepository<User, Long>, UserCustomRepository {
-    @Modifying
-    @Query("UPDATE User u SET u.deletedAt = :deletedAt WHERE u.id = :id")
-    void softDeleteById(@Param("id") Long id, @Param("deletedAt") LocalDateTime deletedAt);
-
 }
 
