@@ -30,6 +30,7 @@ import java.util.Map;
 
 import com.sing4u.kr.common.exception.RestAccessDeniedHandler;
 import com.sing4u.kr.common.exception.RestAuthenticationEntryPoint;
+import com.sing4u.kr.common.properties.EndPointProperties;
 import com.sing4u.kr.jwt.filter.JwtAuthenticationFilter;
 import com.sing4u.kr.jwt.provider.JwtTokenProvider;
 import com.sing4u.kr.user.enums.UserRole;
@@ -43,6 +44,7 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler restAccessDeniedHandler;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EndPointProperties endPointProperties;
 
 //    @Value("${http.cors.allowedOriginPatterns}")
 //    private String allowedOriginPatterns;
@@ -85,7 +87,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/api/v1/health/**").permitAll()
+                        .requestMatchers(endPointProperties.getPublicApiList()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

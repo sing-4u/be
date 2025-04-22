@@ -35,5 +35,5 @@ server:
 
 jwt:
   secret: my-jwt-secret-key-change-this-to-a-very-long-string
-  access-token-validity: 900000
-  refresh-token-validity: 604800000
+  access-token-validity: 900000 # 15min
+  refresh-token-validity: 604800000 # 7days
