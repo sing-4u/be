@@ -6,6 +6,7 @@ import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -22,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseResult<UserCreateResponse> createUser(@RequestBody UserCreateRequest request) {
+    public ResponseResult<UserCreateResponse> createUser(@RequestBody @Valid UserCreateRequest request) {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.createUser(request));
     }
 
@@ -41,26 +42,26 @@ public class UserController {
     }
 
     @PutMapping("/mypage/accountType")
-    public ResponseResult<Void> updateAccountType(@RequestBody UserUpdateAccountTypeRequest request) {
+    public ResponseResult<Void> updateAccountType(@RequestBody @Valid UserUpdateAccountTypeRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         userService.updateAccountType(userId, request);
         return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 
     @PutMapping("/mypage/profile")
-    public ResponseResult<UserProfileResponse> updateProfile(@RequestBody UserUpdateProfileRequest request) {
+    public ResponseResult<UserProfileResponse> updateProfile(@RequestBody @Valid UserUpdateProfileRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateProfile(userId, request));
     }
 
     @PutMapping("/mypage/email")
-    public ResponseResult<UserUpdateEmailResponse> updateEmail(@RequestBody UserUpdateEmailRequest request) {
+    public ResponseResult<UserUpdateEmailResponse> updateEmail(@RequestBody @Valid UserUpdateEmailRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateEmail(userId, request));
     }
 
     @PutMapping("/mypage/password")
-    public ResponseResult<UserUpdatePasswordResponse> updatePassword(@RequestBody UserUpdatePasswordRequest request) {
+    public ResponseResult<UserUpdatePasswordResponse> updatePassword(@RequestBody @Valid UserUpdatePasswordRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updatePassword(userId, request));
     }
