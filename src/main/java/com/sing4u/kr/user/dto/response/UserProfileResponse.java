@@ -2,44 +2,40 @@ package com.sing4u.kr.user.dto.response;
 
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
-import com.sing4u.kr.user.entity.enums.ActivityPlatformType;
-
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.sing4u.kr.user.entity.UserActivityPlatform;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Builder(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserProfileResponse {
-    private Long id;
+    private Long userId;
     private String nickname;
     private String email;
     private UserType userType;
     private String profileImage;
     private String introduction;
     private String mainCoverUrl;
-    private String activityPlatformUrl;
-    private ActivityPlatformType activityPlatformType;
     private LocalDateTime updatedAt;
+    private List<ActivityPlatformResponse> activityPlatforms;
 
-    public static UserProfileResponse from(User user) {
+    public static UserProfileResponse from(User user, List<UserActivityPlatform> platforms) {
         return UserProfileResponse.builder()
-                .id(user.getId())
+                .userId(user.getUserId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .userType(user.getUserType())
                 .profileImage(user.getProfileImage())
                 .introduction(user.getIntroduction())
                 .mainCoverUrl(user.getMainCoverUrl())
-                .activityPlatformUrl(user.getActivityPlatformUrl())
-                .activityPlatformType(user.getActivityPlatformType())
                 .updatedAt(user.getUpdatedAt())
+                .activityPlatforms(platforms.stream()
+                        .map(ActivityPlatformResponse::from)
+                        .toList())
                 .build();
     }
 }

@@ -2,19 +2,16 @@ package com.sing4u.kr.user.dto.response;
 
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Builder(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserCreateResponse {
-    private Long id;
+    private Long userId;
     private String email;
     private String nickname;
     private UserType userType;
@@ -22,7 +19,7 @@ public class UserCreateResponse {
 
     public static UserCreateResponse from(User user) {
         return UserCreateResponse.builder()
-                .id(user.getId())
+                .userId(user.getUserId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .userType(user.getUserType())

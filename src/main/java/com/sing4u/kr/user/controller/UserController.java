@@ -1,5 +1,8 @@
 package com.sing4u.kr.user.controller;
 
+import com.sing4u.kr.application.utils.SecurityContextUtils;
+import com.sing4u.kr.common.dto.ResponseResult;
+import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.service.UserService;
@@ -18,48 +21,54 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserCreateResponse> createUser(@RequestBody UserCreateRequest request) {
-        return ResponseEntity.ok(userService.createUser(request));
+    @PostMapping("/register")
+    public ResponseResult<UserCreateResponse> createUser(@RequestBody UserCreateRequest request) {
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.createUser(request));
     }
 
     @GetMapping
-    public ResponseEntity<Slice<UserListResponse>> getAllUsers(
+    public ResponseResult<Slice<UserListResponse>> getAllUsers(
             @RequestParam(defaultValue = "") String keyword,
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(userService.getUserListSearch(keyword, pageable));
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserListSearch(keyword, pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserProfileResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    @GetMapping("/mypage")
+    public ResponseResult<UserProfileResponse> getUserById() {
+        Long userId = SecurityContextUtils.getAccountId();
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserById(userId));
     }
 
-    @PutMapping("/{id}/accountType")
-    public ResponseEntity<Void> updateAccountType(@PathVariable Long id, @RequestBody UserUpdateAccountTypeRequest request) {
-        userService.updateAccountType(id, request);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/mypage/accountType")
+    public ResponseResult<Void> updateAccountType(@RequestBody UserUpdateAccountTypeRequest request) {
+        Long userId = SecurityContextUtils.getAccountId();
+        userService.updateAccountType(userId, request);
+        return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 
-    @PutMapping("/{id}/profile")
-    public ResponseEntity<UserProfileResponse> updateProfile(@PathVariable Long id, @RequestBody UserUpdateProfileRequest request) {
-        return ResponseEntity.ok(userService.updateProfile(id, request));
+    @PutMapping("/mypage/profile")
+    public ResponseResult<UserProfileResponse> updateProfile(@RequestBody UserUpdateProfileRequest request) {
+        Long userId = SecurityContextUtils.getAccountId();
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateProfile(userId, request));
     }
 
-    @PutMapping("/{id}/email")
-    public ResponseEntity<UserUpdateEmailResponse> updateEmail(@PathVariable Long id, @RequestBody UserUpdateEmailRequest request) {
-        return ResponseEntity.ok(userService.updateEmail(id, request));
+    @PutMapping("/mypage/email")
+    public ResponseResult<UserUpdateEmailResponse> updateEmail(@RequestBody UserUpdateEmailRequest request) {
+        Long userId = SecurityContextUtils.getAccountId();
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateEmail(userId, request));
     }
 
-    @PutMapping("/{id}/password")
-    public ResponseEntity<UserUpdatePasswordResponse> updatePassword(@PathVariable Long id, @RequestBody UserUpdatePasswordRequest request) {
-        return ResponseEntity.ok(userService.updatePassword(id, request));
+    @PutMapping("/mypage/password")
+    public ResponseResult<UserUpdatePasswordResponse> updatePassword(@RequestBody UserUpdatePasswordRequest request) {
+        Long userId = SecurityContextUtils.getAccountId();
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updatePassword(userId, request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/mypage")
+    public ResponseResult<Void> deleteUser() {
+        Long userId = SecurityContextUtils.getAccountId();
+        userService.deleteUser(userId);
+        return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 }
