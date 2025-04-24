@@ -24,7 +24,7 @@ public class UserProfileResponse {
 
     public static UserProfileResponse from(User user) {
         return UserProfileResponse.builder()
-                .userId(user.getId())
+                .userId(user.getUserId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .userType(user.getUserType())
