@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -27,7 +27,7 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.createUser(request));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseResult<Slice<UserListResponse>> getAllUsers(
             @RequestParam(defaultValue = "") String keyword,
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
@@ -35,38 +35,38 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserListSearch(keyword, pageable));
     }
 
-    @GetMapping("/mypage")
+    @GetMapping("/me")
     public ResponseResult<UserProfileResponse> getUserById() {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserById(userId));
     }
 
-    @PutMapping("/mypage/accountType")
+    @PutMapping("/me/accountType")
     public ResponseResult<Void> updateAccountType(@RequestBody @Valid UserUpdateAccountTypeRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         userService.updateAccountType(userId, request);
         return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 
-    @PutMapping("/mypage/profile")
+    @PutMapping("/me/profile")
     public ResponseResult<UserProfileResponse> updateProfile(@RequestBody @Valid UserUpdateProfileRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateProfile(userId, request));
     }
 
-    @PutMapping("/mypage/email")
+    @PutMapping("/me/email")
     public ResponseResult<UserUpdateEmailResponse> updateEmail(@RequestBody @Valid UserUpdateEmailRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateEmail(userId, request));
     }
 
-    @PutMapping("/mypage/password")
+    @PutMapping("/me/password")
     public ResponseResult<UserUpdatePasswordResponse> updatePassword(@RequestBody @Valid UserUpdatePasswordRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updatePassword(userId, request));
     }
 
-    @DeleteMapping("/mypage")
+    @DeleteMapping("/")
     public ResponseResult<Void> deleteUser() {
         Long userId = SecurityContextUtils.getAccountId();
         userService.deleteUser(userId);

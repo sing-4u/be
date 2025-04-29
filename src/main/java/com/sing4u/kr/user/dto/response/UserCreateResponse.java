@@ -19,7 +19,7 @@ public class UserCreateResponse {
 
     public static UserCreateResponse from(User user) {
         return UserCreateResponse.builder()
-                .userId(user.getUserId())
+                .userId(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .userType(user.getUserType())

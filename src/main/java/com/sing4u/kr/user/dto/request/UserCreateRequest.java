@@ -3,6 +3,7 @@ package com.sing4u.kr.user.dto.request;
 import com.sing4u.kr.user.entity.enums.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,6 @@ public class UserCreateRequest {
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
-    @NotBlank(message = "계정 유형은 필수입니다.")
+    @NotNull(message = "계정 유형은 필수입니다.")
     private UserType userType;
 }

@@ -34,7 +34,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         List<User> content = queryFactory
                 .selectFrom(user)
                 .where(builder)
-                .orderBy(user.userId.desc())
+                .orderBy(user.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();

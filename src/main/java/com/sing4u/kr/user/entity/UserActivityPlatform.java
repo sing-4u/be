@@ -13,7 +13,7 @@ public class UserActivityPlatform {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long platformId;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "activity_platform_type", length = 20, nullable = false)

@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +44,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserProfileResponse getUserById(Long id) {
         User user = getEntityOrThrow(id);
-        List<UserActivityPlatform> platforms = userActivityPlatformRepository.findAllByUserId(user.getUserId());
+        List<UserActivityPlatform> platforms = userActivityPlatformRepository.findAllByUserId(user.getId());
         return UserProfileResponse.from(user, platforms);
     }
 
@@ -59,13 +63,29 @@ public class UserService {
                 request.getIntroduction(),
                 request.getMainCoverUrl()
         );
-        List<UserActivityPlatform> platforms = request.getActivityPlatforms().stream()
-                .map(p -> UserActivityPlatform.of(p.getPlatformType(), p.getPlatformUrl(), user.getUserId()))
+        List<UserActivityPlatform> existingPlatforms = userActivityPlatformRepository.findAllByUserId(id);
+        Map<String, UserActivityPlatform> existingMap = existingPlatforms.stream()
+                .collect(Collectors.toMap(UserActivityPlatform::getActivityPlatformUrl, Function.identity()));
+        List<UserActivityPlatform> finalPlatforms = request.getActivityPlatforms().stream()
+                .map(p -> {
+                    String url = p.getPlatformUrl();
+                    return existingMap.containsKey(url)
+                            ? existingMap.get(url)
+                            : UserActivityPlatform.of(p.getPlatformType(), url, user.getId());
+                })
                 .toList();
-        userActivityPlatformRepository.deleteByUserId(id);
-        userActivityPlatformRepository.saveAll(platforms);
+        Set<String> requestUrls = request.getActivityPlatforms().stream()
+                .map(ActivityPlatformRequest::getPlatformUrl)
+                .collect(Collectors.toSet());
+        List<UserActivityPlatform> toDelete = existingPlatforms.stream()
+                .filter(platform -> !requestUrls.contains(platform.getActivityPlatformUrl()))
+                .toList();
+        if (!toDelete.isEmpty()) {
+            userActivityPlatformRepository.deleteAll(toDelete);
+        }
+        userActivityPlatformRepository.saveAll(finalPlatforms);
         userRepository.save(user);
-        return UserProfileResponse.from(user, platforms);
+        return UserProfileResponse.from(user, finalPlatforms);
     }
 
     @Transactional

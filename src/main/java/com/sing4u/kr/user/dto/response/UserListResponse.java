@@ -14,7 +14,7 @@ public class UserListResponse {
 
     public static UserListResponse from(User user) {
         return UserListResponse.builder()
-                .userId(user.getUserId())
+                .userId(user.getId())
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
                 .build();

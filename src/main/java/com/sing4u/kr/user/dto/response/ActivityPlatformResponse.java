@@ -13,6 +13,9 @@ public class ActivityPlatformResponse {
     private String platformUrl;
 
     public static ActivityPlatformResponse from(UserActivityPlatform platform) {
-        return new ActivityPlatformResponse(platform.getActivityPlatformType(), platform.getActivityPlatformUrl());
+        return ActivityPlatformResponse.builder()
+                .platformType(platform.getActivityPlatformType())
+                .platformUrl(platform.getActivityPlatformUrl())
+                .build();
     }
 }

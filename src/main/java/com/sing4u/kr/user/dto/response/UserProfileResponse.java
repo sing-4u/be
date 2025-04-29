@@ -25,7 +25,7 @@ public class UserProfileResponse {
 
     public static UserProfileResponse from(User user, List<UserActivityPlatform> platforms) {
         return UserProfileResponse.builder()
-                .userId(user.getUserId())
+                .userId(user.getId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .userType(user.getUserType())
