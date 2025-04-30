@@ -37,3 +37,10 @@ endpoints:
     - /webjars/**
     - /v3/api-docs
 
+
+sing4u:
+  server-url: https://api-dev.sing4u.com
+
+springdoc:
+  swagger-ui:
+    enabled: true

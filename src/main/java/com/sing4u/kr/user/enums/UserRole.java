@@ -32,6 +32,19 @@ public enum UserRole {
         }
     }
 
+    public static UserRole getMainAccountRoleFromString(List<String> roleList) {
+        for(String role : roleList) {
+            if (role.equals(UserRole.ADMIN.toString())) {
+                return UserRole.ADMIN;
+            } else if (role.equals(UserRole.ARTIST.toString())) {
+                return UserRole.ARTIST;
+            } else if (role.equals(UserRole.USER.toString())) {
+                return UserRole.USER;
+            }
+        }
+        return UserRole.USER;
+    }
+
     public static Map<String, UserRole> getUserRoleStringMap() {
         return Stream.of(UserRole.values())
                 .collect(Collectors.toMap(UserRole::toString, role -> role));
