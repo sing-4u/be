@@ -38,3 +38,10 @@ endpoints:
     - /v3/api-docs
     - /api/v1/users/register
 
+
+sing4u:
+  server-url: https://api-dev.sing4u.com
+
+springdoc:
+  swagger-ui:
+    enabled: true

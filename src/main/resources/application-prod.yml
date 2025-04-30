@@ -17,9 +17,24 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
+          lob:
+            non_contextual_creation: true
+        default_batch_fetch_size: 100
+    show-sql: true
+    open-in-view: false
 
 server:
   servlet:
     encoding:
       force-response: true
       charset: UTF-8
+
+sing4u:
+  server-url: https://api.sing4u.com
+
+springdoc:
+  swagger-ui:
+    enabled: false
