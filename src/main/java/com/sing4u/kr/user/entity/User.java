@@ -3,6 +3,9 @@ package com.sing4u.kr.user.entity;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.entity.enums.ActivityPlatformType;
 import com.sing4u.kr.user.entity.enums.SocialType;
+import com.sing4u.kr.user.enums.UserRole;
+
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -57,6 +60,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "activity_platform_type", length = 20)
     private ActivityPlatformType activityPlatformType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private UserRole role;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

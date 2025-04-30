@@ -35,5 +35,14 @@ endpoints:
     - /swagger-ui.html
     - /swagger-ui.html/**
     - /webjars/**
-    - /v3/api-docs
+    - /v3/api-docs/**
+    - /api/v1/swagger/auth
+
+sing4u:
+  server-url: http://localhost:8080
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
 
