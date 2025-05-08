@@ -79,8 +79,9 @@ public class User {
         this.userType = userType;
     }
 
-    public void updateProfile(String profileImage, String introduction, String mainCoverUrl) {
+    public void updateProfile(String profileImage, String nickname, String introduction, String mainCoverUrl) {
         this.profileImage = profileImage;
+        this.nickname = nickname;
         this.introduction = introduction;
         this.mainCoverUrl = mainCoverUrl;
     }

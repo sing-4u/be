@@ -15,6 +15,5 @@ public class UserUpdateProfileRequest {
     private String nickname;
     private String introduction;
     private String mainCoverUrl;
-    private String activityPlatformUrl;
     private List<ActivityPlatformRequest> activityPlatforms;
 }

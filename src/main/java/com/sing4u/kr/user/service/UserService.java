@@ -31,7 +31,7 @@ public class UserService {
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
-        User user = User.of(request.getEmail(), request.getNickname(), passwordEncoder.encode(request.getPassword()), request.getUserType());
+        User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
         return UserCreateResponse.from(userRepository.save(user));
     }
 
@@ -60,32 +60,31 @@ public class UserService {
         User user = getEntityOrThrow(id);
         user.updateProfile(
                 request.getProfileImage(),
+                request.getNickname(),
                 request.getIntroduction(),
                 request.getMainCoverUrl()
         );
-        List<UserActivityPlatform> existingPlatforms = userActivityPlatformRepository.findAllByUserId(id);
-        Map<String, UserActivityPlatform> existingMap = existingPlatforms.stream()
+        List<UserActivityPlatform> existingPlatformList = userActivityPlatformRepository.findAllByUserId(id);
+        Map<String, UserActivityPlatform> existingPlatformMap = existingPlatformList.stream()
                 .collect(Collectors.toMap(UserActivityPlatform::getActivityPlatformUrl, Function.identity()));
-        List<UserActivityPlatform> finalPlatforms = request.getActivityPlatforms().stream()
-                .map(p -> {
-                    String url = p.getPlatformUrl();
-                    return existingMap.containsKey(url)
-                            ? existingMap.get(url)
-                            : UserActivityPlatform.of(p.getPlatformType(), url, user.getId());
-                })
+        List<UserActivityPlatform> platformsToSave = request.getActivityPlatforms().stream()
+                .map(requestPlatform -> existingPlatformMap.getOrDefault(
+                        requestPlatform.getPlatformUrl(),
+                        UserActivityPlatform.of(requestPlatform.getPlatformType(), requestPlatform.getPlatformUrl(), user.getId())
+                ))
                 .toList();
-        Set<String> requestUrls = request.getActivityPlatforms().stream()
+        Set<String> requestedPlatformUrls = request.getActivityPlatforms().stream()
                 .map(ActivityPlatformRequest::getPlatformUrl)
                 .collect(Collectors.toSet());
-        List<UserActivityPlatform> toDelete = existingPlatforms.stream()
-                .filter(platform -> !requestUrls.contains(platform.getActivityPlatformUrl()))
+        List<UserActivityPlatform> platformsToDelete = existingPlatformList.stream()
+                .filter(existing -> !requestedPlatformUrls.contains(existing.getActivityPlatformUrl()))
                 .toList();
-        if (!toDelete.isEmpty()) {
-            userActivityPlatformRepository.deleteAll(toDelete);
+        if (!platformsToDelete.isEmpty()) {
+            userActivityPlatformRepository.deleteAll(platformsToDelete);
         }
-        userActivityPlatformRepository.saveAll(finalPlatforms);
+        userActivityPlatformRepository.saveAll(platformsToSave);
         userRepository.save(user);
-        return UserProfileResponse.from(user, finalPlatforms);
+        return UserProfileResponse.from(user, platformsToSave);
     }
 
     @Transactional
