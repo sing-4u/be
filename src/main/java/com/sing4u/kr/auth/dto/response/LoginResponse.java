@@ -7,4 +7,5 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginResponse {
     private String accessToken;
+    private String profileImage;
 }

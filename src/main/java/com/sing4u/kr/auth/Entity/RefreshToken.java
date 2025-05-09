@@ -28,7 +28,7 @@ public class RefreshToken {
 
     @CreationTimestamp
     @Column(nullable = false)
-    private LocalDateTime issuedAt;
+    private LocalDateTime createdAt;
 
     public static RefreshToken of(Long userId, String token) {
         return RefreshToken.builder()
