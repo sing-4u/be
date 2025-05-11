@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -32,11 +33,11 @@ public class AuthService {
 
     @Transactional
     public LoginDto emailLogin(LoginRequest request) {
-        User user = userRepository.findByEmailDeletedAtisNull(request.getEmail())
-                .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
+        User user = userRepository.findByEmailAndDeletedAtIsNull(request.getEmail())
+                .orElseThrow(() -> new Exception400(ResponseCode.ERROR_USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new Exception400("비밀번호가 일치하지 않습니다.", ResponseCode.ERROR_WRONG_PARAMETERS);
+            throw new Exception400(ResponseCode.ERROR_WRONG_PARAMETERS);
         }
 
         String accessToken = jwtTokenProvider.generateAccessToken(
@@ -58,7 +59,7 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenDto recreate(String refreshToken) {
+    public TokenDto refresh(String refreshToken) {
         JwtToken jwt;
         try {
             jwt = jwtTokenProvider.getAllClaimsFromToken(refreshToken);
@@ -70,7 +71,7 @@ public class AuthService {
                 .orElseThrow(InvalidTokenException::new);
 
         String newRefreshToken = refreshToken;
-        if (jwtTokenProvider.isTokenExpired(refreshToken)) {
+        if (jwt.getExpiredAt().before(new Date())) {
             newRefreshToken = jwtTokenProvider.generateRefreshToken(
                     jwt.getUserId(),
                     jwt.getRoles(),

@@ -6,6 +6,7 @@ import com.sing4u.kr.auth.dto.response.LoginResponse;
 import com.sing4u.kr.auth.dto.response.TokenDto;
 import com.sing4u.kr.auth.dto.response.TokenResponse;
 import com.sing4u.kr.auth.service.AuthService;
+import com.sing4u.kr.auth.utils.CookieUtils;
 import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.jwt.exceptions.InvalidTokenException;
@@ -28,65 +29,23 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @Value("${cookie.refresh-name}")
-    private String refreshCookieName;
-
-    @Value("${cookie.refresh-path}")
-    private String refreshPath;
-
-    @Value("${cookie.refresh-http-only}")
-    private boolean refreshHttpOnly;
-
-    @Value("${cookie.refresh-secure}")
-    private boolean refreshSecure;
-
-    @Value("${cookie.refresh-same-site}")
-    private String refreshSameSite;
-
-    @Value("${cookie.refresh-max-age-days}")
-    private int refreshMaxAgeDays;
-
     private final AuthService authService;
 
     @PostMapping("/login/email")
     public ResponseResult<LoginResponse> emailLogin(@RequestBody LoginRequest request,
                                                     HttpServletResponse response) {
         LoginDto dto = authService.emailLogin(request);
-        setRefreshTokenCookie(response, dto.getRefreshToken());
+        CookieUtils.setRefreshTokenCookie(response, dto.getRefreshToken());
 
         return new ResponseResult<>(ResponseCode.SUCCESS, LoginResponse.of(dto.getAccessToken(), dto.getProfileImage()));
     }
 
-    @PostMapping("/recreate")
-    public ResponseResult<TokenResponse> recreate(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = extractRefreshTokenFromCookie(request);
-        TokenDto dto = authService.recreate(refreshToken);
-        setRefreshTokenCookie(response, dto.getRefreshToken());
+    @PostMapping("/refresh")
+    public ResponseResult<TokenResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.extractRefreshTokenFromCookie(request);
+        TokenDto dto = authService.refresh(refreshToken);
+        CookieUtils.setRefreshTokenCookie(response, dto.getRefreshToken());
         return new ResponseResult<>(ResponseCode.SUCCESS, TokenResponse.of(dto.getAccessToken(), dto.getRefreshToken()));
-    }
-
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (refreshCookieName.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        throw new InvalidTokenException();
-    }
-
-    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        ResponseCookie cookie = ResponseCookie.from(refreshCookieName, refreshToken)
-                .httpOnly(refreshHttpOnly)
-                .secure(refreshSecure)
-                .sameSite(refreshSameSite)
-                .path(refreshPath)
-                .maxAge(Duration.ofDays(refreshMaxAgeDays))
-                .build();
-
-        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
 }

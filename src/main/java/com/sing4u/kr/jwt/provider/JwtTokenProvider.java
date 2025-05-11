@@ -135,34 +135,6 @@ public class JwtTokenProvider {
         return createToken(expirationDate, claims);
     }
 
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            log.warn("Invalid JWT: {}", e.getMessage());
-            return false;
-        }
-    }
-
-    public Date getExpiration(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
-    }
-
     private static String getUserName(List<UserRole> accountRoles, Long accountId) {
         UserRole role = UserRole.getMainAccountRole(accountRoles);
 
