@@ -37,3 +37,11 @@ jwt:
   secret: my-jwt-secret-key-change-this-to-a-very-long-string
   access-token-validity: 900000 # 15min
   refresh-token-validity: 604800000 # 7days
+
+cookie:
+  refresh-name: refreshToken
+  refresh-path: /api/v1/auth/recreate
+  refresh-http-only: true
+  refresh-secure: true
+  refresh-same-site: None
+  refresh-max-age-days: 7
