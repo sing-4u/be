@@ -1,9 +1,11 @@
 package com.sing4u.kr.auth.utils;
 
+import com.sing4u.kr.auth.properties.CookieProperties;
 import com.sing4u.kr.jwt.exceptions.InvalidTokenException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -14,29 +16,13 @@ import java.time.Duration;
 @UtilityClass
 public class CookieUtils {
 
-    @Value("${cookie.refresh-name}")
-    private String refreshCookieName;
-
-    @Value("${cookie.refresh-path}")
-    private String refreshPath;
-
-    @Value("${cookie.refresh-http-only}")
-    private boolean refreshHttpOnly;
-
-    @Value("${cookie.refresh-secure}")
-    private boolean refreshSecure;
-
-    @Value("${cookie.refresh-same-site}")
-    private String refreshSameSite;
-
-    @Value("${cookie.refresh-max-age-days}")
-    private int refreshMaxAgeDays;
+    static CookieProperties cookieProperties;
 
     public static String extractRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (refreshCookieName.equals(cookie.getName())) {
+                if (cookieProperties.getRefreshName().equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
@@ -45,12 +31,12 @@ public class CookieUtils {
     }
 
     public static void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        ResponseCookie cookie = ResponseCookie.from(refreshCookieName, refreshToken)
-                .httpOnly(refreshHttpOnly)
-                .secure(refreshSecure)
-                .sameSite(refreshSameSite)
-                .path(refreshPath)
-                .maxAge(Duration.ofDays(refreshMaxAgeDays))
+        ResponseCookie cookie = ResponseCookie.from(cookieProperties.getRefreshName(), refreshToken)
+                .httpOnly(cookieProperties.isRefreshHttpOnly())
+                .secure(cookieProperties.isRefreshSecure())
+                .sameSite(cookieProperties.getRefreshSameSite())
+                .path(cookieProperties.getRefreshPath())
+                .maxAge(Duration.ofDays(cookieProperties.getRefreshMaxAgeDays()))
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
