@@ -7,7 +7,7 @@ import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.UserActivityPlatform;
-import com.sing4u.kr.user.reopository.UserActivityPlatformRepository;
+import com.sing4u.kr.user.repository.UserActivityPlatformRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -44,8 +44,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserProfileResponse getUserById(Long id) {
         User user = getEntityOrThrow(id);
-        List<UserActivityPlatform> platforms = userActivityPlatformRepository.findAllByUserId(user.getId());
-        return UserProfileResponse.from(user, platforms);
+        return UserProfileResponse.from(user);
     }
 
     @Transactional
@@ -64,13 +63,25 @@ public class UserService {
                 request.getIntroduction(),
                 request.getMainCoverUrl()
         );
+        userRepository.save(user);
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
+    public UserActivityPlatformResponse getActivityPlatform(Long id) {
+        List<UserActivityPlatform> platforms = userActivityPlatformRepository.findAllByUserId(id);
+        return UserActivityPlatformResponse.from(platforms);
+    }
+
+    @Transactional
+    public UserActivityPlatformResponse updateActivityPlatform(Long id, UserUpdateActivityPlatformRequest request) {
         List<UserActivityPlatform> existingPlatformList = userActivityPlatformRepository.findAllByUserId(id);
         Map<String, UserActivityPlatform> existingPlatformMap = existingPlatformList.stream()
                 .collect(Collectors.toMap(UserActivityPlatform::getActivityPlatformUrl, Function.identity()));
         List<UserActivityPlatform> platformsToSave = request.getActivityPlatforms().stream()
                 .map(requestPlatform -> existingPlatformMap.getOrDefault(
                         requestPlatform.getPlatformUrl(),
-                        UserActivityPlatform.of(requestPlatform.getPlatformType(), requestPlatform.getPlatformUrl(), user.getId())
+                        UserActivityPlatform.of(requestPlatform.getPlatformType(), requestPlatform.getPlatformUrl(), id)
                 ))
                 .toList();
         Set<String> requestedPlatformUrls = request.getActivityPlatforms().stream()
@@ -83,8 +94,7 @@ public class UserService {
             userActivityPlatformRepository.deleteAll(platformsToDelete);
         }
         userActivityPlatformRepository.saveAll(platformsToSave);
-        userRepository.save(user);
-        return UserProfileResponse.from(user, platformsToSave);
+        return UserActivityPlatformResponse.from(platformsToSave);
     }
 
     @Transactional

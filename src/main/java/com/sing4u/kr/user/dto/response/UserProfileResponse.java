@@ -21,9 +21,8 @@ public class UserProfileResponse {
     private String introduction;
     private String mainCoverUrl;
     private LocalDateTime updatedAt;
-    private List<ActivityPlatformResponse> activityPlatforms;
 
-    public static UserProfileResponse from(User user, List<UserActivityPlatform> platforms) {
+    public static UserProfileResponse from(User user) {
         return UserProfileResponse.builder()
                 .userId(user.getId())
                 .nickname(user.getNickname())
@@ -33,9 +32,6 @@ public class UserProfileResponse {
                 .introduction(user.getIntroduction())
                 .mainCoverUrl(user.getMainCoverUrl())
                 .updatedAt(user.getUpdatedAt())
-                .activityPlatforms(platforms.stream()
-                        .map(ActivityPlatformResponse::from)
-                        .toList())
                 .build();
     }
 }

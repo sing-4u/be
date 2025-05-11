@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,7 +40,7 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserById(userId));
     }
 
-    @PutMapping("/me/accountType")
+    @PutMapping("/me/account-type")
     public ResponseResult<Void> updateAccountType(@RequestBody @Valid UserUpdateAccountTypeRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         userService.updateAccountType(userId, request);
@@ -52,6 +51,18 @@ public class UserController {
     public ResponseResult<UserProfileResponse> updateProfile(@RequestBody @Valid UserUpdateProfileRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateProfile(userId, request));
+    }
+
+    @GetMapping("/me/activity-platform")
+    public ResponseResult<UserActivityPlatformResponse> getActivityPlatform() {
+        Long userId = SecurityContextUtils.getAccountId();
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getActivityPlatform(userId));
+    }
+
+    @PutMapping("/me/activity-platform")
+    public ResponseResult<UserActivityPlatformResponse> updateActivityPlatform(@RequestBody @Valid UserUpdateActivityPlatformRequest request) {
+        Long userId = SecurityContextUtils.getAccountId();
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateActivityPlatform(userId, request));
     }
 
     @PutMapping("/me/email")
