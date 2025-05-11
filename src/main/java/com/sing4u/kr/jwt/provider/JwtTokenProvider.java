@@ -121,46 +121,33 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateRefreshToken(String email) {
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
+    public String generateRefreshToken(Long accountId,
+                                      List<UserRole> roles,
+                                      String nickName,
+                                      UserType userType) {
+        ZonedDateTime now = ZonedDateTime.now();
 
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
+        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName, userType);
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            log.warn("Invalid JWT: {}", e.getMessage());
-            return false;
-        }
-    }
+        ZonedDateTime expiration = now.plusSeconds(refreshTokenValidity);
+        Date expirationDate = Date.from(expiration.toInstant());
 
-    public Date getExpiration(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
+        return createToken(expirationDate, claims);
     }
 
     private static String getUserName(List<UserRole> accountRoles, Long accountId) {
         UserRole role = UserRole.getMainAccountRole(accountRoles);
 
         return String.format("%s_%s", role, accountId);
+    }
+
+    public boolean isTokenExpired(String token) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        return expiration.before(new Date());
     }
 }

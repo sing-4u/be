@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, UserCustomRepository {
     Optional<User> findByIdAndDeletedAtIsNull(Long id);
+    Optional<User> findByEmailAndDeletedAtIsNull(String email);
 }
 
