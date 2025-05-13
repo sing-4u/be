@@ -54,12 +54,9 @@ public class User {
     @Column(name = "main_cover_url", length = 255)
     private String mainCoverUrl;
 
-    @Column(name = "activity_platform_url", length = 255)
-    private String activityPlatformUrl;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "activity_platform_type", length = 20)
-    private ActivityPlatformType activityPlatformType;
+    @Column(name = "role")
+    private UserRole role;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -93,13 +90,11 @@ public class User {
         this.userType = userType;
     }
 
-    public void updateProfile(String profileImage, String introduction, String mainCoverUrl,
-                              String activityPlatformUrl, ActivityPlatformType activityPlatformType) {
+    public void updateProfile(String profileImage, String nickname, String introduction, String mainCoverUrl) {
         this.profileImage = profileImage;
+        this.nickname = nickname;
         this.introduction = introduction;
         this.mainCoverUrl = mainCoverUrl;
-        this.activityPlatformUrl = activityPlatformUrl;
-        this.activityPlatformType = activityPlatformType;
     }
 
     public void updateEmail(String email) {
@@ -110,7 +105,7 @@ public class User {
         this.password = password;
     }
 
-    public void updateDeletedAt() {
+    public void delete() {
         this.deletedAt = LocalDateTime.now();
     }
 }

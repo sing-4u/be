@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,5 @@ public class UserUpdateProfileRequest {
     private String nickname;
     private String introduction;
     private String mainCoverUrl;
-    private String activityPlatformUrl;
-    private ActivityPlatformType activityPlatformType;
+    private List<ActivityPlatformRequest> activityPlatforms;
 }

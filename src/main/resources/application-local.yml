@@ -35,6 +35,7 @@ endpoints:
     - /swagger-ui.html
     - /swagger-ui.html/**
     - /webjars/**
+    - /api/v1/users/register
     - /v3/api-docs/**
     - /api/v1/swagger/auth
 
