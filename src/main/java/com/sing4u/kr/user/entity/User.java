@@ -58,10 +58,6 @@ public class User {
     @Column(name = "role")
     private UserRole role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private UserRole role;
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
