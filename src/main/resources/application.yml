@@ -12,6 +12,9 @@ spring:
       max-file-size: 120MB
       max-request-size: 150MB
   shutdown: graceful
+  config:
+    import:
+      - 'aws-parameterstore:/config/api/application_${spring.profiles.active}/'
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

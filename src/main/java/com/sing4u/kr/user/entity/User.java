@@ -104,4 +104,8 @@ public class User {
     public void delete() {
         this.deletedAt = LocalDateTime.now();
     }
+
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 }

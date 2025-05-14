@@ -6,13 +6,17 @@ import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.service.UserService;
+
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -83,4 +87,12 @@ public class UserController {
         userService.deleteUser(userId);
         return new ResponseResult<>(ResponseCode.SUCCESS);
     }
+
+    @PutMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseResult<UserUpdateProfileImageResponse> updateProfileImage(@RequestPart MultipartFile profileImage) {
+        Long userId = SecurityContextUtils.getAccountId();
+
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateUserProfileImage(userId, profileImage));
+    }
+
 }
