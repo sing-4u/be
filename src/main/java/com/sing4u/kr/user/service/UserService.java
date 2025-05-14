@@ -2,6 +2,7 @@ package com.sing4u.kr.user.service;
 
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
+import com.sing4u.kr.home.dto.request.HomeRequest;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
@@ -29,16 +30,17 @@ public class UserService {
     private final UserActivityPlatformRepository userActivityPlatformRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
+    public List<UserListResponse> getArtistList(HomeRequest request) {
+        int offset = request.getPage() * request.getPageSize();
+        List<User> userList = userRepository.findArtistsWithKeywordAndRandomOrder(request.getKeyword(), request.getSeed(), offset, request.getPageSize());
+        return UserListResponse.fromList(userList);
+    }
+
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
         User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
         return UserCreateResponse.from(userRepository.save(user));
-    }
-
-    @Transactional(readOnly = true)
-    public Slice<UserListResponse> getUserListSearch(String keyword, Pageable pageable) {
-        return userRepository.searchByNickname(keyword, pageable)
-                .map(UserListResponse::from);
     }
 
     @Transactional(readOnly = true)

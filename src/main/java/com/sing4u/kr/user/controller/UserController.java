@@ -26,14 +26,6 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.createUser(request));
     }
 
-    @GetMapping("/")
-    public ResponseResult<Slice<UserListResponse>> getAllUsers(
-            @RequestParam(defaultValue = "") String keyword,
-            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserListSearch(keyword, pageable));
-    }
-
     @GetMapping("/me")
     public ResponseResult<UserProfileResponse> getUserById() {
         Long userId = SecurityContextUtils.getAccountId();

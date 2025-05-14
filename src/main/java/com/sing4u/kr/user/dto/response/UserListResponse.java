@@ -3,6 +3,8 @@ package com.sing4u.kr.user.dto.response;
 import com.sing4u.kr.user.entity.User;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Builder(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -11,12 +13,20 @@ public class UserListResponse {
     private Long userId;
     private String nickname;
     private String profileImage;
+    private boolean isOpened;
 
     public static UserListResponse from(User user) {
         return UserListResponse.builder()
                 .userId(user.getId())
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
+                .isOpened(user.isOpened())
                 .build();
+    }
+
+    public static List<UserListResponse> fromList(List<User> users) {
+        return users.stream()
+                .map(UserListResponse::from)
+                .toList();
     }
 }

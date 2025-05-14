@@ -69,12 +69,16 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "is_opened", nullable = false)
+    private boolean isOpened;
+
     public static User of(String nickname, String email, String password, UserType userType) {
         return User.builder()
                 .nickname(nickname)
                 .email(email)
                 .password(password)
                 .userType(userType)
+                .isOpened(false)
                 .build();
     }
 
