@@ -27,6 +27,10 @@ spring:
   profiles:
     active: local
 
+  cache:
+    ehcache:
+      config: classpath:ehcache.xml
+
 server:
   servlet:
     encoding:

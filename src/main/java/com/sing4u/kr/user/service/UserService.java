@@ -10,6 +10,7 @@ import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.UserActivityPlatform;
 import com.sing4u.kr.user.repository.UserActivityPlatformRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +30,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserActivityPlatformRepository userActivityPlatformRepository;
     private final PasswordEncoder passwordEncoder;
-
+    @Cacheable(
+            value = "homeArtists",
+            key = "'page=' + #page + ',seed=' + #seed",
+            condition = "#keyword == null")
     @Transactional(readOnly = true)
     public List<UserListResponse> getArtistList(HomeRequest request) {
         int offset = request.getPage() * request.getPageSize();

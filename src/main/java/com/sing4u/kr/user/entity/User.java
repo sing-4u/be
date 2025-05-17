@@ -1,7 +1,6 @@
 package com.sing4u.kr.user.entity;
 
 import com.sing4u.kr.user.entity.enums.UserType;
-import com.sing4u.kr.user.entity.enums.ActivityPlatformType;
 import com.sing4u.kr.user.entity.enums.SocialType;
 import com.sing4u.kr.user.enums.UserRole;
 
@@ -69,8 +68,8 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "is_opened", nullable = false)
-    private boolean isOpened;
+    @Column(name = "is_open", nullable = false)
+    private boolean isOpen;
 
     public static User of(String nickname, String email, String password, UserType userType) {
         return User.builder()
@@ -78,7 +77,7 @@ public class User {
                 .email(email)
                 .password(password)
                 .userType(userType)
-                .isOpened(false)
+                .isOpen(false)
                 .build();
     }
 

@@ -34,7 +34,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 .selectFrom(user)
                 .where(condition)
                 .orderBy(
-                        user.isOpened.desc(),
+                        user.isOpen.desc(),
                         rand.asc()
                 )
                 .offset(offset)

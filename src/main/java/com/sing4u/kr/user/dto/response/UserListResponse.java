@@ -13,14 +13,14 @@ public class UserListResponse {
     private Long userId;
     private String nickname;
     private String profileImage;
-    private boolean isOpened;
+    private boolean isOpen;
 
     public static UserListResponse from(User user) {
         return UserListResponse.builder()
                 .userId(user.getId())
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
-                .isOpened(user.isOpened())
+                .isOpen(user.isOpen())
                 .build();
     }
 
