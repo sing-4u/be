@@ -18,6 +18,7 @@ import java.util.List;
 @Getter
 @Entity
 @Builder
+@Setter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "musicSession")
