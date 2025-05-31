@@ -45,6 +45,10 @@ sing4u:
   server-url: https://api.sing4u.com
   file-url: https://image.sing4u.kr/
 
+cors:
+  origin:
+    - "https://www.sing4u.kr"
+    -
 springdoc:
   swagger-ui:
     enabled: false
