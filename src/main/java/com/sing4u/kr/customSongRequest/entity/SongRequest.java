@@ -20,9 +20,8 @@ public class SongRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // songRequestId
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)
-    private Session session;
+    private Long sessionId;
 
     @Column(name = "fan_email", length = 50)
     private String fanEmail;
@@ -41,15 +40,6 @@ public class SongRequest {
     @Column(name = "requested_at", nullable = false, updatable = false)
     private LocalDateTime requestedAt;
 
-    public static SongRequest fromCreateDto(Session session, SongRequestCreateDto dto) {
-        return SongRequest.builder()
-                .session(session)
-                .fanEmail(dto.getEmail())
-                .songTitle(dto.getSongTitle())
-                .songArtistName(dto.getArtistName())
-                .spotifyTrackId(dto.getSpotifyTrackId())
-                .build();
-    }
 }
 
 
