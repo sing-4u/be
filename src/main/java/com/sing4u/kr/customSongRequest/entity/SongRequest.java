@@ -40,15 +40,6 @@ public class SongRequest {
     @Column(name = "requested_at", nullable = false, updatable = false)
     private LocalDateTime requestedAt;
 
-    public static SongRequest fromCreateDto(Session session, SongRequestCreateDto dto) {
-        return SongRequest.builder()
-                .sessionId(dto.getSessionId())
-                .fanEmail(dto.getEmail())
-                .songTitle(dto.getSongTitle())
-                .songArtistName(dto.getArtistName())
-                .spotifyTrackId(dto.getSpotifyTrackId())
-                .build();
-    }
 }
 
 
