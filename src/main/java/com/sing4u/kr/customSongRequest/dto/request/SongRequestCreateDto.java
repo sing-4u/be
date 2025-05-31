@@ -2,11 +2,11 @@ package com.sing4u.kr.customSongRequest.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class SongRequestCreateDto {
     @NotNull(message = "아티스트 ID는 필수입니다.")
     private Long artistId;

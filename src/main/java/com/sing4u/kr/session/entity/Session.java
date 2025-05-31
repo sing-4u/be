@@ -15,10 +15,9 @@ import java.util.List;
 
 // 아티스트가 팬들의 신청곡을 받는 세션
 @Enabled
-@Getter
 @Entity
 @Builder
-@Setter
+@Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "musicSession")
