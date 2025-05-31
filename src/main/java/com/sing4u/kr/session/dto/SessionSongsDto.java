@@ -20,17 +20,13 @@ public class SessionSongsDto {
     private LocalDateTime closedAt;
     private List<SongDetailDto> songs;
 
-
-    public static SessionSongsDto from(Session session) {
-        List<SongDetailDto> songs = session.getSongRequests().stream()
-                .map(SongDetailDto::from)
-                .collect(Collectors.toList());
-
+    public static SessionSongsDto from(Session session, List<SongDetailDto> songDetails) {
         return SessionSongsDto.builder()
                 .sessionId(session.getId())
                 .startedAt(session.getStartedAt())
                 .closedAt(session.getClosedAt())
-                .songs(songs)
+                .songs(songDetails) // 파라미터로 받은 리스트 사용
                 .build();
     }
+
 }

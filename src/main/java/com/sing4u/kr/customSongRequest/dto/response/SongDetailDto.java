@@ -18,14 +18,17 @@ public class SongDetailDto {
     private String spotifyTrackId;
     private LocalDateTime requestedAt;
 
-    public static SongDetailDto from(SongRequest sr) {
+    public static SongDetailDto from(SongRequest songRequest) {
+        if (songRequest == null) {
+            return null;
+        }
         return SongDetailDto.builder()
-                .songRequestId(sr.getId())
-                .songTitle(sr.getSongTitle())
-                .singer(sr.getSongArtistName())
-                .email(sr.getFanEmail())
-                .spotifyTrackId(sr.getSpotifyTrackId())
-                .requestedAt(sr.getRequestedAt())
+                .songRequestId(songRequest.getId())
+                .songTitle(songRequest.getSongTitle())
+                .singer(songRequest.getSongArtistName())
+                .email(songRequest.getFanEmail())
+                .spotifyTrackId(songRequest.getSpotifyTrackId())
+                .requestedAt(songRequest.getRequestedAt())
                 .build();
     }
 }

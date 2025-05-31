@@ -5,6 +5,7 @@ import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.customSongRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.customSongRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.customSongRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.customSongRequest.entity.SongRequest;
 import com.sing4u.kr.customSongRequest.repository.SongRequestRepository;
 import com.sing4u.kr.session.entity.Session;
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class SongRequestService {
 
     private static final Logger logger = LoggerFactory.getLogger(SongRequestService.class);
@@ -58,6 +58,7 @@ public class SongRequestService {
         return new SongRequestResponseDto(savedSongRequest.getId(), "신청곡 등록 완료");
     }
 
+    @Transactional(readOnly = true)
     public List<SessionSongsDto> getSongRequestsByArtist(Long artistId) {
         userRepository.findByIdAndUserType(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND,"아티스트를 찾을 수 없습니다. ID: " + artistId));
@@ -65,7 +66,15 @@ public class SongRequestService {
         List<Session> sessions = sessionCustomRepository.findAllWithSongsByArtist(artistId);
 
         return sessions.stream()
-                .map(SessionSongsDto::from)
+                .map(session -> {
+                    List<SongRequest> requestsForThisSession = songRequestRepository.findBySessionIdOrderByRequestedAtAsc(session.getId());
+
+                    List<SongDetailDto> songDetails = requestsForThisSession.stream()
+                            .map(SongDetailDto::from)
+                            .collect(Collectors.toList());
+                    
+                    return SessionSongsDto.from(session, songDetails);
+                })
                 .collect(Collectors.toList());
     }
 }
