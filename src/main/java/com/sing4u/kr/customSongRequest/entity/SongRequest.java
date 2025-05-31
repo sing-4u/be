@@ -20,9 +20,8 @@ public class SongRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // songRequestId
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", nullable = false)
-    private Session session;
+    @Column(name = "session_id", nullable = false)
+    private Long sessionId;
 
     @Column(name = "fan_email", length = 50)
     private String fanEmail;
@@ -43,7 +42,7 @@ public class SongRequest {
 
     public static SongRequest fromCreateDto(Session session, SongRequestCreateDto dto) {
         return SongRequest.builder()
-                .session(session)
+                .sessionId(dto.getSessionId())
                 .fanEmail(dto.getEmail())
                 .songTitle(dto.getSongTitle())
                 .songArtistName(dto.getArtistName())
