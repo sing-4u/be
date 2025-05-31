@@ -5,7 +5,6 @@ import com.sing4u.kr.session.repository.SessionCustomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
