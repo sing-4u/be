@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/songRequests") // API 명세서 기준 Endpoint
+@RequestMapping("/api/v1/songRequests") // API 명세서 기준 Endpoint
 @RequiredArgsConstructor
 public class SongRequestController {
 

@@ -9,25 +9,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/artists")
 @RequiredArgsConstructor
 public class SessionController {
 
     private final SessionService sessionService;
 
-    @PostMapping("/artists/{artistId}/sessions")
+    @PostMapping("/{artistId}/sessions")
     public ResponseEntity<SessionResponseDto> startSession(@PathVariable Long artistId) {
         SessionResponseDto sessionResponse = sessionService.createSession(artistId);
         return ResponseEntity.status(HttpStatus.CREATED).body(sessionResponse);
     }
 
-    @PatchMapping("/artists/{artistId}/sessions/{sessionId}/close")
+    @PatchMapping("/{artistId}/sessions/{sessionId}/close")
     public ResponseEntity<SessionResponseDto> closeSession(@PathVariable Long artistId, @PathVariable Long sessionId) {
         SessionResponseDto sessionResponse = sessionService.closeSession(artistId, sessionId);
         return ResponseEntity.ok(sessionResponse);
     }
 
-    @GetMapping("/artists/{artistId}/sessions")
+    @GetMapping("/{artistId}/sessions")
     public ResponseEntity<CurrentSessionResponseDto> getArtistCurrentOpenSession(@PathVariable Long artistId) {
         CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId);
         if (currentSession == null) {
