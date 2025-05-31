@@ -10,7 +10,6 @@ import com.sing4u.kr.customSongRequest.entity.SongRequest;
 import com.sing4u.kr.customSongRequest.repository.SongRequestRepository;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
-import com.sing4u.kr.session.repository.SessionCustomRepository;
 import com.sing4u.kr.session.repository.SessionRepository;
 import com.sing4u.kr.session.dto.SessionSongsDto;
 import com.sing4u.kr.user.repository.UserRepository;
@@ -33,7 +32,6 @@ public class SongRequestService {
 
     private final SongRequestRepository songRequestRepository;
     private final SessionRepository sessionRepository;
-    private final SessionCustomRepository sessionCustomRepository;
     private final UserRepository userRepository;
 
 
@@ -63,7 +61,7 @@ public class SongRequestService {
         userRepository.findByIdAndUserType(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND,"아티스트를 찾을 수 없습니다. ID: " + artistId));
 
-        List<Session> sessions = sessionCustomRepository.findAllWithSongsByArtist(artistId);
+        List<Session> sessions = sessionRepository.findAllWithSongsByArtist(artistId);
 
         return sessions.stream()
                 .map(session -> {
@@ -72,7 +70,7 @@ public class SongRequestService {
                     List<SongDetailDto> songDetails = requestsForThisSession.stream()
                             .map(SongDetailDto::from)
                             .collect(Collectors.toList());
-                    
+
                     return SessionSongsDto.from(session, songDetails);
                 })
                 .collect(Collectors.toList());

@@ -45,12 +45,10 @@ class SessionServiceImplTest {
     private final Long SESSION_ID = 100L;
     private final Long NON_EXISTENT_SESSION_ID = 999L;
 
-    // Helper method to create a User
     private User createArtist(Long id, String nickName) {
         return User.testUserBuilder(id, nickName, UserType.ARTIST);
     }
 
-    // Helper method to create a Session
     private Session createSession(Long id, User artist, SessionStatus status) {
         LocalDateTime startedAt = LocalDateTime.now().minusHours(1);
         LocalDateTime closedAt = (status == SessionStatus.CLOSE) ? startedAt.plusMinutes(30) : null;
@@ -60,7 +58,6 @@ class SessionServiceImplTest {
                 .status(status)
                 .startedAt(startedAt)
                 .closedAt(closedAt)
-                .songRequests(new ArrayList<>())
                 .build();
     }
 

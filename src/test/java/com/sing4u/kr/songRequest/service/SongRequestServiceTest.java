@@ -10,7 +10,6 @@ import com.sing4u.kr.customSongRequest.service.SongRequestService;
 import com.sing4u.kr.session.dto.SessionSongsDto;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
-import com.sing4u.kr.session.repository.SessionCustomRepository;
 import com.sing4u.kr.session.repository.SessionRepository;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
@@ -44,9 +43,6 @@ class SongRequestServiceTest {
     private SessionRepository sessionRepository;
 
     @Mock
-    private SessionCustomRepository sessionCustomRepository;
-
-    @Mock
     private UserRepository userRepository;
 
     @InjectMocks
@@ -75,7 +71,6 @@ class SongRequestServiceTest {
                 .status(status)
                 .startedAt(LocalDateTime.now().minusHours(1))
                 .closedAt(status == SessionStatus.CLOSE ? LocalDateTime.now() : null)
-                .songRequests(new ArrayList<>()) // 중요: songRequests 리스트 초기화
                 .build();
     }
 
@@ -179,7 +174,44 @@ class SongRequestServiceTest {
             verify(songRequestRepository, never()).save(any(SongRequest.class));
         }
     }
+// SongRequestServiceTest.java - GetSongRequestsByArtistTests 클래스 내
 
+    @Test
+    @DisplayName("성공 - 신청곡이 존재할 때")
+    void getSongRequestsByArtist_whenSongsExist_returnsListOfSessionSongsDto() {
+        // given
+        // 1. Artist 모킹
+        when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
+
+        // 2. sessionRepository.findAllWithSongsByArtist(ARTIST_ID)가 Session 목록을 반환하도록 모킹
+        //    (이 Session 객체들은 songRequests 컬렉션을 직접 가지고 있지 않음)
+        //    openSession은 @BeforeEach에서 artist와 OPEN 상태로 미리 생성되어 있음
+        when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
+
+        // 3. 각 세션 ID에 대해 songRequestRepository.findBySessionIdOrderByRequestedAtAsc(sessionId)가
+        //    해당 세션의 신청곡 목록을 반환하도록 모킹
+        SongRequest song1 = createSongRequest(1L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 1"));
+        SongRequest song2 = createSongRequest(2L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 2"));
+        List<SongRequest> requestsForOpenSession = List.of(song1, song2);
+        when(songRequestRepository.findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID)).thenReturn(requestsForOpenSession);
+
+        // when
+        List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
+
+        // then
+        assertThat(result).isNotNull().hasSize(1);
+        SessionSongsDto sessionSongsDto = result.get(0);
+        assertThat(sessionSongsDto.getSessionId()).isEqualTo(OPEN_SESSION_ID);
+        assertThat(sessionSongsDto.getSongs()).hasSize(2);
+        assertThat(sessionSongsDto.getSongs())
+                .extracting(com.sing4u.kr.customSongRequest.dto.response.SongDetailDto::getSongTitle)
+                .containsExactlyInAnyOrder("Song 1", "Song 2");
+
+        // verify 호출 확인
+        verify(userRepository).findByIdAndUserType(ARTIST_ID, UserType.ARTIST);
+        verify(sessionRepository).findAllWithSongsByArtist(ARTIST_ID); // SessionCustomRepository 대신 SessionRepository 사용 가정
+        verify(songRequestRepository).findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID); // 이 호출이 발생하는지 확인
+    }
     @Nested
     @DisplayName("아티스트별 신청곡 목록 조회 (getSongRequestsByArtist)")
     class GetSongRequestsByArtistTests {
@@ -187,14 +219,14 @@ class SongRequestServiceTest {
         @Test
         @DisplayName("성공 - 신청곡이 존재할 때")
         void getSongRequestsByArtist_whenSongsExist_returnsListOfSessionSongsDto() {
-            // given
+            when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
+
+            when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
+
             SongRequest song1 = createSongRequest(1L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 1"));
             SongRequest song2 = createSongRequest(2L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 2"));
-            openSession.getSongRequests().addAll(List.of(song1, song2)); // Session 객체에 직접 SongRequest 추가
-
-            when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-            when(sessionCustomRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
-
+            List<SongRequest> requestsForOpenSession = List.of(song1, song2);
+            when(songRequestRepository.findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID)).thenReturn(requestsForOpenSession);
 
             // when
             List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
@@ -205,11 +237,13 @@ class SongRequestServiceTest {
             assertThat(sessionSongsDto.getSessionId()).isEqualTo(OPEN_SESSION_ID);
             assertThat(sessionSongsDto.getSongs()).hasSize(2);
             assertThat(sessionSongsDto.getSongs())
-                    .extracting(com.sing4u.kr.customSongRequest.dto.response.SongDetailDto::getSongTitle) // SongDetailDto 경로 확인
+                    .extracting(com.sing4u.kr.customSongRequest.dto.response.SongDetailDto::getSongTitle)
                     .containsExactlyInAnyOrder("Song 1", "Song 2");
 
+            // verify 호출 확인
             verify(userRepository).findByIdAndUserType(ARTIST_ID, UserType.ARTIST);
-            verify(sessionCustomRepository).findAllWithSongsByArtist(ARTIST_ID);
+            verify(sessionRepository).findAllWithSongsByArtist(ARTIST_ID); // SessionCustomRepository 대신 SessionRepository 사용 가정
+            verify(songRequestRepository).findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID); // 이 호출이 발생하는지 확인
         }
 
         @Test
@@ -218,7 +252,7 @@ class SongRequestServiceTest {
             // given
             // openSession.getSongRequests()는 @BeforeEach에서 new ArrayList<>()로 초기화됨
             when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-            when(sessionCustomRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
+            when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
 
 
             // when
@@ -235,7 +269,7 @@ class SongRequestServiceTest {
         void getSongRequestsByArtist_whenNoSessionsForArtist_returnsEmptyList() {
             // given
             when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-            when(sessionCustomRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(Collections.emptyList());
+            when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(Collections.emptyList());
 
             // when
             List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
@@ -256,7 +290,7 @@ class SongRequestServiceTest {
                     .isInstanceOf(ApiException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.NOT_FOUND)
                     .hasMessageContaining("아티스트를 찾을 수 없습니다.");
-            verify(sessionCustomRepository, never()).findAllWithSongsByArtist(anyLong());
+            verify(sessionRepository, never()).findAllWithSongsByArtist(anyLong());
         }
     }
 }
