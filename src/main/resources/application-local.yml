@@ -54,7 +54,7 @@ sing4u:
 
 cors:
   origin:
-    - "http://localhost:8080"
+    - ""*"
 
 springdoc:
   swagger-ui:
