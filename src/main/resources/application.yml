@@ -48,7 +48,3 @@ cookie:
   refresh-secure: true
   refresh-same-site: None
   refresh-max-age-days: 7
-  
-cors:
-  origin:
-    - "https://www.sing4u.kr"

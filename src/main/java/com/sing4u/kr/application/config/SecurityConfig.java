@@ -45,7 +45,6 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final JwtTokenProvider jwtTokenProvider;
     private final EndPointProperties endPointProperties;
-    private final CorsProperties corsProperties;
 
 //    @Value("${http.cors.allowedOriginPatterns}")
 //    private String allowedOriginPatterns;
@@ -113,7 +112,7 @@ public class SecurityConfig {
         List<String> headerList = List.of("x-requested-with", "authorization", "content-type", "access-control-allow-origin");
         List<String> exposeHeaders = List.of("content-type", "Set-Cookie");
 
-        corsConfiguration.setAllowedOriginPatterns(corsProperties.getOrigins());
+        corsConfiguration.setAllowedOriginPatterns(List.of("*"));
         corsConfiguration.setAllowedMethods(methodList);
         corsConfiguration.setAllowedHeaders(headerList);
         corsConfiguration.setExposedHeaders(exposeHeaders);
