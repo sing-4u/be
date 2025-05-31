@@ -54,6 +54,11 @@ sing4u:
   server-url: http://localhost:8080
   file-url: https://image.sing4u.kr/
 
+cors:
+  origin:
+    - "*"
+
+
 springdoc:
   swagger-ui:
     enabled: true
