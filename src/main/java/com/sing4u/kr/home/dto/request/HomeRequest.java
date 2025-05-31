@@ -13,6 +13,4 @@ public class HomeRequest {
     private String keyword;
     private int page;
     private int pageSize = 12;
-    @NotNull(message = "seed 값은 필수입니다.")
-    private long seed;
 }
