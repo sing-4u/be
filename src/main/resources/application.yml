@@ -48,8 +48,3 @@ cookie:
   refresh-secure: true
   refresh-same-site: None
   refresh-max-age-days: 7
-
-spotify:
-  api:
-    client-id: 937b827c270c4a59a3898de109c4c4cd
-    client-secret: d5199bf76fe9412dadcffa62c47621cc
