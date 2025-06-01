@@ -17,8 +17,11 @@ public class SongRequestCreateDto {
     @Size(max = 50, message = "이메일은 최대 50자까지 가능합니다.")
     private String email;
 
-    @Size(max = 100, message = "스포티파이 트랙 ID는 최대 100자까지 가능합니다.")
-    private String spotifyTrackId;
+    @Size(max = 20, message = "음악 플랫폼 이름은 최대 20자까지 가능합니다.")
+    private String musicPlatformName; // 예: "SPOTIFY", "YOUTUBE_MUSIC"
+
+    @Size(max = 100, message = "플랫폼 트랙 ID는 최대 100자까지 가능합니다.")
+    private String platformTrackId;
 
     @Size(max = 100, message = "곡 제목은 최대 100자까지 가능합니다.")
     private String songTitle;

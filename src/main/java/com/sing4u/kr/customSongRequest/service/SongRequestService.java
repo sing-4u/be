@@ -8,22 +8,24 @@ import com.sing4u.kr.customSongRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.customSongRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.customSongRequest.entity.SongRequest;
 import com.sing4u.kr.customSongRequest.repository.SongRequestRepository;
+import com.sing4u.kr.music.MusicInterface;
+import com.sing4u.kr.music.MusicPlatformSelector;
+import com.sing4u.kr.music.dto.TrackDto;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.repository.SessionRepository;
 import com.sing4u.kr.session.dto.SessionSongsDto;
-import com.sing4u.kr.spotify.service.SpotifyService;
 import com.sing4u.kr.user.repository.UserRepository;
-import com.sing4u.kr.user.entity.enums.UserType; // UserType enum 경로 확인
+import com.sing4u.kr.user.entity.enums.UserType;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,30 +37,42 @@ public class SongRequestService {
     private final SongRequestRepository songRequestRepository;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
-    private final SpotifyService spotifyService;
+    private final MusicPlatformSelector musicPlatformSelector;
 
-    private record SongInfo(String title, String artistName, String spotifyTrackId) {}
+    private record SongInfo(String title, String artistName, String platformTrackId, String platformName){}
 
     private SongInfo determineSongInfo(SongRequestCreateDto createDto) {
         String title = createDto.getSongTitle();
         String artistName = createDto.getArtistName();
-        String spotifyTrackId = createDto.getSpotifyTrackId();
+        String resolvedPlatformTrackId = createDto.getPlatformTrackId(); // 사용자가 제공한 플랫폼 ID
+        String resolvedPlatformName = createDto.getMusicPlatformName();
 
-        if (createDto.getSpotifyTrackId() != null && !createDto.getSpotifyTrackId().isBlank()) {
-            logger.info("Spotify 트랙 ID로 정보 조회 시도: {}", createDto.getSpotifyTrackId());
-            Track trackInfoFromSpotify = spotifyService.getTrackInfo(createDto.getSpotifyTrackId());
-            if (trackInfoFromSpotify != null) {
-                title = trackInfoFromSpotify.getName();
-                artistName = spotifyService.getArtistNamesFromTrack(trackInfoFromSpotify);
-                spotifyTrackId = trackInfoFromSpotify.getId(); // Spotify에서 가져온 ID로 업데이트
-                logger.info("Spotify 정보로 곡 정보 설정: '{}' - '{}' (ID: {})", title, artistName, spotifyTrackId);
+        if (resolvedPlatformName != null && !resolvedPlatformName.isBlank() &&
+                resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
+
+            Optional<MusicInterface> selectedServiceOpt = musicPlatformSelector.selectService(resolvedPlatformName);
+
+            if (selectedServiceOpt.isPresent()) {
+                MusicInterface platformService = selectedServiceOpt.get();
+                logger.info("'{}' 플랫폼의 트랙 ID '{}'로 정보 조회를 시도합니다.", resolvedPlatformName, resolvedPlatformTrackId);
+
+                TrackDto trackDetails = platformService.getTrackDetails(resolvedPlatformTrackId);
+
+                if (trackDetails != null) {
+                    title = trackDetails.getTitle();
+                    artistName = trackDetails.getArtistName();
+                    resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
+                    resolvedPlatformName = trackDetails.getPlatformName();
+                    logger.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})", resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
+                } else {
+                    logger.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.", createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+                }
             } else {
-                logger.warn("Spotify에서 트랙 정보를 가져오지 못했습니다 (요청 ID: {}). DTO에 입력된 곡 정보를 사용합니다.", createDto.getSpotifyTrackId());
+                logger.warn("지원하지 않는 음악 플랫폼('{}')이거나, DTO에 잘못된 정보가 입력되었습니다. DTO의 곡 정보를 사용합니다.", resolvedPlatformName);
             }
         }
-        return new SongInfo(title, artistName, spotifyTrackId);
+        return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName);
     }
-
     @Transactional
     public SongRequestResponseDto createSongRequest(SongRequestCreateDto createDto) {
         Session session = sessionRepository.findById(createDto.getSessionId())
@@ -84,7 +98,8 @@ public class SongRequestService {
                 .fanEmail(createDto.getEmail())
                 .songTitle(determinedSongInfo.title())
                 .songArtistName(determinedSongInfo.artistName())
-                .spotifyTrackId(determinedSongInfo.spotifyTrackId())
+                .musicPlatformName(determinedSongInfo.platformName())   // 새 필드 사용
+                .platformTrackId(determinedSongInfo.platformTrackId())
                 .build();
 
         SongRequest savedSongRequest = songRequestRepository.save(songRequest);

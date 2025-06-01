@@ -1,4 +1,4 @@
-package com.sing4u.kr.spotify.config;
+package com.sing4u.kr.music.spotify;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
