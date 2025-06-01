@@ -1,11 +1,11 @@
 package com.sing4u.kr.session.controller;
 
+import com.sing4u.kr.common.dto.ResponseResult;
+import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.service.SessionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,23 +16,20 @@ public class SessionController {
     private final SessionService sessionService;
 
     @PostMapping("/{artistId}/sessions")
-    public ResponseEntity<SessionResponseDto> startSession(@PathVariable Long artistId) {
+    public ResponseResult<SessionResponseDto> startSession(@PathVariable Long artistId) {
         SessionResponseDto sessionResponse = sessionService.createSession(artistId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(sessionResponse);
+        return new ResponseResult<>(ResponseCode.SUCCESS, sessionResponse);
     }
 
     @PatchMapping("/{artistId}/sessions/{sessionId}/close")
-    public ResponseEntity<SessionResponseDto> closeSession(@PathVariable Long artistId, @PathVariable Long sessionId) {
+    public ResponseResult<SessionResponseDto> closeSession(@PathVariable Long artistId, @PathVariable Long sessionId) {
         SessionResponseDto sessionResponse = sessionService.closeSession(artistId, sessionId);
-        return ResponseEntity.ok(sessionResponse);
+        return new ResponseResult<>(ResponseCode.SUCCESS, sessionResponse);
     }
 
     @GetMapping("/{artistId}/sessions")
-    public ResponseEntity<CurrentSessionResponseDto> getArtistCurrentOpenSession(@PathVariable Long artistId) {
+    public ResponseResult<CurrentSessionResponseDto> getArtistCurrentOpenSession(@PathVariable Long artistId) {
         CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId);
-        if (currentSession == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(currentSession);
+        return new ResponseResult<>(ResponseCode.SUCCESS, currentSession);
     }
 }

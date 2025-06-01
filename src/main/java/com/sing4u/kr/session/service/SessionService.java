@@ -25,7 +25,7 @@ public class SessionService {
 
     @Transactional
     public SessionResponseDto createSession(Long artistId){
-        User artist = userRepository.findByIdAndUserType(artistId, UserType.ARTIST)
+        User artist = userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "해당 아티스트가 존재하지 않습니다."));
 
         // 이미 열린 세션이 있는지 확인
