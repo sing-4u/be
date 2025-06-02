@@ -54,7 +54,7 @@ sing4u:
 
 cors:
   origin:
-    - ""*"
+    - "*"
 
 springdoc:
   swagger-ui:
