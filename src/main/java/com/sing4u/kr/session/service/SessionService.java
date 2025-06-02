@@ -51,7 +51,7 @@ public class SessionService {
 
     @Transactional
     public SessionResponseDto closeSession(Long artistId, Long sessionId) {
-        userRepository.findByIdAndUserType(artistId, UserType.ARTIST)
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
 
         Session session = sessionRepository.findByIdAndArtistId(sessionId, artistId)
@@ -63,7 +63,7 @@ public class SessionService {
     }
 
     public CurrentSessionResponseDto getArtistOpenSession(Long artistId) {
-        userRepository.findByIdAndUserType(artistId, UserType.ARTIST)
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
 
         return sessionRepository.findByArtistIdAndStatus(artistId, SessionStatus.OPEN)
