@@ -26,9 +26,11 @@ public class SongRequest {
     @Column(name = "fan_email", length = 50)
     private String fanEmail;
 
-    // PR #1 에서는 이 필드를 사용한 Spotify API 연동은 하지 않음. 값 저장만 가능.
-    @Column(name = "spotify_track_id", length = 100)
-    private String spotifyTrackId;
+    @Column(name = "music_platform_name", length = 20) // 예: "SPOTIFY", "YOUTUBE_MUSIC"
+    private String musicPlatformName;
+
+    @Column(name = "platform_track_id", length = 100) // 해당 플랫폼에서의 트랙 ID
+    private String platformTrackId;
 
     @Column(name = "song_title", length = 100)
     private String songTitle;
@@ -40,15 +42,6 @@ public class SongRequest {
     @Column(name = "requested_at", nullable = false, updatable = false)
     private LocalDateTime requestedAt;
 
-    public static SongRequest fromCreateDto(Session session, SongRequestCreateDto dto) {
-        return SongRequest.builder()
-                .sessionId(dto.getSessionId())
-                .fanEmail(dto.getEmail())
-                .songTitle(dto.getSongTitle())
-                .songArtistName(dto.getArtistName())
-                .spotifyTrackId(dto.getSpotifyTrackId())
-                .build();
-    }
 }
 
 
