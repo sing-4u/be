@@ -9,7 +9,7 @@ import com.sing4u.kr.customSongRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.customSongRequest.entity.SongRequest;
 import com.sing4u.kr.customSongRequest.repository.SongRequestRepository;
 import com.sing4u.kr.music.MusicInterface;
-import com.sing4u.kr.music.MusicPlatformSelector;
+import com.sing4u.kr.music.MusicPlatformFactory;
 import com.sing4u.kr.music.dto.TrackDto;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
@@ -37,7 +37,7 @@ public class SongRequestService {
     private final SongRequestRepository songRequestRepository;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
-    private final MusicPlatformSelector musicPlatformSelector;
+    private final MusicPlatformFactory musicPlatformFactory;
 
     private record SongInfo(String title, String artistName, String platformTrackId, String platformName){}
 
@@ -50,7 +50,7 @@ public class SongRequestService {
         if (resolvedPlatformName != null && !resolvedPlatformName.isBlank() &&
                 resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
 
-            Optional<MusicInterface> selectedServiceOpt = musicPlatformSelector.selectService(resolvedPlatformName);
+            Optional<MusicInterface> selectedServiceOpt = musicPlatformFactory.getService(resolvedPlatformName);
 
             if (selectedServiceOpt.isPresent()) {
                 MusicInterface platformService = selectedServiceOpt.get();

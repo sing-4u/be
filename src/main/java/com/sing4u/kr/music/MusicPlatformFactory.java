@@ -10,12 +10,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class MusicPlatformSelector {
+public class MusicPlatformFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(MusicPlatformSelector.class); // 로깅용
+    private static final Logger logger = LoggerFactory.getLogger(MusicPlatformFactory.class); // 로깅용
     private final Map<String, MusicInterface> servicesByPlatformName;
 
-    public MusicPlatformSelector(List<MusicInterface> musicPlatformServices) {
+    public MusicPlatformFactory(List<MusicInterface> musicPlatformServices) {
         this.servicesByPlatformName = musicPlatformServices.stream()
                 .collect(Collectors.toMap(
                         service -> service.getPlatformIdentifier().toUpperCase(),
@@ -27,7 +27,7 @@ public class MusicPlatformSelector {
                 ));
     }
 
-    public Optional<MusicInterface> selectService(String platformIdentifier) {
+    public Optional<MusicInterface> getService(String platformIdentifier) {
         if (platformIdentifier == null || platformIdentifier.isBlank()) return Optional.empty();
         return Optional.ofNullable(servicesByPlatformName.get(platformIdentifier.toUpperCase()));
     }
