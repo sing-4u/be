@@ -27,7 +27,7 @@ public class SongDetailDto {
                 .songTitle(songRequest.getSongTitle())
                 .singer(songRequest.getSongArtistName())
                 .email(songRequest.getFanEmail())
-                .spotifyTrackId(songRequest.getSpotifyTrackId())
+                .spotifyTrackId(songRequest.getPlatformTrackId())
                 .requestedAt(songRequest.getRequestedAt())
                 .build();
     }

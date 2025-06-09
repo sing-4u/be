@@ -1,17 +1,13 @@
 package com.sing4u.kr.session.entity;
 
 
-import com.sing4u.kr.customSongRequest.entity.SongRequest;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.user.entity.User;
 import jakarta.persistence.*;
-import jdk.jfr.Enabled;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 // 아티스트가 팬들의 신청곡을 받는 세션
 @Entity
