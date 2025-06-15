@@ -110,5 +110,18 @@ public class User {
 
     public void updateIsOpen(boolean isOpen) {
         this.isOpen = isOpen;
+
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    // 테스트용 public 정적 팩토리 메소드
+    public static User testUserBuilder(Long id, String nickName, UserType userType) {
+        return User.builder() // 클래스 내부에서는 protected builder 접근 가능
+                .id(id)
+                .nickname(nickName)
+                .userType(userType)
+                .build();
+
     }
 }

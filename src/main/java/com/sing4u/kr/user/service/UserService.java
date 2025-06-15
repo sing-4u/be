@@ -1,5 +1,6 @@
 package com.sing4u.kr.user.service;
 
+import com.sing4u.kr.file.service.S3Service;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
 import com.sing4u.kr.common.response.PagingResponse;
@@ -10,6 +11,9 @@ import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.UserActivityPlatform;
 import com.sing4u.kr.user.repository.UserActivityPlatformRepository;
+import com.sing4u.kr.user.utils.UserFileUtils;
+
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +22,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserActivityPlatformRepository userActivityPlatformRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
+
     @Cacheable(
             value = "homeArtists",
             key = "'page=' + #request.page",
@@ -140,5 +147,19 @@ public class UserService {
     private User getEntityOrThrow(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
+    }
+
+    @Transactional
+    public UserUpdateProfileImageResponse updateUserProfileImage(Long id, MultipartFile file) {
+        User user = this.getEntityOrThrow(id);
+
+        String uploadPath = UserFileUtils.getProfileImageKey(id);
+        String uploadedPath = this.s3Service.uploadFile(uploadPath, file);
+
+        user.updateProfileImage(uploadedPath);
+
+        this.userRepository.save(user);
+
+        return UserUpdateProfileImageResponse.of(user.getProfileImage());
     }
 }

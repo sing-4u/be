@@ -10,6 +10,15 @@ spring:
       idle-timeout: 30000
       max-lifetime: 600000
       connection-timeout: 20000
+  cloud:
+    aws:
+      credentials:
+        access-key: ${aws.accessKey}
+        secret-key: ${aws.secretKey}
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: sing4u
 
   jpa:
     hibernate:
@@ -34,7 +43,12 @@ server:
 
 sing4u:
   server-url: https://api.sing4u.com
+  file-url: https://image.sing4u.kr/
 
+cors:
+  origin:
+    - "https://www.sing4u.kr"
+    -
 springdoc:
   swagger-ui:
     enabled: false

@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: api
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC
     username: ${DB_USER}
@@ -10,6 +12,15 @@ spring:
       idle-timeout: 30000
       max-lifetime: 600000
       connection-timeout: 20000
+  cloud:
+    aws:
+      credentials:
+        access-key: ${aws.accessKey}
+        secret-key: ${aws.secretKey}
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: sing4u
 
   jpa:
     hibernate:
@@ -41,7 +52,13 @@ endpoints:
 
 
 sing4u:
-  server-url: https://api-dev.sing4u.com
+  server-url: http://localhost:8080
+  file-url: https://image.sing4u.kr/
+
+cors:
+  origin:
+    - "*"
+
 
 springdoc:
   swagger-ui:
