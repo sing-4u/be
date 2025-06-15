@@ -28,7 +28,7 @@ spring:
     active: local
 
   cache:
-    ehcache:
+    jcache:
       config: classpath:ehcache.xml
 
 server:

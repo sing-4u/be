@@ -19,9 +19,20 @@ public class HomeController {
 
     private final UserService userService;
 
-    @GetMapping("/")
-    public ResponseResult<PagingResponse<UserListResponse>> getArtists(@RequestBody @Valid HomeRequest request) {
+    @GetMapping
+    public ResponseResult<PagingResponse<UserListResponse>> getArtists(
+            @RequestParam int page,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String keyword
+    ) {
+        HomeRequest request = HomeRequest.builder()
+                .page(page)
+                .pageSize(pageSize)
+                .keyword(keyword)
+                .build();
+
         PagingResponse<UserListResponse> response = userService.getArtistList(request);
         return new ResponseResult<>(ResponseCode.SUCCESS, response);
     }
 }
+

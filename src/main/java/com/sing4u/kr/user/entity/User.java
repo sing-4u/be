@@ -107,4 +107,8 @@ public class User {
     public void delete() {
         this.deletedAt = LocalDateTime.now();
     }
+
+    public void updateIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
 }
