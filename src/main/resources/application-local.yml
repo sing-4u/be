@@ -35,6 +35,10 @@ spring:
     show-sql: true
     open-in-view: false
 
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
+
 endpoints:
   public-api-list:
     - /api/v1/health/**
@@ -47,6 +51,7 @@ endpoints:
     - /api/v1/users/register
     - /v3/api-docs/**
     - /api/v1/swagger/auth
+    - /api/v1/home
 
 sing4u:
   server-url: http://localhost:8080

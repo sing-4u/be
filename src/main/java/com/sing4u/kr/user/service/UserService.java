@@ -3,6 +3,8 @@ package com.sing4u.kr.user.service;
 import com.sing4u.kr.file.service.S3Service;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
+import com.sing4u.kr.common.response.PagingResponse;
+import com.sing4u.kr.home.dto.request.HomeRequest;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
@@ -13,6 +15,8 @@ import com.sing4u.kr.user.utils.UserFileUtils;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,16 +39,24 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final S3Service s3Service;
 
+    @Cacheable(
+            value = "homeArtists",
+            key = "'page=' + #request.page",
+            condition = "#request.keyword == null || #request.keyword.trim().isEmpty()"
+    )
+    @Transactional(readOnly = true)
+    public PagingResponse<UserListResponse> getArtistList(HomeRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getPageSize());
+        Slice<User> userSlice = userRepository.findArtistsWithKeywordAndRandomOrder(request.getKeyword(), pageable);
+
+        Slice<UserListResponse> responseSlice = userSlice.map(UserListResponse::from);
+        return PagingResponse.of(responseSlice);
+    }
+
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
         User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
         return UserCreateResponse.from(userRepository.save(user));
-    }
-
-    @Transactional(readOnly = true)
-    public Slice<UserListResponse> getUserListSearch(String keyword, Pageable pageable) {
-        return userRepository.searchByNickname(keyword, pageable)
-                .map(UserListResponse::from);
     }
 
     @Transactional(readOnly = true)

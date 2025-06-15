@@ -1,12 +1,13 @@
 package com.sing4u.kr.user.repository.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sing4u.kr.user.entity.QUser;
 import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserCustomRepository;
-
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -20,30 +21,33 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<User> searchByNickname(String keyword, Pageable pageable) {
+    public Slice<User> findArtistsWithKeywordAndRandomOrder(String keyword, Pageable pageable) {
         QUser user = QUser.user;
 
-        BooleanBuilder builder = new BooleanBuilder();
-
-        builder.and(user.deletedAt.isNull());
+        BooleanBuilder condition = new BooleanBuilder()
+                .and(user.userType.eq(UserType.ARTIST));
 
         if (keyword != null && !keyword.isBlank()) {
-            builder.and(user.nickname.containsIgnoreCase(keyword));
+            condition.and(user.nickname.containsIgnoreCase(keyword));
         }
 
-        List<User> content = queryFactory
+        NumberTemplate<Double> rand = Expressions.numberTemplate(Double.class, "RAND()");
+
+        List<User> result = queryFactory
                 .selectFrom(user)
-                .where(builder)
-                .orderBy(user.id.desc())
+                .where(condition)
+                .orderBy(user.isOpen.desc(), rand.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        boolean hasNext = content.size() > pageable.getPageSize();
+        boolean hasNext = result.size() > pageable.getPageSize();
+
         if (hasNext) {
-            content.remove(pageable.getPageSize());
+            result.remove(result.size() - 1);
         }
 
-        return new SliceImpl<>(content, pageable, hasNext);
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 }
+
