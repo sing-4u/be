@@ -32,15 +32,6 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.createUser(request));
     }
 
-    @Operation(summary = "사용자 목록 조회", description = "닉네임으로 사용자를 검색하고 페이징하여 조회합니다.")
-    @GetMapping("/")
-    public ResponseResult<Slice<UserListResponse>> getAllUsers(
-            @RequestParam(defaultValue = "") String keyword,
-            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserListSearch(keyword, pageable));
-    }
-
     @Operation(summary = "내 정보 조회", description = "로그인된 사용자의 상세 정보를 조회합니다.")
     @GetMapping("/me")
     public ResponseResult<UserProfileResponse> getUserById() {
