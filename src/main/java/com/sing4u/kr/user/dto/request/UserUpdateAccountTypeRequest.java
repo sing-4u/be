@@ -1,5 +1,6 @@
 package com.sing4u.kr.user.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserUpdateAccountTypeRequest {
 
+    @Schema(description = "변경할 계정 유형", example = "ARTIST", allowableValues = {"USER", "ARTIST"})
     @NotNull(message = "계정 유형은 필수입니다.")
     private UserType userType;
 }
