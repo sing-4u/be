@@ -110,7 +110,7 @@ public class User {
 
     public void updateIsOpen(boolean isOpen) {
         this.isOpen = isOpen;
-
+    }
     public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
