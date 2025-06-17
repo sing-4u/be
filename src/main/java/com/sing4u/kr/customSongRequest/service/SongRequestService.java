@@ -73,39 +73,53 @@ public class SongRequestService {
         }
         return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName);
     }
-    @Transactional
+
     public SongRequestResponseDto createSongRequest(SongRequestCreateDto createDto) {
-        Session session = sessionRepository.findById(createDto.getSessionId())
-                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND,"세션을 찾을 수 없습니다. ID: " + createDto.getSessionId()));
-
-        // 세션 유효성 검사
-        if (!session.getArtist().getId().equals(createDto.getArtistId())) {
-            throw new ApiException(ExceptionCode.CONFLICT, "세션이 지정된 아티스트에게 속하지 않습니다.");
-        }
-        if (session.getStatus() != SessionStatus.OPEN) {
-            throw new ApiException(ExceptionCode.CONFLICT, "이 세션은 현재 신청곡을 받고 있지 않습니다.");
-        }
-
+        // STEP 1: 외부 API 호출 등 트랜잭션이 불필요한 작업을 먼저 수행합니다.
         SongInfo determinedSongInfo = determineSongInfo(createDto);
 
-        if (determinedSongInfo.title() == null || determinedSongInfo.title().isBlank() ||
-                determinedSongInfo.artistName() == null || determinedSongInfo.artistName().isBlank()) {
-            throw new IllegalArgumentException("곡 제목과 아티스트 이름은 필수입니다. Spotify로 곡 정보를 가져오지 못했고, 직접 입력된 정보도 없습니다.");
+        // STEP 2: 순수 DB 작업만 처리하는 트랜잭션 메서드를 호출합니다.
+        return createAndSaveSongRequestInTx(createDto, determinedSongInfo);
+    }
+
+    @Transactional
+    public SongRequestResponseDto createAndSaveSongRequestInTx(SongRequestCreateDto createDto, SongInfo songInfo) {
+
+        // 유효성 검사 1: 곡 정보 확인
+        if (songInfo.title() == null || songInfo.title().isBlank() ||
+                songInfo.artistName() == null || songInfo.artistName().isBlank()) {
+            throw new IllegalArgumentException("곡 제목과 아티스트 이름은 필수입니다. 외부 플랫폼에서 정보를 가져오지 못했고, 직접 입력된 정보도 없습니다.");
         }
 
+        // 유효성 검사 2: 세션 확인
+        Session session = sessionRepository.findById(createDto.getSessionId())
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "세션을 찾을 수 없습니다. ID: " + createDto.getSessionId()));
+
+        validateSession(session, createDto.getArtistId());
+
+        // DB 작업: 엔티티 생성 및 저장
         SongRequest songRequest = SongRequest.builder()
                 .sessionId(session.getId())
                 .fanEmail(createDto.getEmail())
-                .songTitle(determinedSongInfo.title())
-                .songArtistName(determinedSongInfo.artistName())
-                .musicPlatformName(determinedSongInfo.platformName())   // 새 필드 사용
-                .platformTrackId(determinedSongInfo.platformTrackId())
+                .songTitle(songInfo.title())
+                .songArtistName(songInfo.artistName())
+                .musicPlatformName(songInfo.platformName())
+                .platformTrackId(songInfo.platformTrackId())
                 .build();
 
         SongRequest savedSongRequest = songRequestRepository.save(songRequest);
         logger.info("신청곡 등록 완료: ID {}, 제목: {}", savedSongRequest.getId(), savedSongRequest.getSongTitle());
 
         return new SongRequestResponseDto(savedSongRequest.getId(), "신청곡 등록 완료");
+    }
+
+    private void validateSession(Session session, Long requestArtistId) {
+        if (!session.getArtist().getId().equals(requestArtistId)) {
+            throw new ApiException(ExceptionCode.CONFLICT, "세션이 지정된 아티스트에게 속하지 않습니다.");
+        }
+        if (session.getStatus() != SessionStatus.OPEN) {
+            throw new ApiException(ExceptionCode.CONFLICT, "이 세션은 현재 신청곡을 받고 있지 않습니다.");
+        }
     }
 
     @Transactional(readOnly = true)

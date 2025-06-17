@@ -7,6 +7,7 @@ import com.sing4u.kr.customSongRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.customSongRequest.service.SongRequestService;
 import com.sing4u.kr.session.dto.SessionSongsDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,9 @@ public class SongRequestController {
 
     @Operation(summary = "아티스트 곡 요청 목록 조회", description = "특정 아티스트에게 요청된 커스텀 곡 요청 목록을 조회")
     @GetMapping("/artists/{artistId}")
-    public ResponseResult<List<SessionSongsDto>> getArtistSongRequests(@PathVariable Long artistId) {
+    public ResponseResult<List<SessionSongsDto>> getArtistSongRequests(
+            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 ID", example = "1")
+            @PathVariable Long artistId) {
         List<SessionSongsDto> songRequests = songRequestService.getSongRequestsByArtist(artistId);
         return new ResponseResult<>(ResponseCode.SUCCESS, songRequests);
     }
