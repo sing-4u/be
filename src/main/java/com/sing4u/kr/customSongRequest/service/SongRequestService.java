@@ -19,20 +19,21 @@ import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.enums.UserType;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SongRequestService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SongRequestService.class);
 
     private final SongRequestRepository songRequestRepository;
     private final SessionRepository sessionRepository;
@@ -54,7 +55,7 @@ public class SongRequestService {
 
             if (selectedServiceOpt.isPresent()) {
                 MusicInterface platformService = selectedServiceOpt.get();
-                logger.info("'{}' 플랫폼의 트랙 ID '{}'로 정보 조회를 시도합니다.", resolvedPlatformName, resolvedPlatformTrackId);
+                log.info("'{}' 플랫폼의 트랙 ID '{}'로 정보 조회를 시도합니다.", resolvedPlatformName, resolvedPlatformTrackId);
 
                 TrackDto trackDetails = platformService.getTrackDetails(resolvedPlatformTrackId);
 
@@ -63,22 +64,22 @@ public class SongRequestService {
                     artistName = trackDetails.getArtistName();
                     resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
                     resolvedPlatformName = trackDetails.getPlatformName();
-                    logger.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})", resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
+                    log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})", resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
                 } else {
-                    logger.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.", createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+                    log.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.", createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
                 }
             } else {
-                logger.warn("지원하지 않는 음악 플랫폼('{}')이거나, DTO에 잘못된 정보가 입력되었습니다. DTO의 곡 정보를 사용합니다.", resolvedPlatformName);
+                log.warn("지원하지 않는 음악 플랫폼('{}')이거나, DTO에 잘못된 정보가 입력되었습니다. DTO의 곡 정보를 사용합니다.", resolvedPlatformName);
             }
         }
         return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName);
     }
 
     public SongRequestResponseDto createSongRequest(SongRequestCreateDto createDto) {
-        // STEP 1: 외부 API 호출 등 트랜잭션이 불필요한 작업을 먼저 수행합니다.
+        // STEP 1: 외부 API 호출 등 트랜잭션이 불필요한 작업을 먼저 수행.
         SongInfo determinedSongInfo = determineSongInfo(createDto);
 
-        // STEP 2: 순수 DB 작업만 처리하는 트랜잭션 메서드를 호출합니다.
+        // STEP 2: 순수 DB 작업만 처리하는 트랜잭션 메서드를 호출.
         return createAndSaveSongRequestInTx(createDto, determinedSongInfo);
     }
 
@@ -99,7 +100,7 @@ public class SongRequestService {
 
         // DB 작업: 엔티티 생성 및 저장
         SongRequest songRequest = SongRequest.builder()
-                .sessionId(session.getId())
+                .session(session)
                 .fanEmail(createDto.getEmail())
                 .songTitle(songInfo.title())
                 .songArtistName(songInfo.artistName())
@@ -108,7 +109,7 @@ public class SongRequestService {
                 .build();
 
         SongRequest savedSongRequest = songRequestRepository.save(songRequest);
-        logger.info("신청곡 등록 완료: ID {}, 제목: {}", savedSongRequest.getId(), savedSongRequest.getSongTitle());
+        log.info("신청곡 등록 완료: ID {}, 제목: {}", savedSongRequest.getId(), savedSongRequest.getSongTitle());
 
         return new SongRequestResponseDto(savedSongRequest.getId(), "신청곡 등록 완료");
     }
@@ -127,13 +128,12 @@ public class SongRequestService {
         userRepository.findByIdAndUserType(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND,"아티스트를 찾을 수 없습니다. ID: " + artistId));
 
-        List<Session> sessions = sessionRepository.findAllWithSongsByArtist(artistId);
+        List<Session> sessions = sessionRepository.findAllWithSongRequestsByArtist(artistId);
 
         return sessions.stream()
                 .map(session -> {
-                    List<SongRequest> requestsForThisSession = songRequestRepository.findBySessionIdOrderByRequestedAtAsc(session.getId());
-
-                    List<SongDetailDto> songDetails = requestsForThisSession.stream()
+                    List<SongDetailDto> songDetails = session.getSongRequests().stream()
+                            .sorted(Comparator.comparing(SongRequest::getRequestedAt))
                             .map(SongDetailDto::from)
                             .collect(Collectors.toList());
 

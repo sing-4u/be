@@ -17,8 +17,11 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
 
     Optional<Session> findByIdAndArtistId(Long sessionId, Long artistId);
 
-    @Query("SELECT s FROM Session s WHERE s.artist.id = :artistId ORDER BY s.startedAt DESC")
-    List<Session> findAllWithSongsByArtist(@Param("artistId") Long artistId);
+    @Query("SELECT DISTINCT s FROM Session s " +
+            "LEFT JOIN FETCH s.songRequests sr " +
+            "WHERE s.artist.id = :artistId " +
+            "ORDER BY s.startedAt DESC")
+    List<Session> findAllWithSongRequestsByArtist(@Param("artistId") Long artistId);
 
     Optional<Session> findByArtistIdAndStatus(Long artistId, SessionStatus status);
 }

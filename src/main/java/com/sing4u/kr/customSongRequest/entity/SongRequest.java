@@ -20,8 +20,9 @@ public class SongRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // songRequestId
 
-    @Column(name = "session_id", nullable = false)
-    private Long sessionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id", updatable = false)
+    private Session session;
 
     @Column(name = "fan_email", length = 50)
     private String fanEmail;
