@@ -79,7 +79,7 @@ public class UserController {
     @PutMapping("/me/password")
     public ResponseResult<UserUpdatePasswordResponse> updatePassword(@RequestBody @Valid UserUpdatePasswordRequest request) {
         Long userId = SecurityContextUtils.getAccountId();
-        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updatePassword(userId, request));
+        return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 
     @Operation(summary = "회원 탈퇴", description = "로그인된 사용자의 계정을 삭제(soft-delete) 처리합니다.")
