@@ -145,7 +145,7 @@ public class UserService {
     }
 
     private User getEntityOrThrow(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
     }
 
