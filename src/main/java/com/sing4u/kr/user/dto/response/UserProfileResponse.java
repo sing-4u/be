@@ -23,7 +23,7 @@ public class UserProfileResponse {
     @Schema(description = "이메일", example = "artist@test.com")
     private String email;
 
-    @Schema(description = "계정 유형", example = "ARTIST")
+    @Schema(description = "계정 유형", example = "ARTIST", implementation = UserType.class)
     private UserType userType;
 
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile2.jpg")

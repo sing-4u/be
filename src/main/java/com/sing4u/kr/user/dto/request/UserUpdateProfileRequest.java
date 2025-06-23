@@ -24,6 +24,6 @@ public class UserUpdateProfileRequest {
     @Schema(description = "메인 커버 이미지 URL", example = "https://example.com/new_cover.jpg")
     private String mainCoverUrl;
 
-    @Schema(description = "활동 플랫폼 목록 (프로필 수정 시 함께 변경 가능)")
+    @Schema(description = "활동 플랫폼 목록 (프로필 수정 시 함께 변경 가능)", implementation = ActivityPlatformRequest.class)
     private List<ActivityPlatformRequest> activityPlatforms;
 }

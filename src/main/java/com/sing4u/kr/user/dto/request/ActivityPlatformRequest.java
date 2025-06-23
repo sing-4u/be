@@ -10,7 +10,7 @@ import lombok.*;
 @Builder(access = AccessLevel.PROTECTED)
 public class ActivityPlatformRequest {
 
-    @Schema(description = "플랫폼 타입", example = "YOUTUBE", allowableValues = {"YOUTUBE", "INSTAGRAM", "TIKTOK", "SOUNDCLOUD"})
+    @Schema(description = "플랫폼 타입", example = "YOUTUBE", allowableValues = {"YOUTUBE", "INSTAGRAM", "TIKTOK", "SOUNDCLOUD"}, implementation = ActivityPlatformType.class)
     private ActivityPlatformType platformType;
 
     @Schema(description = "플랫폼 URL 주소", example = "https://www.youtube.com/channel/UC-abcdefg")

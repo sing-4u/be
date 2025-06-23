@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserActivityPlatformResponse {
-    @Schema(description = "활동 플랫폼 목록")
+    @Schema(description = "활동 플랫폼 목록", implementation = ActivityPlatformResponse.class)
     private List<ActivityPlatformResponse> activityPlatforms;
 
     public static UserActivityPlatformResponse from(List<UserActivityPlatform> platforms) {

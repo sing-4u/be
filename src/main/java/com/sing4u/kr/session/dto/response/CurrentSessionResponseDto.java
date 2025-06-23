@@ -17,7 +17,7 @@ public class CurrentSessionResponseDto {
     @Schema(description = "세션을 진행 중인 아티스트 ID", example = "1")
     private Long artistId;
 
-    @Schema(description = "세션 상태 (항상 OPEN)", example = "OPEN")
+    @Schema(description = "세션 상태 (항상 OPEN)", example = "OPEN", implementation = SessionStatus.class)
     private SessionStatus status;
 
     @Schema(description = "세션 시작 시각", example = "2025-06-16T10:00:00")

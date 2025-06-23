@@ -12,7 +12,7 @@ import lombok.*;
 @Schema(description = "활동 플랫폼 정보 응답 DTO")
 public class ActivityPlatformResponse {
 
-    @Schema(description = "플랫폼 타입", example = "YOUTUBE")
+    @Schema(description = "플랫폼 타입", example = "YOUTUBE", implementation = ActivityPlatformType.class)
     private ActivityPlatformType platformType;
 
     @Schema(description = "플랫폼 URL", example = "https://www.youtube.com/channel/UC-abcdefg")

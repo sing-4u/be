@@ -28,7 +28,7 @@ public class UserCreateRequest {
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
-    @Schema(description = "계정 유형", example = "USER", allowableValues = {"USER", "ARTIST"})
+    @Schema(description = "계정 유형", example = "USER", allowableValues = {"USER", "ARTIST"}, implementation = UserType.class)
     @NotNull(message = "계정 유형은 필수입니다.")
     private UserType userType;
 }

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserUpdateAccountTypeRequest {
 
-    @Schema(description = "변경할 계정 유형", example = "ARTIST", allowableValues = {"USER", "ARTIST"})
+    @Schema(description = "변경할 계정 유형", example = "ARTIST", allowableValues = {"USER", "ARTIST"},implementation = UserType.class)
     @NotNull(message = "계정 유형은 필수입니다.")
     private UserType userType;
 }
