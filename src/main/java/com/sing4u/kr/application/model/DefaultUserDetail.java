@@ -42,12 +42,12 @@ public class DefaultUserDetail implements UserDetails, Serializable {
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true; // false에서 true로 변경 자격 증명이 만료되지 않도록 함
     }
 
     @Override

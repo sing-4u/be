@@ -1,4 +1,4 @@
-package com.sing4u.kr.auth.Entity;
+package com.sing4u.kr.auth.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +23,7 @@ public class RefreshToken {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String token;
 
     @CreationTimestamp

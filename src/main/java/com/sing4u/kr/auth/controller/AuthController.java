@@ -9,20 +9,13 @@ import com.sing4u.kr.auth.service.AuthService;
 import com.sing4u.kr.auth.utils.CookieUtils;
 import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
-import com.sing4u.kr.jwt.exceptions.InvalidTokenException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -36,6 +29,7 @@ public class AuthController {
                                                     HttpServletResponse response) {
         LoginDto dto = authService.emailLogin(request);
         CookieUtils.setRefreshTokenCookie(response, dto.getRefreshToken());
+        CookieUtils.setAccessTokenCookie(response, dto.getAccessToken());
 
         return new ResponseResult<>(ResponseCode.SUCCESS, LoginResponse.of(dto.getAccessToken(), dto.getProfileImage()));
     }

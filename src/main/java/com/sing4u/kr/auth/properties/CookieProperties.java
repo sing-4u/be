@@ -10,10 +10,19 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "cookie")
 public class CookieProperties {
+    // Refresh Token 설정
     private String refreshName;
     private String refreshPath;
     private boolean refreshHttpOnly;
     private boolean refreshSecure;
     private String refreshSameSite;
     private int refreshMaxAgeDays;
+
+    // Access Token 설정
+    private String accessName;
+    private String accessPath;
+    private boolean accessHttpOnly;
+    private boolean accessSecure;
+    private String accessSameSite;
+    private int accessMaxAgeMinutes;
 }

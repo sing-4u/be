@@ -1,6 +1,7 @@
 package com.sing4u.kr.health.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import static com.sing4u.kr.common.enums.ResponseCode.ERROR_USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SwaggerService {
     @Value("${spring.profiles.active}")
     private String activeProfile;
@@ -48,18 +50,16 @@ public class SwaggerService {
         }
 
         String[] type = StringUtils.split(username, "_");
-        UserType userType = UserType.toUserType(type[0]);
         UserRole mainRole = UserRole.getMainAccountRoleFromString(List.of(type[0]));
         Long accountId = Long.parseLong(type[1]);
-
+        log.info("accountId : " + accountId);
         User user = this.userRepository.findByIdAndDeletedAtIsNull(accountId)
                 .orElseThrow(() -> new Exception400(ERROR_USER_NOT_FOUND));
 
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
                 List.of(mainRole),
-                user.getNickname(),
-                userType
+                user.getNickname()
         );
 
         return SwaggerAuthResponse.of(

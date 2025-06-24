@@ -1,5 +1,6 @@
 package com.sing4u.kr.jwt.filter;
 
+import com.sing4u.kr.auth.utils.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -11,9 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 
 import java.io.IOException;
 
@@ -36,7 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String accessToken = getAccessTokenFromHeader(request);
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/v1/auth/login")) {
+            filterChain.doFilter(request, response);
+            return;  // 로그인 요청은 토큰 검사 스킵
+        }
+
+        String accessToken =  CookieUtils.extractAccessTokenFromCookie(request);
 
         if (StringUtils.isBlank(accessToken)) {
             filterChain.doFilter(request, response);
@@ -49,8 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             response.setHeader(HEADER_EXCEPTION_CODE, ERROR_EXPIRED_TOKEN.getCode());
             throw new ExpiredTokenException();
-        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException |
-                 InvalidTokenException e) {
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             response.setHeader(HEADER_EXCEPTION_CODE, ERROR_INVALID_TOKEN.getCode());
             log.error("invalid token exception, request uri : {}, accessToken : {}", request.getRequestURI(), accessToken);
             throw new InvalidTokenException(e.getMessage());
@@ -59,11 +63,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getAccessTokenFromHeader(HttpServletRequest request) {
-        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (bearer != null && bearer.startsWith("Bearer ")) {
-            return StringUtils.replaceIgnoreCase(bearer, "bearer", "").trim();
-        }
-        return null;
-    }
+//    private String getAccessTokenFromHeader(HttpServletRequest request) {
+//        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
+//        if (bearer != null && bearer.startsWith("Bearer ")) {
+//            return StringUtils.replaceIgnoreCase(bearer, "bearer", "").trim();
+//        }
+//        return null;
+//    }
 }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USER}
     password: ${DB_PASS}
     hikari:
@@ -64,6 +64,22 @@ cors:
 springdoc:
   swagger-ui:
     enabled: true
+
+
+cookie:
+  refresh-name: refreshToken
+  refresh-path: /api/v1/auth/recreate
+  refresh-http-only: true
+  refresh-secure: false
+  refresh-same-site: None
+  refresh-max-age-days: 7
+
+  access-name: accessToken
+  access-path: /
+  access-http-only: true
+  access-secure: false
+  access-same-site: Lax
+  access-max-age-minutes: 60
 
 
 

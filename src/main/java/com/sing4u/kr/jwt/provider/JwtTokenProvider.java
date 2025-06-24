@@ -1,32 +1,28 @@
 package com.sing4u.kr.jwt.provider;
 
+import com.sing4u.kr.common.utils.DataUtils;
+import com.sing4u.kr.user.entity.enums.UserType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
-
 
 import java.security.Key;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.sing4u.kr.common.utils.DataUtils;
 import com.sing4u.kr.jwt.model.JwtToken;
-import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.enums.UserRole;
 
 @Component
 @Slf4j
 public class JwtTokenProvider {
-
 
     @Value("${jwt.secret}")
     private String secret;
@@ -38,7 +34,6 @@ public class JwtTokenProvider {
     private long refreshTokenValidity;
 
     private final String ACCOUNT_ID = "accountId";
-    private final String USER_TYPE = "user_type";
     private final String USER_NAME = "user_name";
     private final String NICK_NAME = "nick_name";
     private static final String AUTHORITIES = "authorities";
@@ -60,11 +55,10 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(Long accountId,
                                       List<UserRole> roles,
-                                      String nickName,
-                                      UserType userType) {
+                                      String nickName) {
         ZonedDateTime now = ZonedDateTime.now();
 
-        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName, userType);
+        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName);
 
         ZonedDateTime expiration = now.plusSeconds(accessTokenValidity);
         Date expirationDate = Date.from(expiration.toInstant());
@@ -74,15 +68,13 @@ public class JwtTokenProvider {
 
     private Map<String, Object> getClaimsForCreation(Long accountId,
                                                      List<UserRole> roles,
-                                                     String nickName,
-                                                     UserType userType) {
+                                                     String nickName) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(ACCOUNT_ID, accountId);
         claims.put(AUTHORITIES, roles);
         claims.put(USER_NAME, getUserName(roles, accountId));
         claims.put(NICK_NAME, nickName);
-        claims.put(USER_TYPE, userType);
         return claims;
     }
 
@@ -93,16 +85,24 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        List<UserRole> roles = DataUtils.cast(claims.get(AUTHORITIES, List.class), UserRole.class);
-        UserType userType = UserType.valueOf(claims.get(USER_TYPE, String.class));
+
+//        List<UserRole> roles = DataUtils.cast(claims.get(AUTHORITIES, List.class), UserRole.class);
+        // 1. 토큰에서 문자열 리스트를 가져옵니다.
+        List<String> roleStrings = claims.get(AUTHORITIES, List.class);
+
+//        UserType userType = UserType.valueOf(claims.get(USER_TYPE, String.class));
+
+//        // 2. 각 문자열을 UserRole Enum으로 변환하여 새로운 리스트를 만듭니다.
+        List<UserRole> roles = roleStrings.stream()
+                .map(UserRole::valueOf)
+                .collect(Collectors.toList());
 
         return JwtToken.of(
                 claims.get(ACCOUNT_ID, Long.class),
                 claims.getExpiration(),
                 roles,
                 claims.get(NICK_NAME, String.class),
-                claims.get(USER_NAME, String.class),
-                userType
+                claims.get(USER_NAME, String.class)
         );
 
     }
@@ -123,11 +123,10 @@ public class JwtTokenProvider {
 
     public String generateRefreshToken(Long accountId,
                                       List<UserRole> roles,
-                                      String nickName,
-                                      UserType userType) {
+                                      String nickName) {
         ZonedDateTime now = ZonedDateTime.now();
 
-        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName, userType);
+        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName);
 
         ZonedDateTime expiration = now.plusSeconds(refreshTokenValidity);
         Date expirationDate = Date.from(expiration.toInstant());
