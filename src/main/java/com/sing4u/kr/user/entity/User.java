@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Builder(access = AccessLevel.PROTECTED)
+@Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
@@ -34,12 +34,13 @@ public class User {
     @Column(length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String password;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "social_type", length = 20)
-    private SocialType socialType;
+    @Column(name = "social_type", length = 20, nullable = false)
+    private SocialType socialType = SocialType.LOCAL;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", length = 20, nullable = false)

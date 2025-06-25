@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USER}
     password: ${DB_PASS}
     hikari:
@@ -38,6 +38,18 @@ spring:
   cache:
     jcache:
       config: classpath:ehcache.xml
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "631053836667-9tbpsbvjfpmb866as95g1uoqd5gam7q2.apps.googleusercontent.com"
+            client-secret: "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"
+            redirect-url: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - profile
+              - email
 
 endpoints:
   public-api-list:

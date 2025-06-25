@@ -8,6 +8,9 @@ import com.sing4u.kr.home.dto.request.HomeRequest;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.SocialType;
+import com.sing4u.kr.user.entity.enums.UserType;
+import com.sing4u.kr.user.enums.UserRole;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.UserActivityPlatform;
 import com.sing4u.kr.user.repository.UserActivityPlatformRepository;
@@ -57,6 +60,25 @@ public class UserService {
     public UserCreateResponse createUser(UserCreateRequest request) {
         User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
         return UserCreateResponse.from(userRepository.save(user));
+    }
+
+    @Transactional
+    public SocialUserCreateResponse createSocialUser(SocialUserCreateRequest request) {
+        // 중복 가입 방지
+        if (userRepository.findByEmailAndDeletedAtIsNull(request.getEmail()).isPresent()) {
+            throw new IllegalStateException("이미 가입된 유저입니다.");
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .socialType(request.getSocialType())
+                .role(UserRole.USER)
+                .userType(UserType.USER)
+                .isOpen(false)
+                .build();
+
+        return SocialUserCreateResponse.from(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)

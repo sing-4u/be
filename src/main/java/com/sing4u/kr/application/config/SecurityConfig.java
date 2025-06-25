@@ -1,5 +1,7 @@
 package com.sing4u.kr.application.config;
 
+import com.sing4u.kr.auth.service.CustomOAuth2UserService;
+import com.sing4u.kr.auth.utils.OAuth2SuccessHandler;
 import com.sing4u.kr.common.properties.CorsProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +49,8 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final EndPointProperties endPointProperties;
     private final CorsProperties corsProperties;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
 //    @Value("${http.cors.allowedOriginPatterns}")
 //    private String allowedOriginPatterns;
@@ -101,6 +105,10 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler))
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

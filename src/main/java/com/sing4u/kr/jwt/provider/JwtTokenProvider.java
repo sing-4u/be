@@ -72,6 +72,16 @@ public class JwtTokenProvider {
         return createToken(expirationDate, claims);
     }
 
+    //소셜로그인용
+//    public String generateAccessTokenForOAuthUser(String email, String provider) {
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("email", email);
+//        claims.put("provider", provider);
+//        Date expiry = Date.from(ZonedDateTime.now().plusSeconds(accessTokenValidity).toInstant());
+//
+//        return createToken(expiry, claims);
+//    }
+
     private Map<String, Object> getClaimsForCreation(Long accountId,
                                                      List<UserRole> roles,
                                                      String nickName,

@@ -32,6 +32,11 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.createUser(request));
     }
 
+    @PostMapping("/oauth/signup") // 소셜 회원가입(추가정보 별도 입력 시)
+    public ResponseResult<SocialUserCreateResponse> oauthSignup(@RequestBody SocialUserCreateRequest request) {
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.createSocialUser(request));
+    }
+
     @Operation(summary = "내 정보 조회", description = "로그인된 사용자의 상세 정보를 조회합니다.")
     @GetMapping("/me")
     public ResponseResult<UserProfileResponse> getUserById() {

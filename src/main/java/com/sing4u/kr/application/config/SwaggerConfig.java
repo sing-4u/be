@@ -26,6 +26,7 @@ public class SwaggerConfig {
                 .info(new Info().title("Sing4U API").description("Sing4U API").version("v1"))
                 .addServersItem(new Server().url(this.serverUrl))
                 .addSecurityItem(new SecurityRequirement().addList("OAUTH2"))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("OAUTH2", new SecurityScheme()
                                 .type(SecurityScheme.Type.OAUTH2)
@@ -38,6 +39,11 @@ public class SwaggerConfig {
                                                 )
                                         )
                                 )
+                        )
+                        .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
                         )
                 );
     }
