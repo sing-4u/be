@@ -1,8 +1,10 @@
 package com.sing4u.kr.application.config;
 
+import com.sing4u.kr.auth.oauth.service.CustomOAuth2UserService;
+import com.sing4u.kr.auth.oauth.handler.CustomSuccessHandler;
 import com.sing4u.kr.common.properties.CorsProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
@@ -14,8 +16,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
@@ -40,6 +40,7 @@ import com.sing4u.kr.user.enums.UserRole;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @EnableMethodSecurity
+@Slf4j
 public class SecurityConfig {
 
     private final RestAccessDeniedHandler restAccessDeniedHandler;
@@ -47,14 +48,11 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final EndPointProperties endPointProperties;
     private final CorsProperties corsProperties;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
 
 //    @Value("${http.cors.allowedOriginPatterns}")
 //    private String allowedOriginPatterns;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
 
     @Bean
     public static RoleHierarchy roleHierarchy() {
@@ -99,6 +97,10 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler)
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)

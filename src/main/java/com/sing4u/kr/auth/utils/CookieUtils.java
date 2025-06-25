@@ -1,13 +1,9 @@
 package com.sing4u.kr.auth.utils;
 
 import com.sing4u.kr.auth.properties.CookieProperties;
-import com.sing4u.kr.jwt.exceptions.InvalidTokenException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 
@@ -18,16 +14,27 @@ public class CookieUtils {
 
     static CookieProperties cookieProperties;
 
-    public static String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookieProperties.getRefreshName().equals(cookie.getName())) {
+    public static void setCookieProperties(CookieProperties properties) {
+        cookieProperties = properties;
+    }
+
+    public String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        return extractTokenFromCookie(request, cookieProperties.getRefreshName());
+    }
+
+    public String extractAccessTokenFromCookie(HttpServletRequest request) {
+        return extractTokenFromCookie(request, cookieProperties.getAccessName());
+    }
+
+    private String extractTokenFromCookie(HttpServletRequest request, String cookieName) {
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if (cookieName.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
         }
-        throw new InvalidTokenException();
+        return null;
     }
 
     public static void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
@@ -39,6 +46,18 @@ public class CookieUtils {
                 .maxAge(Duration.ofDays(cookieProperties.getRefreshMaxAgeDays()))
                 .build();
 
-        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    public void setAccessTokenCookie(HttpServletResponse response, String accessToken) {
+        ResponseCookie cookie = ResponseCookie.from(cookieProperties.getAccessName(), accessToken)
+                .httpOnly(cookieProperties.isAccessHttpOnly())
+                .secure(cookieProperties.isAccessSecure())
+                .sameSite(cookieProperties.getAccessSameSite())
+                .path(cookieProperties.getAccessPath())
+                .maxAge(Duration.ofMinutes(cookieProperties.getAccessMaxAgeMinutes()))
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }

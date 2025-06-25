@@ -73,11 +73,22 @@ public class User {
     private boolean isOpen;
 
     public static User of(String nickname, String email, String password, UserType userType) {
+
+        UserRole role;
+        if (UserType.ARTIST.equals(userType)) {
+            role = UserRole.ARTIST;
+        } else if(UserType.USER.equals(userType)) {
+            role = UserRole.USER;
+        } else {
+            role = UserRole.ADMIN;
+        }
+
         return User.builder()
                 .nickname(nickname)
                 .email(email)
                 .password(password)
                 .userType(userType)
+                .role(role)
                 .isOpen(false)
                 .build();
     }
@@ -123,5 +134,15 @@ public class User {
                 .userType(userType)
                 .build();
 
+    }
+    public static User ofOAuth2(String email, String name, String encodedPassword, SocialType socialType) {
+        return User.builder()
+                .email(email)
+                .nickname(name)
+                .password(encodedPassword)
+                .role(UserRole.USER)
+                .userType(UserType.USER)
+                .socialType(socialType)
+                .build();
     }
 }

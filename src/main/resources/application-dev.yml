@@ -37,6 +37,22 @@ spring:
     show-sql: true
     open-in-view: false
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 539834899906-k6coqhv9e97j81ep76e92883nhptcu1v.apps.googleusercontent.com #${GOOGLE_CLIENT_ID}
+            client-secret: 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 #${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
+  #      provider:  구굴의 경우 OAuth2 Provider가 Spring Security 내장되어있음
+  #        google:
+  #          authorization-uri: https://accounts.google.com/o/oauth2/auth
+  #          token-uri: https://oauth2.googleapis.com/token
+  #          user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
 endpoints:
   public-api-list:
     - /api/v1/health/**
@@ -49,17 +65,44 @@ endpoints:
     - /v3/api-docs
     - /api/v1/users/register
     - /api/v1/home
-
+    - /api/v1/auth/login/oauth/token
+    - /v3/api-docs/**
+    - /api/v1/auth/login/**
+    - /api/v1/swagger/auth
+    - /api/v1/auth/refresh
 
 sing4u:
-  server-url: http://localhost:8080
+#  server-url: http://localhost:8080
+  server-url: http://13.125.210.40:8080
   file-url: https://image.sing4u.kr/
+  oauth-redirect-url: http://localhost:3000/auth/callback
 
 cors:
   origin:
     - "*"
 
-
 springdoc:
   swagger-ui:
     enabled: true
+
+jwt:
+  issuer: sing4uproject@gmail.com
+  secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb #${JWT_SECRET}
+  access-token-validity: 3600000
+  refresh-token-validity: 1209600000
+
+
+cookie:
+  refresh-name: refreshToken
+  refresh-path: /api/v1/auth/recreate
+  refresh-http-only: true
+  refresh-secure: false
+  refresh-same-site: None
+  refresh-max-age-days: 7
+
+  access-name: accessToken
+  access-path: /
+  access-http-only: true
+  access-secure: false
+  access-same-site: Lax
+  access-max-age-minutes: 60

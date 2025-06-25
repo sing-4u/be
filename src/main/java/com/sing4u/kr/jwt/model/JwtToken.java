@@ -21,5 +21,4 @@ public class JwtToken {
     private List<UserRole> roles;
     private String nickName;
     private String userName;
-    private UserType userType;
 }

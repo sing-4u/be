@@ -53,6 +53,13 @@ cookie:
   refresh-same-site: None
   refresh-max-age-days: 7
 
+  access-name: accessToken
+  access-path: /
+  access-http-only: true
+  access-secure: true
+  access-same-site: Lax
+  access-max-age-minutes: 60
+
 spotify:
   api:
     client-id: 937b827c270c4a59a3898de109c4c4cd
