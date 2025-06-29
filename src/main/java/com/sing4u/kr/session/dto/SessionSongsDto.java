@@ -2,7 +2,7 @@ package com.sing4u.kr.session.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sing4u.kr.customSongRequest.dto.response.SongDetailDto;
+import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.session.entity.Session;
 import lombok.Builder;
 import lombok.Getter;

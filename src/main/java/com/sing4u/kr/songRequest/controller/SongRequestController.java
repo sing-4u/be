@@ -1,14 +1,13 @@
-package com.sing4u.kr.customSongRequest.controller;
+package com.sing4u.kr.songRequest.controller;
 
 import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
-import com.sing4u.kr.customSongRequest.dto.request.SongRequestCreateDto;
-import com.sing4u.kr.customSongRequest.dto.SongRequestResponseDto;
-import com.sing4u.kr.customSongRequest.service.SongRequestService;
+import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
+import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.service.SongRequestService;
 import com.sing4u.kr.session.dto.SessionSongsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

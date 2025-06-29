@@ -28,7 +28,7 @@ spring:
     open-in-view: false
 
   profiles:
-    active: local
+    active: dev
 
   cache:
     jcache:

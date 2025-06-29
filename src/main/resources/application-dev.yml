@@ -24,7 +24,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -82,9 +82,11 @@ cors:
     - "*"
 
 springdoc:
+  api-docs:
+    version: openapi_3_0
   swagger-ui:
     enabled: true
-
+    url: /v3/api-docs
 jwt:
   issuer: sing4uproject@gmail.com
   secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb #${JWT_SECRET}

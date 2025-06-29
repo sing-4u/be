@@ -52,18 +52,6 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateProfile(userId, request));
     }
 
-    @Operation(summary = "내 활동 플랫폼 조회", description = "로그인된 사용자의 활동 플랫폼(유튜브, 인스타그램 등) 목록을 조회합니다.")
-    @GetMapping("/me/activity-platform")
-    public ResponseResult<UserActivityPlatformResponse> getActivityPlatform(@LoginUserId Long userId) {
-        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getActivityPlatform(userId));
-    }
-
-    @Operation(summary = "내 활동 플랫폼 수정", description = "로그인된 사용자의 활동 플랫폼 목록을 수정/업데이트합니다.")
-    @PutMapping("/me/activity-platform")
-    public ResponseResult<UserActivityPlatformResponse> updateActivityPlatform(@LoginUserId Long userId, @RequestBody @Valid UserUpdateActivityPlatformRequest request) {
-        return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateActivityPlatform(userId, request));
-    }
-
     @Operation(summary = "이메일 변경", description = "로그인된 사용자의 이메일을 변경합니다. 현재 비밀번호 확인이 필요합니다.")
     @PutMapping("/me/email")
     public ResponseResult<UserUpdateEmailResponse> updateEmail(@LoginUserId Long userId, @RequestBody @Valid UserUpdateEmailRequest request) {

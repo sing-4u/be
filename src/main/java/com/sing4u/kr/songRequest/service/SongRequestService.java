@@ -1,13 +1,13 @@
-package com.sing4u.kr.customSongRequest.service;
+package com.sing4u.kr.songRequest.service;
 
 
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
-import com.sing4u.kr.customSongRequest.dto.request.SongRequestCreateDto;
-import com.sing4u.kr.customSongRequest.dto.SongRequestResponseDto;
-import com.sing4u.kr.customSongRequest.dto.response.SongDetailDto;
-import com.sing4u.kr.customSongRequest.entity.SongRequest;
-import com.sing4u.kr.customSongRequest.repository.SongRequestRepository;
+import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
+import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
+import com.sing4u.kr.songRequest.entity.SongRequest;
+import com.sing4u.kr.songRequest.repository.SongRequestRepository;
 import com.sing4u.kr.music.MusicInterface;
 import com.sing4u.kr.music.MusicPlatformFactory;
 import com.sing4u.kr.music.dto.TrackDto;
@@ -20,8 +20,6 @@ import com.sing4u.kr.user.entity.enums.UserType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

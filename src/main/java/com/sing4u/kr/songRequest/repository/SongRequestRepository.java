@@ -1,6 +1,6 @@
-package com.sing4u.kr.customSongRequest.repository;
+package com.sing4u.kr.songRequest.repository;
 
-import com.sing4u.kr.customSongRequest.entity.SongRequest;
+import com.sing4u.kr.songRequest.entity.SongRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.sing4u.kr.customSongRequest.dto;
+package com.sing4u.kr.songRequest.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
