@@ -1,7 +1,7 @@
 package com.sing4u.kr.session.entity;
 
 
-import com.sing4u.kr.customSongRequest.entity.SongRequest;
+import com.sing4u.kr.songRequest.entity.SongRequest;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.user.entity.User;
 import jakarta.persistence.*;

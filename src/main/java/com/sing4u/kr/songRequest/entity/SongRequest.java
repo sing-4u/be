@@ -1,6 +1,5 @@
-package com.sing4u.kr.customSongRequest.entity;
+package com.sing4u.kr.songRequest.entity;
 
-import com.sing4u.kr.customSongRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.session.entity.Session;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,11 +1,9 @@
-package com.sing4u.kr.customSongRequest.dto.request;
+package com.sing4u.kr.songRequest.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class SongRequestCreateDto {
