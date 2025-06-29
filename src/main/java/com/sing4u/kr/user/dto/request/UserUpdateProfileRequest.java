@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserUpdateProfileRequest {
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/new_profile.jpg")
-    private String profileImage;
+    private String profileImageLink;
 
     @Schema(description = "새 닉네임", example = "새로운닉네임")
     private String nickname;
