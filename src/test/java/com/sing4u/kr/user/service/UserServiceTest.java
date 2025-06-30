@@ -53,7 +53,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = User.testUserBuilder(1L, "테스트유저", UserType.USER);
+        user = User.testUserBuilder(1L, "테스트유저", UserType.FAN);
         user.setEmail("test@example.com");
         user.setPassword("encodedPassword");
         user.setCreatedAt(LocalDateTime.now());
@@ -73,7 +73,7 @@ class UserServiceTest {
                     "new@example.com",
                     "새유저",
                     "password1234",
-                    UserType.USER
+                    UserType.FAN
             );
 
             when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedNewPassword");

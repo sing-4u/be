@@ -39,7 +39,7 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserById(userId));
     }
 
-    @Operation(summary = "내 계정 유형 변경", description = "USER 또는 ARTIST로 계정 유형을 변경합니다.")
+    @Operation(summary = "내 계정 유형 변경", description = "FAN 또는 ARTIST로 계정 유형을 변경합니다.")
     @PutMapping("/me/account-type")
     public ResponseResult<Void> updateAccountType(@RequestBody @Valid UserUpdateAccountTypeRequest request) {
         Long userId = SecurityContextUtils.getAccountId();

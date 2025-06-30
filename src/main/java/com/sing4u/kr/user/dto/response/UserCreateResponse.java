@@ -21,7 +21,7 @@ public class UserCreateResponse {
     @Schema(description = "사용자 닉네임", example = "테스트유저")
     private String nickname;
 
-    @Schema(description = "계정 유형", example = "USER", implementation = UserType.class)
+    @Schema(description = "계정 유형", example = "FAN", implementation = UserType.class)
     private UserType userType;
 
     @Schema(description = "가입 일시", example = "2025-06-16T14:00:00")

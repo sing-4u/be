@@ -30,8 +30,8 @@
 //    @Test
 //    void createAccessTokenTest() {
 //        Long userId = 1L;
-//        List<UserRole> roles = List.of(UserRole.USER);
-//        String accessToken = jwtTokenProvider.generateAccessToken(userId, roles, "test", UserType.USER);
+//        List<UserRole> roles = List.of(UserRole.FAN);
+//        String accessToken = jwtTokenProvider.generateAccessToken(userId, roles, "test", UserType.FAN);
 //
 //        System.out.println("Access Token: " + accessToken);
 //    }

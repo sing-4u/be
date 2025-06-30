@@ -77,7 +77,7 @@ public class User {
         UserRole role;
         if (UserType.ARTIST.equals(userType)) {
             role = UserRole.ARTIST;
-        } else if(UserType.USER.equals(userType)) {
+        } else if(UserType.FAN.equals(userType)) {
             role = UserRole.USER;
         } else {
             role = UserRole.ADMIN;
@@ -141,7 +141,7 @@ public class User {
                 .nickname(name)
                 .password(encodedPassword)
                 .role(UserRole.USER)
-                .userType(UserType.USER)
+                .userType(UserType.FAN)
                 .socialType(socialType)
                 .build();
     }
