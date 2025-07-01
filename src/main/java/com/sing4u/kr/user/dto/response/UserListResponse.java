@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserListResponse {
-    @Schema(description = "사용자 ID", example = "10")
-    private Long userId;
+    @Schema(description = "생성된 사용자 공개 ID", example = "cd7f1081-e380-4fc7-bb7e-23cf4d7b6d44")
+    private String publicId;
 
     @Schema(description = "닉네임", example = "검색된유저")
     private String nickname;
@@ -23,7 +23,7 @@ public class UserListResponse {
 
     public static UserListResponse from(User user) {
         return UserListResponse.builder()
-                .userId(user.getId())
+                .publicId(user.getPublicId())
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
                 .isOpen(user.isOpen())
