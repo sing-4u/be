@@ -131,9 +131,10 @@ public class User {
         this.profileImage = profileImage;
     }
 
-    public static User testUserBuilder(Long id, String nickName, UserType userType) {
+    public static User testUserBuilder(Long id, String userPublicId, String nickName, UserType userType) {
         return User.builder()
                 .id(id)
+                .userPublicId(userPublicId)
                 .nickname(nickName)
                 .userType(userType)
                 .build();

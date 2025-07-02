@@ -53,7 +53,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = User.testUserBuilder(1L, "테스트유저", UserType.FAN);
+        user = User.testUserBuilder(1L, "test-public-id","테스트유저", UserType.FAN);
         user.setEmail("test@example.com");
         user.setPassword("encodedPassword");
         user.setCreatedAt(LocalDateTime.now());
@@ -80,7 +80,8 @@ class UserServiceTest {
             when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
                 User userToBeSaved = invocation.getArgument(0);
                 User mockedSavedUser = User.testUserBuilder(
-                        2L, // DB에서 ID가 생성되었다고 가정
+                        2L,
+                        "test-public-id2",// DB에서 ID가 생성되었다고 가정
                         userToBeSaved.getNickname(),
                         userToBeSaved.getUserType()
                 );
@@ -98,7 +99,7 @@ class UserServiceTest {
             UserCreateResponse response = userService.createUser(request);
 
             // then
-            assertThat(response.getUserId()).isEqualTo(2L);
+            assertThat(response.getUserPublicId()).isEqualTo("test-public-id2");
             assertThat(response.getEmail()).isEqualTo(request.getEmail());
             assertThat(response.getNickname()).isEqualTo(request.getNickname());
 
@@ -121,7 +122,7 @@ class UserServiceTest {
             var response = userService.getUserById(1L);
 
             // then
-            assertThat(response.getUserId()).isEqualTo(user.getId());
+            assertThat(response.getUserPublicId()).isEqualTo("test-public-id");
             assertThat(response.getNickname()).isEqualTo(user.getNickname());
             verify(userRepository).findByIdAndDeletedAtIsNull(1L);
         }

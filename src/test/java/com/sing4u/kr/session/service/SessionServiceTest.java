@@ -48,7 +48,7 @@ public class SessionServiceTest {
     @BeforeEach
     void setUp() {
         now = LocalDateTime.now();
-        artist = User.testUserBuilder(artistId, "testArtist", UserType.ARTIST);
+        artist = User.testUserBuilder(artistId, "test-public-id", "testArtist", UserType.ARTIST);
         savedSession = Session.builder().id(sessionId).artist(artist).status(SessionStatus.OPEN).startedAt(now).build();
         openSession = Session.builder().id(sessionId).artist(artist).status(SessionStatus.OPEN).startedAt(now).build();
         closedSession = Session.builder().id(sessionId).artist(artist).status(SessionStatus.CLOSE).startedAt(now).closedAt(now.plusHours(1)).build();
