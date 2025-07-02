@@ -55,19 +55,24 @@ public class SongRequestService {
                 MusicInterface platformService = selectedServiceOpt.get();
                 log.info("'{}' 플랫폼의 트랙 ID '{}'로 정보 조회를 시도합니다.", resolvedPlatformName, resolvedPlatformTrackId);
 
-                TrackDto trackDetails = platformService.getTrackDetails(resolvedPlatformTrackId);
+                try {
+                    TrackDto trackDetails = platformService.getTrackDetails(resolvedPlatformTrackId);
 
-                if (trackDetails != null) {
-                    title = trackDetails.getTitle();
-                    artistName = trackDetails.getArtistName();
-                    resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
-                    resolvedPlatformName = trackDetails.getPlatformName();
-                    log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})", resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
-                } else {
-                    log.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.", createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+                    if (trackDetails != null) {
+                        title = trackDetails.getTitle();
+                        artistName = trackDetails.getArtistName();
+                        resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
+                        resolvedPlatformName = trackDetails.getPlatformName();
+                        log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})",
+                                resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
+                    } else {
+                        log.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.",
+                                createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+                    }
+                } catch (Exception e) {
+                    log.error("플랫폼 '{}'에서 트랙 ID '{}' 조회 중 예외 발생. 입력 정보로 계속 진행합니다.",
+                            resolvedPlatformName, resolvedPlatformTrackId, e);
                 }
-            } else {
-                log.warn("지원하지 않는 음악 플랫폼('{}')이거나, DTO에 잘못된 정보가 입력되었습니다. DTO의 곡 정보를 사용합니다.", resolvedPlatformName);
             }
         }
         return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName);
