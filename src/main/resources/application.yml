@@ -51,7 +51,7 @@ cookie:
   refresh-http-only: true
   refresh-secure: true
   refresh-same-site: None
-  refresh-max-age-days: 7
+  refresh-max-age-days: 14
 
   access-name: accessToken
   access-path: /
