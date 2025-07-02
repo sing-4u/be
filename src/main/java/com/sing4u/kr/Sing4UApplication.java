@@ -2,12 +2,14 @@ package com.sing4u.kr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 
 
 import java.util.TimeZone;
 @EnableCaching
 @SpringBootApplication
+@EntityScan(basePackages = "com.sing4u.kr")
 public class Sing4UApplication {
 
 	public static void main(String[] args) {
