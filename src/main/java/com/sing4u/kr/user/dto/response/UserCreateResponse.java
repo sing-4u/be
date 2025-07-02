@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserCreateResponse {
-    @Schema(description = "생성된 사용자 ID", example = "1")
-    private Long userId;
+
+    @Schema(description = "생성된 사용자 공개 ID", example = "cd7f1081-e380-4fc7-bb7e-23cf4d7b6d44")
+    private String userPublicId;
 
     @Schema(description = "사용자 이메일", example = "test@example.com")
     private String email;
@@ -28,7 +29,7 @@ public class UserCreateResponse {
     private LocalDateTime createdAt;
     public static UserCreateResponse from(User user) {
         return UserCreateResponse.builder()
-                .userId(user.getId())
+                .userPublicId(user.getUserPublicId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .userType(user.getUserType())

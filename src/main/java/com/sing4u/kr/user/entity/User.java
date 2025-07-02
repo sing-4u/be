@@ -13,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -27,6 +28,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true, updatable = false)
+    private String userPublicId;
 
     @Column(length = 20, nullable = false)
     private String nickname;
@@ -144,5 +148,12 @@ public class User {
                 .userType(UserType.FAN)
                 .socialType(socialType)
                 .build();
+    }
+
+    @PrePersist
+    public void generatePublicId() {
+        if (this.userPublicId == null) {
+            this.userPublicId = UUID.randomUUID().toString();
+        }
     }
 }
