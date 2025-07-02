@@ -30,7 +30,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true, updatable = false)
-    private String publicId;
+    private String userPublicId;
 
     @Column(length = 20, nullable = false)
     private String nickname;
@@ -152,8 +152,8 @@ public class User {
 
     @PrePersist
     public void generatePublicId() {
-        if (this.publicId == null) {
-            this.publicId = UUID.randomUUID().toString();
+        if (this.userPublicId == null) {
+            this.userPublicId = UUID.randomUUID().toString();
         }
     }
 }

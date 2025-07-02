@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserListResponse {
     @Schema(description = "생성된 사용자 공개 ID", example = "cd7f1081-e380-4fc7-bb7e-23cf4d7b6d44")
-    private String publicId;
+    private String userPublicId;
 
     @Schema(description = "닉네임", example = "검색된유저")
     private String nickname;
@@ -23,7 +23,7 @@ public class UserListResponse {
 
     public static UserListResponse from(User user) {
         return UserListResponse.builder()
-                .publicId(user.getPublicId())
+                .userPublicId(user.getUserPublicId())
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
                 .isOpen(user.isOpen())

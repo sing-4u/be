@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class UserCreateResponse {
 
     @Schema(description = "생성된 사용자 공개 ID", example = "cd7f1081-e380-4fc7-bb7e-23cf4d7b6d44")
-    private String publicId;
+    private String userPublicId;
 
     @Schema(description = "사용자 이메일", example = "test@example.com")
     private String email;
@@ -29,7 +29,7 @@ public class UserCreateResponse {
     private LocalDateTime createdAt;
     public static UserCreateResponse from(User user) {
         return UserCreateResponse.builder()
-                .publicId(user.getPublicId())
+                .userPublicId(user.getUserPublicId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .userType(user.getUserType())
