@@ -43,6 +43,11 @@ public class SessionController {
             @Parameter(description = "세션 정보를 조회할 아티스트의 ID", example = "1")
             @PathVariable Long artistId) {
         CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId);
+
+        if (currentSession == null) {
+            return new ResponseResult<>(ResponseCode.SUCCESS, "오픈된 세션이 없습니다.", null);
+        }
+
         return new ResponseResult<>(ResponseCode.SUCCESS, currentSession);
     }
 }

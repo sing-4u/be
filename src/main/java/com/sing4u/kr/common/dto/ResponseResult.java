@@ -38,4 +38,10 @@ public class ResponseResult<T> {
         this.code = code;
         this.message = message;
     }
+
+    public ResponseResult(ResponseCode code, String message, T data) {
+        this.code = code.getCode();
+        this.message = message;
+        this.data = data;
+    }
 }
