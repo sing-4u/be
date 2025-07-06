@@ -112,7 +112,7 @@ public class SecurityConfig {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        List<String> methodList = List.of("GET", "POST", "OPTIONS", "DELETE", "PUT");
+        List<String> methodList = List.of("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH");
         List<String> headerList = List.of("x-requested-with", "authorization", "content-type", "access-control-allow-origin");
         List<String> exposeHeaders = List.of("content-type", "Set-Cookie");
 

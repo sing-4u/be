@@ -59,7 +59,8 @@ sing4u:
 
 cors:
   origins:
-    - "*"
+    - "https://next.sing4u.kr"
+    - "http://localhost:5173"
 
 springdoc:
   api-docs:
