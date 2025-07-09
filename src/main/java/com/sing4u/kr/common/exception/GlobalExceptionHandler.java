@@ -123,4 +123,13 @@ public class GlobalExceptionHandler {
 
         return new ResponseResult<>(ERROR_INTERNAL_SERVER.getCode(), ERROR_INTERNAL_SERVER.getMessage(), null);
     }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ResponseResult<?>> handleApiException(ApiException e) {
+        log.warn("ApiException: ", e);
+        ExceptionCode code = ExceptionCode.valueOf(e.getCode());
+        return ResponseEntity
+                .status(code.getStatus())
+                .body(new ResponseResult<>(code.getCode(), e.getMessage(), null));
+    }
 }
