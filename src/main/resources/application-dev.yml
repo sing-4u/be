@@ -73,7 +73,7 @@ endpoints:
 
 sing4u:
 #  server-url: http://localhost:8080
-  server-url: http://13.124.239.185:8080
+  server-url: https://13.124.239.185:8080
   file-url: https://image.sing4u.kr/
   oauth-redirect-url: http://localhost:3000/auth/callback
 
