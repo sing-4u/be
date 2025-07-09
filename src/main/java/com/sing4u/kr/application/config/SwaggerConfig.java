@@ -25,6 +25,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+                .addServersItem(new Server().url(serverUrl))
                 .info(new Info().title("Sing4U API").description("Sing4U API").version("v1"))
                 .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new Components()
