@@ -82,6 +82,7 @@ cors:
     - "https://next.sing4u.kr"
     - "http://next.sing4u.kr"
     - "http://localhost:5173"
+    - "https://dev-api.sing4u.kr"
 
 springdoc:
   api-docs:
