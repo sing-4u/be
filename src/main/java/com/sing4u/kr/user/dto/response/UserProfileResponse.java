@@ -1,8 +1,10 @@
 package com.sing4u.kr.user.dto.response;
 
 import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.SocialType;
 import com.sing4u.kr.user.entity.enums.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -34,8 +36,15 @@ public class UserProfileResponse {
     @Schema(description = "메인 커버 이미지 URL", example = "https://example.com/cover2.jpg")
     private String mainCoverUrl;
 
+    @Schema(description = "세션 오픈 여부", example = "false")
+    private boolean isOpen;
+
+    @Schema(description = "소셜 계정 유형", example = "GOOGLE", implementation = SocialType.class)
+    private SocialType socialType;
+
     @Schema(description = "마지막 수정 일시", example = "2025-06-16T15:00:00")
     private LocalDateTime updatedAt;
+
     public static UserProfileResponse from(User user) {
         return UserProfileResponse.builder()
                 .userPublicId(user.getUserPublicId())
@@ -46,6 +55,8 @@ public class UserProfileResponse {
                 .introduction(user.getIntroduction())
                 .mainCoverUrl(user.getMainCoverUrl())
                 .updatedAt(user.getUpdatedAt())
+                .isOpen(user.isOpen())
+                .socialType(user.getSocialType())
                 .build();
     }
 }
