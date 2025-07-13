@@ -72,7 +72,7 @@ public class UserController {
     }
 
     @Operation(summary = "프로필 이미지 변경", description = "사용자의 프로필 이미지를 업로드하고 변경합니다.")
-    @PutMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseResult<UserUpdateProfileImageResponse> updateProfileImage(@LoginUserId Long userId, @RequestPart MultipartFile profileImage) {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateUserProfileImage(userId, profileImage));
     }
