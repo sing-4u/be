@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class SongRequestCreateDto {
     @NotNull(message = "아티스트 ID는 필수입니다.")
-    @Schema(description = "곡을 요청할 아티스트의 ID", example = "1")
-    private Long artistId;
+    @Schema(description = "곡을 요청할 아티스트의 공개 ID", example = "user_public_id_1")
+    private String artistPublicId;
 
     @NotNull(message = "세션 ID는 필수입니다.")
-    @Schema(description = "요청이 속하게 될 세션의 ID", example = "101")
+    @Schema(description = "요청이 속하게 될 세션의 ID", example = "1")
     private Long sessionId;
 
     @Size(max = 50, message = "이메일은 최대 50자까지 가능합니다.")
