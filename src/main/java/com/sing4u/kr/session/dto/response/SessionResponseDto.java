@@ -16,7 +16,7 @@ public class SessionResponseDto {
     @Schema(description = "세션 ID", example = "1")
     private Long sessionId;
 
-    @Schema(description = "세션의 아티스트 ID", example = "public_user_id_1")
+    @Schema(description = "세션의 아티스트 ID", example = "user_public_id_1")
     private String artistId;
 
     @Schema(description = "세션 상태", example = "OPEN",implementation = SessionStatus.class)
