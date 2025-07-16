@@ -33,7 +33,7 @@ public class SongRequestController {
     @Operation(summary = "아티스트 곡 요청 목록 조회", description = "특정 아티스트에게 요청된 커스텀 곡 요청 목록을 조회")
     @GetMapping("/artists/{artistPublicId}")
     public ResponseResult<List<SessionSongsDto>> getArtistSongRequests(
-            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 ID", example = "1")
+            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 공개 ID", example = "user_public_id_1")
             @PathVariable String artistPublicId) {
         Long artistId = userService.getUserIdByPublicId(artistPublicId);
         List<SessionSongsDto> songRequests = songRequestService.getSongRequestsByArtist(artistId);
