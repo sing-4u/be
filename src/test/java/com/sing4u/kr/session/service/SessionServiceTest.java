@@ -10,6 +10,7 @@ import com.sing4u.kr.session.repository.SessionRepository;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserRepository;
+import com.sing4u.kr.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,13 +33,17 @@ public class SessionServiceTest {
     private SessionService sessionService;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private SessionRepository sessionRepository;
 
     @Mock
     private UserRepository userRepository;
 
-    private final  Long artistId =1L;
-    private final Long sessionId =10L;
+    private final String artistPublicId = "test-public-id";
+    private final Long sessionId = 10L;
+    private final Long artistId = 1L;
     private User artist;
     private Session savedSession;
     private Session openSession;
@@ -48,7 +53,7 @@ public class SessionServiceTest {
     @BeforeEach
     void setUp() {
         now = LocalDateTime.now();
-        artist = User.testUserBuilder(artistId, "test-public-id", "testArtist", UserType.ARTIST);
+        artist = User.testUserBuilder(artistId, artistPublicId, "testArtist", UserType.ARTIST);
         savedSession = Session.builder().id(sessionId).artist(artist).status(SessionStatus.OPEN).startedAt(now).build();
         openSession = Session.builder().id(sessionId).artist(artist).status(SessionStatus.OPEN).startedAt(now).build();
         closedSession = Session.builder().id(sessionId).artist(artist).status(SessionStatus.CLOSE).startedAt(now).closedAt(now.plusHours(1)).build();
@@ -57,19 +62,21 @@ public class SessionServiceTest {
     @Test
     @DisplayName("세션 생성 성공")
     void createSession_success() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByArtistAndStatus(artist, SessionStatus.OPEN)).thenReturn(Optional.empty());
         when(sessionRepository.save(any(Session.class))).thenReturn(savedSession);
 
-        SessionResponseDto responseDto = sessionService.createSession(artistId);
+        Long resolvedArtistId = userService.getUserIdByPublicId(artistPublicId);
+        SessionResponseDto responseDto = sessionService.createSession(resolvedArtistId);
 
         assertNotNull(responseDto);
         assertEquals(sessionId, responseDto.getSessionId());
-        assertEquals(artistId, responseDto.getArtistId());
+        assertEquals(artistPublicId, responseDto.getArtistId());
         assertEquals(SessionStatus.OPEN, responseDto.getStatus());
         assertNotNull(responseDto.getStartedAt());
 
-        verify(userRepository, times(1)).findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST);
+        verify(userRepository, times(1)).findByIdAndUserTypeAndDeletedAtIsNull(resolvedArtistId, UserType.ARTIST);
         verify(sessionRepository, times(1)).findByArtistAndStatus(artist, SessionStatus.OPEN);
         verify(sessionRepository, times(1)).save(any(Session.class));
     }
@@ -77,9 +84,10 @@ public class SessionServiceTest {
     @Test
     @DisplayName("세션 생성 실패 - 아티스트를 찾을 수 없음")
     void createSession_artistNotFound() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.empty());
 
-        ApiException exception = assertThrows(ApiException.class, () -> sessionService.createSession(artistId));
+        ApiException exception = assertThrows(ApiException.class, () -> sessionService.createSession(userService.getUserIdByPublicId(artistPublicId)));
         assertEquals(ExceptionCode.NOT_FOUND.getCode(), exception.getCode());
         assertEquals("해당 아티스트가 존재하지 않습니다.", exception.getMessage());
 
@@ -91,10 +99,11 @@ public class SessionServiceTest {
     @Test
     @DisplayName("세션 생성 실패 - 이미 진행 중인 세션 존재")
     void createSession_alreadyOpenSession() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByArtistAndStatus(artist, SessionStatus.OPEN)).thenReturn(Optional.of(openSession));
 
-        ApiException exception = assertThrows(ApiException.class, () -> sessionService.createSession(artistId));
+        ApiException exception = assertThrows(ApiException.class, () -> sessionService.createSession(userService.getUserIdByPublicId(artistPublicId)));
         assertEquals(ExceptionCode.CONFLICT.getCode(), exception.getCode());
         assertEquals("이미 진행 중인 신청곡 받기 세션이 있습니다. Session ID: " + sessionId, exception.getMessage());
 
@@ -106,14 +115,16 @@ public class SessionServiceTest {
     @Test
     @DisplayName("세션 종료 성공")
     void closeSession_success() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByIdAndArtistId(sessionId, artistId)).thenReturn(Optional.of(openSession));
 
-        SessionResponseDto responseDto = sessionService.closeSession(artistId, sessionId);
+        Long resolvedArtistId = userService.getUserIdByPublicId(artistPublicId);
+        SessionResponseDto responseDto = sessionService.closeSession(resolvedArtistId, sessionId);
 
         assertNotNull(responseDto);
         assertEquals(sessionId, responseDto.getSessionId());
-        assertEquals(artistId, responseDto.getArtistId());
+        assertEquals(artistPublicId, responseDto.getArtistId());
         assertEquals(SessionStatus.CLOSE, responseDto.getStatus());
         assertNotNull(responseDto.getStartedAt());
         assertNotNull(openSession.getClosedAt());
@@ -126,10 +137,11 @@ public class SessionServiceTest {
     @DisplayName("세션 종료 실패 - 아티스트를 찾을 수 없음")
     void closeSession_artistNotFound() {
         // Given
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.empty());
 
         // When & Then
-        ApiException exception = assertThrows(ApiException.class, () -> sessionService.closeSession(artistId, sessionId));
+        ApiException exception = assertThrows(ApiException.class, () -> sessionService.closeSession(userService.getUserIdByPublicId(artistPublicId), sessionId));
         assertEquals(ExceptionCode.NOT_FOUND.getCode(), exception.getCode());
         assertEquals("아티스트를 찾을 수 없습니다. ID: " + artistId, exception.getMessage());
 
@@ -141,11 +153,12 @@ public class SessionServiceTest {
     @DisplayName("세션 종료 실패 - 해당 아티스트의 세션을 찾을 수 없음")
     void closeSession_sessionNotFound() {
         // Given
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByIdAndArtistId(sessionId, artistId)).thenReturn(Optional.empty());
 
         // When & Then
-        ApiException exception = assertThrows(ApiException.class, () -> sessionService.closeSession(artistId, sessionId));
+        ApiException exception = assertThrows(ApiException.class, () -> sessionService.closeSession(userService.getUserIdByPublicId(artistPublicId), sessionId));
         assertEquals(ExceptionCode.NOT_FOUND.getCode(), exception.getCode());
         assertEquals("해당 아티스트의 세션을 찾을 수 없습니다. Session ID: " + sessionId, exception.getMessage());
 
@@ -156,10 +169,11 @@ public class SessionServiceTest {
     @Test
     @DisplayName("세션 종료 실패 - 이미 종료된 세션")
     void closeSession_alreadyClosed() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByIdAndArtistId(sessionId, artistId)).thenReturn(Optional.of(closedSession));
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> sessionService.closeSession(artistId, sessionId));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> sessionService.closeSession(userService.getUserIdByPublicId(artistPublicId), sessionId));
         assertEquals("Session is already closed", exception.getMessage());
 
         verify(userRepository, times(1)).findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST);
@@ -169,14 +183,16 @@ public class SessionServiceTest {
     @Test
     @DisplayName("현재 진행 중인 세션 조회 성공")
     void getArtistOpenSession_success() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByArtistIdAndStatus(artistId, SessionStatus.OPEN)).thenReturn(Optional.of(openSession));
 
-        CurrentSessionResponseDto responseDto = sessionService.getArtistOpenSession(artistId);
+        Long resolvedArtistId = userService.getUserIdByPublicId(artistPublicId);
+        CurrentSessionResponseDto responseDto = sessionService.getArtistOpenSession(resolvedArtistId);
 
         assertNotNull(responseDto);
         assertEquals(sessionId, responseDto.getSessionId());
-        assertEquals(artistId, responseDto.getArtistId());
+        assertEquals(artistPublicId, responseDto.getArtistId());
         assertEquals(SessionStatus.OPEN, responseDto.getStatus());
         assertNotNull(responseDto.getStartedAt());
 
@@ -187,10 +203,12 @@ public class SessionServiceTest {
     @Test
     @DisplayName("현재 진행 중인 세션 조회 - 진행 중인 세션 없음")
     void getArtistOpenSession_noOpenSession() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.of(artist));
         when(sessionRepository.findByArtistIdAndStatus(artistId, SessionStatus.OPEN)).thenReturn(Optional.empty());
 
-        CurrentSessionResponseDto responseDto = sessionService.getArtistOpenSession(artistId);
+        Long resolvedArtistId = userService.getUserIdByPublicId(artistPublicId);
+        CurrentSessionResponseDto responseDto = sessionService.getArtistOpenSession(resolvedArtistId);
 
         assertNull(responseDto);
 
@@ -201,9 +219,10 @@ public class SessionServiceTest {
     @Test
     @DisplayName("현재 진행 중인 세션 조회 실패 - 아티스트를 찾을 수 없음")
     void getArtistOpenSession_artistNotFound() {
+        when(userService.getUserIdByPublicId(artistPublicId)).thenReturn(artistId);
         when(userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)).thenReturn(Optional.empty());
 
-        ApiException exception = assertThrows(ApiException.class, () -> sessionService.getArtistOpenSession(artistId));
+        ApiException exception = assertThrows(ApiException.class, () -> sessionService.getArtistOpenSession(userService.getUserIdByPublicId(artistPublicId)));
         assertEquals(ExceptionCode.NOT_FOUND.getCode(), exception.getCode());
         assertEquals("아티스트를 찾을 수 없습니다. ID: " + artistId, exception.getMessage());
 
