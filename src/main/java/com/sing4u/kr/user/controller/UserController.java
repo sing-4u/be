@@ -60,7 +60,8 @@ public class UserController {
 
     @Operation(summary = "비밀번호 변경", description = "로그인된 사용자의 비밀번호를 변경합니다. 현재 비밀번호 확인이 필요합니다.")
     @PutMapping("/me/password")
-    public ResponseResult<UserUpdatePasswordResponse> updatePassword(@RequestBody @Valid UserUpdatePasswordRequest request) {
+    public ResponseResult<UserUpdatePasswordResponse> updatePassword(@LoginUserId Long userId, @RequestBody @Valid UserUpdatePasswordRequest request) {
+        userService.updatePassword(userId, request);
         return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 

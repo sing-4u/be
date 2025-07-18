@@ -6,6 +6,7 @@ import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.songRequest.service.SongRequestService;
 import com.sing4u.kr.session.dto.SessionSongsDto;
+import com.sing4u.kr.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import java.util.List;
 public class SongRequestController {
 
     private final SongRequestService songRequestService;
+    private final UserService userService;
 
     @Operation(summary = "곡 요청 제출", description = "팬이 아티스트에게 곡 요청을 제출합니다.")
     @PostMapping
@@ -29,10 +31,11 @@ public class SongRequestController {
     }
 
     @Operation(summary = "아티스트 곡 요청 목록 조회", description = "특정 아티스트에게 요청된 커스텀 곡 요청 목록을 조회")
-    @GetMapping("/artists/{artistId}")
+    @GetMapping("/artists/{artistPublicId}")
     public ResponseResult<List<SessionSongsDto>> getArtistSongRequests(
-            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 ID", example = "1")
-            @PathVariable Long artistId) {
+            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 공개 ID", example = "user_public_id_1")
+            @PathVariable String artistPublicId) {
+        Long artistId = userService.getUserIdByPublicId(artistPublicId);
         List<SessionSongsDto> songRequests = songRequestService.getSongRequestsByArtist(artistId);
         return new ResponseResult<>(ResponseCode.SUCCESS, songRequests);
     }

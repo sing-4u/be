@@ -14,8 +14,8 @@ public class CurrentSessionResponseDto {
     @Schema(description = "세션 ID", example = "101")
     private Long sessionId;
 
-    @Schema(description = "세션을 진행 중인 아티스트 ID", example = "1")
-    private Long artistId;
+    @Schema(description = "세션을 진행 중인 아티스트 ID", example = "user_public_id_1")
+    private String artistId;
 
     @Schema(description = "세션 상태 (항상 OPEN)", example = "OPEN", implementation = SessionStatus.class)
     private SessionStatus status;
@@ -25,7 +25,7 @@ public class CurrentSessionResponseDto {
     public static CurrentSessionResponseDto from(Session session) {
         return CurrentSessionResponseDto.builder()
                 .sessionId(session.getId())
-                .artistId(session.getArtist().getId())
+                .artistId(session.getArtist().getUserPublicId())
                 .status(session.getStatus())
                 .startedAt(session.getStartedAt())
                 .build();

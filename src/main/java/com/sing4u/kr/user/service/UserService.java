@@ -134,7 +134,7 @@ public class UserService {
         }
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        // return UserUpdatePasswordResponse.from(user);
+        //return UserUpdatePasswordResponse.from(user);
     }
 
     @Transactional
@@ -161,5 +161,13 @@ public class UserService {
         this.userRepository.save(user);
 
         return UserUpdateProfileImageResponse.of(user.getProfileImage());
+    }
+
+    @Transactional(readOnly = true)
+    public Long getUserIdByPublicId(String publicId) {
+        User user = userRepository.findByUserPublicIdAndDeletedAtIsNull(publicId)
+                .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
+
+        return user.getId();
     }
 }

@@ -18,6 +18,7 @@ import com.sing4u.kr.session.dto.SessionSongsDto;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.enums.UserType;
 
+import com.sing4u.kr.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class SongRequestService {
     private final MusicPlatformFactory musicPlatformFactory;
 
     private record SongInfo(String title, String artistName, String platformTrackId, String platformName){}
+
+    private final UserService userService;
 
     private SongInfo determineSongInfo(SongRequestCreateDto createDto) {
         String title = createDto.getSongTitle();
@@ -94,7 +97,8 @@ public class SongRequestService {
         Session session = sessionRepository.findById(createDto.getSessionId())
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "세션을 찾을 수 없습니다. ID: " + createDto.getSessionId()));
 
-        validateSession(session, createDto.getArtistId());
+        Long artistId = userService.getUserIdByPublicId(createDto.getArtistPublicId());
+        validateSession(session, artistId);
 
         // DB 작업: 엔티티 생성 및 저장
         SongRequest songRequest = SongRequest.builder()

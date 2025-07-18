@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SessionResponseDto {
-    @Schema(description = "세션 ID", example = "101")
+    @Schema(description = "세션 ID", example = "1")
     private Long sessionId;
 
-    @Schema(description = "세션의 아티스트 ID", example = "1")
-    private Long artistId;
+    @Schema(description = "세션의 아티스트 ID", example = "user_public_id_1")
+    private String artistId;
 
     @Schema(description = "세션 상태", example = "OPEN",implementation = SessionStatus.class)
     private SessionStatus status;
@@ -31,7 +31,7 @@ public class SessionResponseDto {
     public static SessionResponseDto from(Session session) {
         return SessionResponseDto.builder()
                 .sessionId(session.getId())
-                .artistId(session.getArtist().getId())
+                .artistId(session.getArtist().getUserPublicId())
                 .status(session.getStatus())
                 .startedAt(session.getStartedAt())
                 .closedAt(session.getClosedAt())
