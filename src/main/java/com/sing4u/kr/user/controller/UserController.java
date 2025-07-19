@@ -78,4 +78,11 @@ public class UserController {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.updateUserProfileImage(userId, profileImage));
     }
 
+    @Operation(summary = "프로필 이미지 삭제", description = "사용자의 프로필 이미지를 삭제합니다.")
+    @PatchMapping("/me/profile-image/delete")
+    public ResponseResult<Void> deleteProfileImage(@LoginUserId Long userId) {
+        userService.deleteUserProfileImage(userId);
+        return new ResponseResult<>(ResponseCode.SUCCESS);
+    }
+
 }

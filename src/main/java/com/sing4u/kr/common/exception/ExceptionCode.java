@@ -17,7 +17,8 @@ public enum ExceptionCode {
     
     // 도메인별 에러
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "Customer not found."),
-    ORDER_CANNOT_BE_CANCELED(HttpStatus.CONFLICT, "ORDER_CANNOT_BE_CANCELED", "Order cannot be canceled.");
+    ORDER_CANNOT_BE_CANCELED(HttpStatus.CONFLICT, "ORDER_CANNOT_BE_CANCELED", "Order cannot be canceled."),
+    S3_FILE_DELETE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "S3_FILE_DELETE_FAIL", "S3 파일 삭제에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;
