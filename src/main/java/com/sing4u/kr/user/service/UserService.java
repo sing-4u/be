@@ -76,7 +76,6 @@ public class UserService {
     public UserProfileResponse updateProfile(Long id, UserUpdateProfileRequest request) {
         User user = getEntityOrThrow(id);
         user.updateProfile(
-                request.getProfileImageLink(),
                 request.getNickname(),
                 request.getIntroduction(),
                 request.getMainCoverUrl()

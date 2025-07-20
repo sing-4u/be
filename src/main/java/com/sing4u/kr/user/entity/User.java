@@ -105,8 +105,7 @@ public class User {
         this.userType = userType;
     }
 
-    public void updateProfile(String profileImageLink, String nickname, String introduction, String mainCoverUrl) {
-        this.profileImage = profileImageLink;
+    public void updateProfile(String nickname, String introduction, String mainCoverUrl) {
         this.nickname = nickname;
         this.introduction = introduction;
         this.mainCoverUrl = mainCoverUrl;
