@@ -182,6 +182,6 @@ public class UserService {
         }
 
         user.setProfileImage(null);
-        userRepository.save(user);
+        //userRepository.save(user);
     }
 }
