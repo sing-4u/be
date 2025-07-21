@@ -1,5 +1,7 @@
 package com.sing4u.kr.file.service;
 
+import com.sing4u.kr.common.exception.ApiException;
+import com.sing4u.kr.common.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import com.sing4u.kr.file.utils.FileUtils;
 
@@ -46,12 +49,40 @@ public class S3Service {
     }
 
     private String generateUploadPath(String path, MultipartFile file) {
-        return Path.of(this.activeProfile,
-                path,
-                FileUtils.generateFileName(file)).toString();
+        return String.join("/", this.activeProfile, path, FileUtils.generateFileName(file));
     }
 
     private String getFullPath(String path) {
         return this.fileUrl + path;
+    }
+
+    public void deleteFile(String fullUrl) {
+        if (fullUrl == null || fullUrl.isBlank()) {
+            throw new IllegalArgumentException("Provided S3 URL is null or blank.");
+        }
+
+        if (!fullUrl.startsWith(fileUrl)) {
+            throw new IllegalArgumentException("URL does not match fileUrl: " + fullUrl);
+        }
+
+        String key = fullUrl.replaceFirst("^" + Pattern.quote(fileUrl), "");
+
+        try {
+            boolean exists = s3Client.headObject(builder -> builder
+                    .bucket(bucketName)
+                    .key(key)
+                    .build()).sdkHttpResponse().isSuccessful();
+
+            if (!exists) {
+                throw new ApiException(ExceptionCode.S3_FILE_DELETE_FAIL, "S3 object does not exist: " + key);
+            }
+
+            s3Client.deleteObject(builder -> builder
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
+        } catch (Exception e) {
+            throw new ApiException(ExceptionCode.S3_FILE_DELETE_FAIL);
+        }
     }
 }

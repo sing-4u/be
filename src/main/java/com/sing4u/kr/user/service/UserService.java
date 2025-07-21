@@ -1,5 +1,6 @@
 package com.sing4u.kr.user.service;
 
+import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.file.service.S3Service;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
@@ -168,5 +169,18 @@ public class UserService {
                 .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
 
         return user.getId();
+    }
+
+    @Transactional
+    public void deleteUserProfileImage(Long id) {
+        User user = this.getEntityOrThrow(id);
+
+        String imageUrl = user.getProfileImage();
+        if (imageUrl != null) {
+            s3Service.deleteFile(imageUrl); // 전체 URL 넘겨도 내부에서 key 추출
+        }
+
+        user.setProfileImage(null);
+        //userRepository.save(user);
     }
 }

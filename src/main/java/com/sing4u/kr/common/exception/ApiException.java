@@ -39,4 +39,10 @@ public class ApiException extends RuntimeException {
         this.code = exceptionCode.getCode();
         this.message = customMessage != null ? customMessage : exceptionCode.getDefaultMessage();
     }
+
+    public ApiException(ExceptionCode exceptionCode) {
+        super(exceptionCode.getDefaultMessage());
+        this.code = exceptionCode.getCode();
+        this.message = exceptionCode.getDefaultMessage();
+    }
 }
