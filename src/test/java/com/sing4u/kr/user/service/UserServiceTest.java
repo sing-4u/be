@@ -72,7 +72,7 @@ class UserServiceTest {
             UserCreateRequest request =  new TestUserCreateRequest(
                     "new@example.com",
                     "새유저",
-                    "password1234",
+                    "password123!",
                     UserType.FAN
             );
 
@@ -103,7 +103,7 @@ class UserServiceTest {
             assertThat(response.getEmail()).isEqualTo(request.getEmail());
             assertThat(response.getNickname()).isEqualTo(request.getNickname());
 
-            verify(passwordEncoder).encode("password1234");
+            verify(passwordEncoder).encode("password123!");
             verify(userRepository).save(any(User.class));
         }
     }

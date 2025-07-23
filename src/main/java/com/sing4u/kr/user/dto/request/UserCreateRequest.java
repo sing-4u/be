@@ -2,10 +2,7 @@ package com.sing4u.kr.user.dto.request;
 
 import com.sing4u.kr.user.entity.enums.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
@@ -23,9 +20,13 @@ public class UserCreateRequest {
     @NotBlank(message = "닉네임은 필수입니다.")
     private String nickname;
 
-    @Schema(description = "비밀번호", example = "password1234")
+    @Schema(description = "비밀번호", example = "password123!")
     @NotBlank(message = "비밀번호는 필수입니다.")
-    @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
+    @Size(min = 8, max = 16, message = "비밀번호는 8자 이상 16자 이하여야 합니다.")
+    @Pattern(
+            regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,16}$",
+            message = "비밀번호는 영문자, 숫자, 특수문자, 숫자를 포함해 8~16자여야 합니다."
+    )
     private String password;
 
     @Schema(description = "계정 유형", example = "FAN", allowableValues = {"FAN", "ARTIST"}, implementation = UserType.class)
