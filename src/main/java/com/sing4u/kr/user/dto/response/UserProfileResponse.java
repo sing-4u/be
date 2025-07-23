@@ -1,5 +1,7 @@
 package com.sing4u.kr.user.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.SocialType;
 import com.sing4u.kr.user.entity.enums.UserType;
@@ -36,6 +38,7 @@ public class UserProfileResponse {
     @Schema(description = "메인 커버 이미지 URL", example = "https://example.com/cover2.jpg")
     private String mainCoverUrl;
 
+    @JsonProperty("isOpen")
     @Schema(description = "세션 오픈 여부", example = "false")
     private boolean isOpen;
 
@@ -58,5 +61,10 @@ public class UserProfileResponse {
                 .isOpen(user.isOpen())
                 .socialType(user.getSocialType())
                 .build();
+    }
+
+    @JsonIgnore  // Lombok이 만든 isOpen() 무시
+    public boolean isOpen() {
+        return isOpen;
     }
 }
