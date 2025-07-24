@@ -16,7 +16,7 @@ public class UserUpdatePasswordRequest {
     @Schema(description = "현재 비밀번호", example = "password1234")
     @NotBlank(message = "비밀번호는 필수입니다.")
     //@Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
-    private String password;
+    private String currentPassword;
 
     @Schema(description = "새로운 비밀번호", example = "new_password5678")
     @NotBlank(message = "비밀번호는 필수입니다.")

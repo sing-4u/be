@@ -129,7 +129,7 @@ public class UserService {
     @Transactional
     public void updatePassword(Long id, UserUpdatePasswordRequest request) {
         User user = getEntityOrThrow(id);
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new Exception400("비밀번호가 일치하지 않습니다.", ResponseCode.ERROR_WRONG_PARAMETERS);
         }
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
