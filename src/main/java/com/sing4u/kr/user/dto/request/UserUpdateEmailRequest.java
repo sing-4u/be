@@ -29,6 +29,6 @@ public class UserUpdateEmailRequest {
     //@Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
-    @Schema(description = "소셜 타입 (현재 로직에선 미사용)", example = "LOCAL", allowableValues = {"GOOGLE", "LOCAL"}, implementation = SocialType.class)
-    private SocialType socialType;
+//    @Schema(description = "소셜 타입 (현재 로직에선 미사용)", example = "LOCAL", allowableValues = {"GOOGLE", "LOCAL"}, implementation = SocialType.class)
+//    private SocialType socialType;
 }
