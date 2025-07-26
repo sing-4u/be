@@ -7,8 +7,10 @@ import com.sing4u.kr.auth.dto.response.TokenDto;
 import com.sing4u.kr.auth.dto.response.TokenResponse;
 import com.sing4u.kr.auth.service.AuthService;
 import com.sing4u.kr.auth.utils.CookieUtils;
+import com.sing4u.kr.common.auth.LoginUserId;
 import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,19 @@ public class AuthController {
         TokenDto dto = authService.refresh(refreshToken);
         CookieUtils.setRefreshTokenCookie(response, dto.getRefreshToken());
         return new ResponseResult<>(ResponseCode.SUCCESS, TokenResponse.of(dto.getAccessToken(), dto.getRefreshToken()));
+    }
+
+    @Operation(summary = "로그아웃", description = "사용자의 AccessToken / RefreshToken 쿠키를 삭제합니다.")
+    @PostMapping("/logout")
+    public ResponseResult<Void> logout(@LoginUserId Long userId, HttpServletResponse response) {
+        // RefreshToken db에서 삭제
+        authService.logout(userId);
+
+        // 쿠키 삭제: accessToken / refreshToken
+        CookieUtils.deleteAccessTokenCookie(response);
+        CookieUtils.deleteRefreshTokenCookie(response);
+
+        return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 
 }

@@ -13,4 +13,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     // 토큰 값으로 RefreshToken을 삭제하는 메서드
     void deleteByToken(String token);
 
+    void deleteByUserId(Long userId);
 }

@@ -60,4 +60,28 @@ public class CookieUtils {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
+
+    public static void deleteRefreshTokenCookie(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(cookieProperties.getRefreshName(), "")
+                .httpOnly(cookieProperties.isRefreshHttpOnly())
+                .secure(cookieProperties.isRefreshSecure())
+                .sameSite(cookieProperties.getRefreshSameSite())
+                .path(cookieProperties.getRefreshPath())
+                .maxAge(0) // 즉시 만료
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    public static void deleteAccessTokenCookie(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(cookieProperties.getAccessName(), "")
+                .httpOnly(cookieProperties.isAccessHttpOnly())
+                .secure(cookieProperties.isAccessSecure())
+                .sameSite(cookieProperties.getAccessSameSite())
+                .path(cookieProperties.getAccessPath())
+                .maxAge(0) // 즉시 만료
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 }
