@@ -118,10 +118,10 @@ public class UserService {
     @Transactional
     public UserUpdateEmailResponse updateEmail(Long id, UserUpdateEmailRequest request) {
         User user = getEntityOrThrow(id);
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new Exception400("비밀번호가 일치하지 않습니다.", ResponseCode.ERROR_WRONG_PARAMETERS);
         }
-        user.updateEmail(request.getEmail());
+        user.updateEmail(request.getNewEmail());
         userRepository.save(user);
         return UserUpdateEmailResponse.from(user);
     }
