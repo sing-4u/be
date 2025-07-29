@@ -10,11 +10,11 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserUpdateEmailResponse {
     @Schema(description = "성공적으로 변경된 이메일 주소", example = "new_email@example.com")
-    private String email;
+    private String newEmail;
 
     public static UserUpdateEmailResponse from(User user) {
         return UserUpdateEmailResponse.builder()
-                .email(user.getEmail())
+                .newEmail(user.getEmail())
                 .build();
     }
 }
