@@ -121,7 +121,7 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new Exception400("비밀번호가 일치하지 않습니다.", ResponseCode.ERROR_PASSWORD_MISMATCH);
         }
-        user.updateEmail(request.getEmail());
+        user.updateEmail(request.getNewEmail());
         userRepository.save(user);
         return UserUpdateEmailResponse.from(user);
     }

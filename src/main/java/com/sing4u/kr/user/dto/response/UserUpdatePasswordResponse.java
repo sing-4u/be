@@ -16,7 +16,7 @@ public class UserUpdatePasswordResponse {
     private String newPassword;
     public static UserUpdatePasswordResponse from(User user) {
         return UserUpdatePasswordResponse.builder()
-                .password(user.getPassword())
+                .currentPassword(user.getPassword())
                 .newPassword(user.getPassword())
                 .build();
     }

@@ -19,7 +19,7 @@ public class UserUpdateEmailRequest {
     @Schema(description = "변경할 새 이메일", example = "new_email@example.com")
     @NotBlank(message = "이메일은 필수입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
-    private String email;
+    private String newEmail;
 
     @Schema(description = "사용자 닉네임 (현재 로직에선 미사용)", example = "테스트유저")
     @NotBlank(message = "닉네임은 필수입니다.")
@@ -34,6 +34,7 @@ public class UserUpdateEmailRequest {
     )
     private String password;
 
-    @Schema(description = "소셜 타입 (현재 로직에선 미사용)", example = "LOCAL", allowableValues = {"GOOGLE", "LOCAL"}, implementation = SocialType.class)
-    private SocialType socialType;
+
+//    @Schema(description = "소셜 타입 (현재 로직에선 미사용)", example = "LOCAL", allowableValues = {"GOOGLE", "LOCAL"}, implementation = SocialType.class)
+//    private SocialType socialType;
 }
