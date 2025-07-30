@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserUpdatePasswordResponse {
     @Schema(description = "이전 비밀번호 (보안상 응답에 포함하지 않는 것을 권장)", example = "password123!")
-    private String password;
+    private String currentPassword;
 
     @Schema(description = "새로운 비밀번호 (보안상 응답에 포함하지 않는 것을 권장)", example = "new_password456!")
     private String newPassword;
