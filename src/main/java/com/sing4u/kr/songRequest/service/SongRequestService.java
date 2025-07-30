@@ -138,7 +138,7 @@ public class SongRequestService {
                     // step 1 곡 제목 :: 아티스트이름 으로 그룹핑
                     Map<String, List<SongRequest>> grouped = session.getSongRequests().stream()
                             .collect(Collectors.groupingBy(
-                                    req -> req.getSongTitle() + ":: " + req.getSongArtistName()
+                                    req -> req.getSongTitle() + "::" + req.getSongArtistName()
                             ));
 
                     // step 2 그룹별로 생성
