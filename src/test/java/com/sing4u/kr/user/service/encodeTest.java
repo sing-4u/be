@@ -12,7 +12,7 @@ public class encodeTest {
     void encodeTest() {
         PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-        String rawPassword = "user_1";
+        String rawPassword = "password123!";
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         System.out.println(encodedPassword);  // 이미 prefix 포함됨: {bcrypt}...

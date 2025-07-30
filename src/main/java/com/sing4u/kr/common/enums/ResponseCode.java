@@ -24,6 +24,8 @@ public enum ResponseCode {
 
     ERROR_ALREADY_EXIST_USER("3000", "이미 존재하는 사용자 입니다."),
     ERROR_USER_NOT_FOUND("3001", "존재하지 않는 사용자 입니다"),
+
+    ERROR_PASSWORD_MISMATCH("3002", "비밀번호가 일치하지 않습니다."),
     ;
     private final String code;
     private final String message;
