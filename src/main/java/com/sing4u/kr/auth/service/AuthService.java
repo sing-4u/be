@@ -98,4 +98,9 @@ public class AuthService {
 
         return TokenDto.of(newAccessToken, newRefreshToken);
     }
+
+    @Transactional
+    public void logout(Long userId) {
+        refreshTokenRepository.deleteByUserId(userId);
+    }
 }
