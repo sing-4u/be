@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -134,11 +135,22 @@ public class SongRequestService {
 
         return sessions.stream()
                 .map(session -> {
-                    List<SongDetailDto> songDetails = session.getSongRequests().stream()
-                            .sorted(Comparator.comparing(SongRequest::getRequestedAt))
-                            .map(SongDetailDto::from)
-                            .collect(Collectors.toList());
+                    // step 1 곡 제목 :: 아티스트이름 으로 그룹핑
+                    Map<String, List<SongRequest>> grouped = session.getSongRequests().stream()
+                            .collect(Collectors.groupingBy(
+                                    req -> req.getSongTitle() + ":: " + req.getSongArtistName()
+                            ));
 
+                    // step 2 그룹별로 생성
+                    List<SongDetailDto> songDetails = grouped.entrySet().stream()
+                            .map(entry -> {
+                                List<SongRequest> requests = entry.getValue();
+                                SongRequest latest = requests.get(requests.size() - 1);
+
+                                return SongDetailDto.from(latest, (long) requests.size());
+                            })
+                            .sorted(Comparator.comparing(SongDetailDto::getRequestedAt))
+                            .collect(Collectors.toList());
                     return SessionSongsDto.from(session, songDetails);
                 })
                 .collect(Collectors.toList());

@@ -18,17 +18,23 @@ public class SongDetailDto {
     private String spotifyTrackId;
     private LocalDateTime requestedAt;
 
-    public static SongDetailDto from(SongRequest songRequest) {
+    private Long count;
+
+//
+
+    public static SongDetailDto from(SongRequest songRequest, Long count) {
         if (songRequest == null) {
             return null;
         }
+
         return SongDetailDto.builder()
                 .songRequestId(songRequest.getId())
                 .songTitle(songRequest.getSongTitle())
                 .singer(songRequest.getSongArtistName())
-                .email(songRequest.getFanEmail())
+                .email(songRequest.getFanEmail()) // 그룹 기준에서는 신청자 정보는 의미 없음
                 .spotifyTrackId(songRequest.getPlatformTrackId())
                 .requestedAt(songRequest.getRequestedAt())
+                .count(count)
                 .build();
     }
 }
