@@ -1,5 +1,6 @@
 package com.sing4u.kr.user.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sing4u.kr.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -19,6 +20,8 @@ public class UserListResponse {
 
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile10.jpg")
     private String profileImage;
+
+    @JsonProperty("isOpen")
     private boolean isOpen;
 
     public static UserListResponse from(User user) {
