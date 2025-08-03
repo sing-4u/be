@@ -10,6 +10,7 @@ import com.sing4u.kr.user.service.UserService;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -83,6 +84,14 @@ public class UserController {
     public ResponseResult<Void> deleteProfileImage(@LoginUserId Long userId) {
         userService.deleteUserProfileImage(userId);
         return new ResponseResult<>(ResponseCode.SUCCESS);
+    }
+
+    @Operation(summary = "공개 프로필 조회", description = "신청곡 상세 페이지 등에서 사용자의 공개 프로필 정보를 조회합니다.")
+    @GetMapping("/{publicId}")
+    public ResponseResult<UserPublicProfileResponse> getUserPublicProfile(
+            @Parameter(description = "사용자 공개 ID", example = "user_public_id_1")
+            @PathVariable String publicId) {
+        return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserPublicProfile(publicId));
     }
 
 }

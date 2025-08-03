@@ -183,4 +183,13 @@ public class UserService {
         user.setProfileImage(null);
         //userRepository.save(user);
     }
+
+    @Transactional(readOnly = true)
+    public UserPublicProfileResponse getUserPublicProfile(String publicId) {
+        User user = userRepository.findByUserPublicIdAndDeletedAtIsNull(publicId)
+                .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
+
+        return UserPublicProfileResponse.from(user);
+    }
+
 }
