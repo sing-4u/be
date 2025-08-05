@@ -88,7 +88,7 @@ public class UserController {
 
     @Operation(summary = "공개 프로필 조회", description = "신청곡 상세 페이지 등에서 사용자의 공개 프로필 정보를 조회합니다.")
     @GetMapping("/{publicId}")
-    public ResponseResult<UserPublicProfileResponse> getUserPublicProfile(
+    public ResponseResult<UserProfileResponse> getUserPublicProfile(
             @Parameter(description = "사용자 공개 ID", example = "user_public_id_1")
             @PathVariable String publicId) {
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.getUserPublicProfile(publicId));

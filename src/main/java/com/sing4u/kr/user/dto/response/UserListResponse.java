@@ -1,5 +1,7 @@
 package com.sing4u.kr.user.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sing4u.kr.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -19,6 +21,9 @@ public class UserListResponse {
 
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile10.jpg")
     private String profileImage;
+
+    @JsonProperty("isOpen")
+    @Schema(description = "세션 오픈 여부", example = "false")
     private boolean isOpen;
 
     public static UserListResponse from(User user) {
@@ -34,5 +39,10 @@ public class UserListResponse {
         return users.stream()
                 .map(UserListResponse::from)
                 .toList();
+    }
+
+    @JsonIgnore  // Lombok이 만든 isOpen() 무시
+    public boolean isOpen() {
+        return isOpen;
     }
 }
