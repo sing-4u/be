@@ -72,8 +72,8 @@ endpoints:
     - /api/v1/auth/refresh
 
 sing4u:
-  #server-url: http://localhost:8080
-  server-url: https://dev-api.sing4u.kr
+  server-url: http://localhost:8080
+#  server-url: https://dev-api.sing4u.kr
   file-url: https://image.sing4u.kr/
   oauth-redirect-url: http://localhost:3000/auth/callback
 
