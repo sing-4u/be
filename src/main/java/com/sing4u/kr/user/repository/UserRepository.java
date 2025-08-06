@@ -13,5 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserCustomRep
     Optional<User> findByIdAndUserType(Long id, UserType userType);
     Optional<User> findByIdAndUserTypeAndDeletedAtIsNull(Long id, UserType userType);
     Optional<User> findByUserPublicIdAndDeletedAtIsNull(String publicId);
+    Optional<User> findByUserPublicIdAndUserTypeAndDeletedAtIsNull(String publicId, UserType userType);
 }
 

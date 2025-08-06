@@ -9,6 +9,7 @@ import com.sing4u.kr.home.dto.request.HomeRequest;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.UserActivityPlatform;
 import com.sing4u.kr.user.repository.UserActivityPlatformRepository;
@@ -183,4 +184,13 @@ public class UserService {
         user.setProfileImage(null);
         //userRepository.save(user);
     }
+
+    @Transactional(readOnly = true)
+    public UserProfileResponse getUserPublicProfile(String publicId) {
+        User user = userRepository.findByUserPublicIdAndUserTypeAndDeletedAtIsNull(publicId, UserType.ARTIST)
+                .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
+
+        return UserProfileResponse.from(user);
+    }
+
 }
