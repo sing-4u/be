@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 public class PagingResponse<T> {
-    private final List<T> data;
+    private final List<T> artistItems;
     private final int page;
     private final int size;
     private final Long totalElements; // Page일 경우에만 값 제공
@@ -19,7 +19,7 @@ public class PagingResponse<T> {
 
     public static <T> PagingResponse<T> of(Page<T> pageData) {
         return PagingResponse.<T>builder()
-                .data(pageData.getContent())
+                .artistItems(pageData.getContent())
                 .page(pageData.getNumber())
                 .size(pageData.getSize())
                 .totalElements(pageData.getTotalElements())
@@ -30,7 +30,7 @@ public class PagingResponse<T> {
 
     public static <T> PagingResponse<T> of(Slice<T> sliceData) {
         return PagingResponse.<T>builder()
-                .data(sliceData.getContent())
+                .artistItems(sliceData.getContent())
                 .page(sliceData.getNumber())
                 .size(sliceData.getSize())
                 .totalElements(null)
@@ -41,7 +41,7 @@ public class PagingResponse<T> {
 
     public static <T> PagingResponse<T> of(List<T> data, int page, int size, long totalElements, boolean hasNext) {
         return PagingResponse.<T>builder()
-                .data(data)
+                .artistItems(data)
                 .page(page)
                 .size(size)
                 .totalElements(totalElements)
