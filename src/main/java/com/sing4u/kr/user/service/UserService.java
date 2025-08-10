@@ -15,8 +15,8 @@ import com.sing4u.kr.user.entity.UserActivityPlatform;
 import com.sing4u.kr.user.repository.UserActivityPlatformRepository;
 import com.sing4u.kr.user.utils.UserFileUtils;
 
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,6 +67,7 @@ public class UserService {
         return UserProfileResponse.from(user);
     }
 
+    @CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public void updateAccountType(Long id, UserUpdateAccountTypeRequest request) {
         User user = getEntityOrThrow(id);
@@ -74,6 +75,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public UserProfileResponse updateProfile(Long id, UserUpdateProfileRequest request) {
         User user = getEntityOrThrow(id);
@@ -138,6 +140,7 @@ public class UserService {
         //return UserUpdatePasswordResponse.from(user);
     }
 
+    @CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public void deleteUser(Long id) {
         User user = getEntityOrThrow(id);
@@ -150,6 +153,7 @@ public class UserService {
                 .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
     }
 
+    @CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public UserUpdateProfileImageResponse updateUserProfileImage(Long id, MultipartFile file) {
         User user = this.getEntityOrThrow(id);
@@ -172,6 +176,7 @@ public class UserService {
         return user.getId();
     }
 
+    @CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public void deleteUserProfileImage(Long id) {
         User user = this.getEntityOrThrow(id);
