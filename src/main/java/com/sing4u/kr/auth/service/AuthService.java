@@ -1,18 +1,22 @@
 package com.sing4u.kr.auth.service;
 
+import com.sing4u.kr.auth.dto.response.SendCodeResponse;
 import com.sing4u.kr.auth.entity.RefreshToken;
 import com.sing4u.kr.auth.dto.LoginDto;
 import com.sing4u.kr.auth.dto.request.LoginRequest;
 import com.sing4u.kr.auth.dto.response.TokenDto;
+import com.sing4u.kr.auth.repository.PasswordResetTokenRepository;
 import com.sing4u.kr.auth.repository.RefreshTokenRepository;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
 import com.sing4u.kr.jwt.exceptions.InvalidTokenException;
 import com.sing4u.kr.jwt.model.JwtToken;
 import com.sing4u.kr.jwt.provider.JwtTokenProvider;
+import com.sing4u.kr.mail.service.MailService;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.enums.UserRole;
+import com.sing4u.kr.user.entity.enums.SocialType;
 import com.sing4u.kr.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -32,6 +38,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokens;        // Caffeine 저장소 (code/throttle/ticket)
+    private final MailService mailService;                                 // SMTP 메일 발송
+
+    // 프론트 타이머 표시용(값만 응답에 내려줌. 실제 TTL은 Caffeine Bean에서 관리)
+    private static final int CODE_EXPIRES_SECONDS = 180;   // 3분
+    private static final int RESEND_THROTTLE_SECONDS = 30; // 30초
 
     @Transactional
     public LoginDto emailLogin(LoginRequest request) {
@@ -102,5 +114,93 @@ public class AuthService {
     @Transactional
     public void logout(Long userId) {
         refreshTokenRepository.deleteByUserId(userId);
+    }
+
+    /**
+     * 인증번호 전송: 6자리 코드 생성 → Caffeine에 3분 저장, 30초 재요청 제한 → 이메일 발송
+     */
+    @Transactional(readOnly = true)
+    public SendCodeResponse sendPasswordResetCode(String email) {
+        // 가입 여부 확인
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new Exception400(ResponseCode.ERROR_USER_NOT_FOUND));
+
+        // 소셜 전용 계정 차단
+        if (user.getSocialType() != null && user.getSocialType() != SocialType.LOCAL) {
+            throw new Exception400(ResponseCode.PASSWORD_RESET_SOCIAL_ACCOUNT);
+        }
+
+        // 30초 재요청 제한
+        if (passwordResetTokens.isThrottled(email)) {
+            throw new Exception400(ResponseCode.PASSWORD_RESET_RESEND_THROTTLED);
+        }
+
+        // 6자리 숫자 코드
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+
+        // 저장 (TTL/만료는 Caffeine Bean 설정)
+        passwordResetTokens.saveCode(email, code);
+        passwordResetTokens.throttle(email);
+
+        // 메일 발송
+        String subject = "[Sing4U] 비밀번호 재설정 인증번호";
+        String body = """
+                인증번호: %s
+                유효 시간: 3분
+                타인에게 공유하지 마세요.
+                """.formatted(code);
+        mailService.send(email, subject, body);
+
+        return new SendCodeResponse(CODE_EXPIRES_SECONDS, RESEND_THROTTLE_SECONDS, maskEmail(email));
+    }
+
+    /**
+     * 인증번호 검증: 일치하면 일회성 resetToken 발급(10분 TTL), 코드 즉시 폐기
+     */
+    @Transactional(readOnly = true)
+    public String verifyPasswordResetCode(String email, String code) {
+        String stored = passwordResetTokens.getCode(email);
+        if (stored == null) {
+            // 만료되었거나 발송 이력이 없음
+            throw new Exception400(ResponseCode.PASSWORD_RESET_CODE_EXPIRED);
+        }
+        if (!stored.equals(code)) {
+            // 불일치
+            throw new Exception400(ResponseCode.PASSWORD_RESET_CODE_INVALID );
+        }
+
+        // 1회성 사용: 코드 삭제
+        passwordResetTokens.removeCode(email);
+
+        // resetToken 발급(난수) 및 저장(10분 TTL은 Bean에서)
+        String resetToken = UUID.randomUUID().toString();
+        passwordResetTokens.saveTicket(email, resetToken);
+        return resetToken;
+    }
+
+    /**
+     * 최종 비밀번호 변경: resetToken 검증 → 사용자 조회 → 암호화 저장 → 토큰 폐기
+     */
+    @Transactional
+    public void confirmPasswordReset(String email, String resetToken, String newPassword) {
+        String stored = passwordResetTokens.getTicket(email);
+        if (stored == null || !stored.equals(resetToken)) {
+            throw new Exception400(ResponseCode.PASSWORD_RESET_TOKEN_INVALID);
+        }
+
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new Exception400(ResponseCode.ERROR_USER_NOT_FOUND));
+
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // 토큰 1회성 사용 후 폐기
+        passwordResetTokens.removeTicket(email);
+    }
+
+    private String maskEmail(String email) {
+        int at = email.indexOf('@');
+        if (at <= 1) return "***";
+        return email.charAt(0) + "***" + email.substring(at);
     }
 }
