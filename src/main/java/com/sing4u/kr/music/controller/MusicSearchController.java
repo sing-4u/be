@@ -29,12 +29,11 @@ public class MusicSearchController {
     @GetMapping("/search")
     public ResponseResult<List<TrackDto>> searchTracks(
             @Parameter(description = "검색어 (예: 'Golden')") @RequestParam @NotBlank String q,
-            @Parameter(description = "플랫폼 식별자 (기본: SPOTIFY)") @RequestParam(defaultValue = "SPOTIFY") String platform,
             @Parameter(description = "가져올 개수 (1~50)") @RequestParam(defaultValue = "10") @Min(1) @Max(50) int limit,
             @Parameter(description = "페이지 오프셋 (0부터)") @RequestParam(defaultValue = "0") @Min(0) int offset
     ) {
-        MusicInterface svc = platformFactory.getService(platform)
-                .orElseThrow(() -> new ApiException("INVALID_PLATFORM", "지원하지 않는 플랫폼: " + platform));
+        MusicInterface svc = platformFactory.getService("SPOTIFY")
+                .orElseThrow(() -> new ApiException("INVALID_PLATFORM", "지원하지 않는 플랫폼: "));
 
         List<TrackDto> items = svc.searchTracks(q, limit, offset, null);
         return new ResponseResult<>(ResponseCode.SUCCESS, items);
