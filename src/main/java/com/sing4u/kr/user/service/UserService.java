@@ -43,7 +43,7 @@ public class UserService {
 
     @Cacheable(
             value = "homeArtists",
-            key = "'page=' + #request.page",
+            key = "'page=' + #request.page + ',size=' + #request.pageSize",
             condition = "#request.keyword == null || #request.keyword.trim().isEmpty()"
     )
     @Transactional(readOnly = true)
@@ -55,6 +55,11 @@ public class UserService {
         return PagingResponse.of(responseSlice);
     }
 
+    @CacheEvict(
+            value = "homeArtists",
+            allEntries = true,
+            condition = "#request.userType == T(com.sing4u.kr.user.entity.enums.UserType).ARTIST"
+    )
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
         User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
