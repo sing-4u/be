@@ -11,14 +11,13 @@ import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchTracksRequest;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -126,11 +125,15 @@ public class SpotifyMusicService implements MusicInterface {
                         String artistNames = Arrays.stream(t.getArtists())
                                 .map(ArtistSimplified::getName)
                                 .collect(Collectors.joining(", "));
+
+                        String coverUrl = getCoverUrl(t);
+
                         return TrackDto.builder()
                                 .platformTrackId(t.getId())
                                 .title(t.getName())
                                 .artistName(artistNames)
                                 .platformName(getPlatformIdentifier())
+                                .albumImageUrl(coverUrl)
                                 .build();
                     })
                     .collect(Collectors.toList());
@@ -143,5 +146,19 @@ public class SpotifyMusicService implements MusicInterface {
             logger.error("Unexpected error", e);
         }
         return List.of();
+    }
+
+    private static String getCoverUrl(Track t) {
+        String coverUrl = null;
+        AlbumSimplified album = t.getAlbum();
+        if (album != null && album.getImages() != null && album.getImages().length > 0) {
+            Image[] images = album.getImages(); // 보통 [640, 300, 64] 순서
+            if (images.length >= 2) {
+                coverUrl = images[1].getUrl();   // 중간(대부분 300px)
+            } else {
+                coverUrl = images[0].getUrl();   // 1장만 있으면 그거 사용
+            }
+        }
+        return coverUrl;
     }
 }
