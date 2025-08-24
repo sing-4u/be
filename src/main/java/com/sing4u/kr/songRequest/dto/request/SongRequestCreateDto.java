@@ -20,8 +20,8 @@ public class SongRequestCreateDto {
     private String email;
 
     @Size(max = 20, message = "음악 플랫폼 이름은 최대 20자까지 가능합니다.")
-    @Schema(description = "음원 플랫폼 명 (정보 조회에 사용)", example = "SPOTIFY", allowableValues = {"SPOTIFY", "YOUTUBE_MUSIC"})
-    private String musicPlatformName;
+    @Schema(hidden = true) // Swagger 문서에서 숨김
+    private final String musicPlatformName = "SPOTIFY";
 
     @Size(max = 100, message = "플랫폼 트랙 ID는 최대 100자까지 가능합니다.")
     @Schema(description = "음원 플랫폼의 트랙 ID (정보 조회에 사용)", example = "4iV5W9uYEdYUVa79Axb7Rh")

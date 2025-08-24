@@ -26,8 +26,8 @@ public class SongRequest {
     @Column(name = "fan_email", length = 50)
     private String fanEmail;
 
-    @Column(name = "music_platform_name", length = 20) // 예: "SPOTIFY", "YOUTUBE_MUSIC"
-    private String musicPlatformName;
+    @Column(name = "music_platform_name", length = 20) // 예: "SPOTIFY",
+    private String musicPlatformName = "SPOTIFY";
 
     @Column(name = "platform_track_id", length = 100) // 해당 플랫폼에서의 트랙 ID
     private String platformTrackId;
