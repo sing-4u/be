@@ -11,4 +11,5 @@ public class TrackDto {
     private String title;
     private String artistName;
     private String platformName;
+    private String albumImageUrl;
 }

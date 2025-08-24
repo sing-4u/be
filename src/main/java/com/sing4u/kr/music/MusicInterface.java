@@ -1,6 +1,9 @@
 package com.sing4u.kr.music;
 
 import com.sing4u.kr.music.dto.TrackDto;
+import jakarta.annotation.Nullable;
+
+import java.util.List;
 
 public interface MusicInterface {
     /**
@@ -19,4 +22,9 @@ public interface MusicInterface {
      * @return 트랙 상세 정보를 담은 {@link TrackDto}. 정보를 찾지 못하거나 오류 발생 시 null을 반환.
      */
     TrackDto getTrackDetails(String platformTrackId);
+
+    /** 플랫폼별 검색 */
+    default List<TrackDto> searchTracks(String query, int limit, int offset, @Nullable String market) {
+        throw new UnsupportedOperationException(getPlatformIdentifier() + " does not support search");
+    }
 }
