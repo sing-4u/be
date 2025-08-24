@@ -53,6 +53,15 @@ spring:
   #          token-uri: https://oauth2.googleapis.com/token
   #          user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USER}
+    password: ${MAIL_PASS}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
 endpoints:
   public-api-list:
     - /api/v1/health/**
@@ -73,6 +82,7 @@ endpoints:
     - /api/v1/users/{publicId}
     - /api/v1/music/search
     - /api/v1/songRequests
+    - /api/v1/auth/password-reset/**
 
 sing4u:
   server-url: http://localhost:8080
@@ -118,3 +128,6 @@ cookie:
 
 server:
   forward-headers-strategy: framework
+
+mail:
+  from: ${MAIL_USER}
