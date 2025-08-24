@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class SongRequestController {
 
     @Operation(summary = "곡 요청 제출", description = "팬이 아티스트에게 곡 요청을 제출합니다.")
     @PostMapping
+    @PreAuthorize("permitAll()")
     public ResponseResult<SongRequestResponseDto> submitSongRequest(@Valid @RequestBody SongRequestCreateDto createDto) {
         SongRequestResponseDto responseDto = songRequestService.createSongRequest(createDto);
         return new ResponseResult<>(ResponseCode.SUCCESS, responseDto);
