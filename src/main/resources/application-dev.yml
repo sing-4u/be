@@ -130,3 +130,5 @@ server:
 
 mail:
   from: ${MAIL_USER}
+  brand: Sing4U
+  support-email: sing4uofficial@gmail.com

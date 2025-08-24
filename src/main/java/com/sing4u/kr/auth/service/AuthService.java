@@ -5,6 +5,7 @@ import com.sing4u.kr.auth.entity.RefreshToken;
 import com.sing4u.kr.auth.dto.LoginDto;
 import com.sing4u.kr.auth.dto.request.LoginRequest;
 import com.sing4u.kr.auth.dto.response.TokenDto;
+import com.sing4u.kr.auth.mail.PasswordResetMailer;
 import com.sing4u.kr.auth.repository.PasswordResetTokenRepository;
 import com.sing4u.kr.auth.repository.RefreshTokenRepository;
 import com.sing4u.kr.common.enums.ResponseCode;
@@ -39,7 +40,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokens;        // Caffeine 저장소 (code/throttle/ticket)
-    private final MailService mailService;                                 // SMTP 메일 발송
+    private final PasswordResetMailer passwordResetMailer;                               // SMTP 메일 발송
 
     // 프론트 타이머 표시용(값만 응답에 내려줌. 실제 TTL은 Caffeine Bean에서 관리)
     private static final int CODE_EXPIRES_SECONDS = 180;   // 3분
@@ -143,13 +144,7 @@ public class AuthService {
         passwordResetTokens.throttle(email);
 
         // 메일 발송
-        String subject = "[Sing4U] 비밀번호 재설정 인증번호";
-        String body = """
-                인증번호: %s
-                유효 시간: 3분
-                타인에게 공유하지 마세요.
-                """.formatted(code);
-        mailService.send(email, subject, body);
+        passwordResetMailer.send(email, code);
 
         return new SendCodeResponse(CODE_EXPIRES_SECONDS, RESEND_THROTTLE_SECONDS, maskEmail(email));
     }
