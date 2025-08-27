@@ -15,10 +15,14 @@ import com.sing4u.kr.common.auth.LoginUserId;
 import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,10 +78,17 @@ public class AuthController {
             - 1205: SNS 간편가입 계정
             """
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "요청 접수(메일 발송 비동기)"),
+            @ApiResponse(responseCode = "429", description = "재전송 제한(30초)"),
+            @ApiResponse(responseCode = "400", description = "요청 오류 / SNS 간편가입 계정 등")
+    })
     @PostMapping("/password-reset/code")
-    public ResponseResult<SendCodeResponse> sendCode(@RequestBody @Valid PasswordResetSendCodeRequest req) {
+    public ResponseEntity<ResponseResult<SendCodeResponse>> sendCode(@RequestBody @Valid PasswordResetSendCodeRequest req) {
         SendCodeResponse data = service.sendPasswordResetCode(req.getEmail());
-        return new ResponseResult<>(ResponseCode.SUCCESS, data);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED) // 202
+                .body(new ResponseResult<>(ResponseCode.SUCCESS, data));
     }
 
 
