@@ -83,6 +83,7 @@ endpoints:
     - /api/v1/music/search
     - /api/v1/songRequests
     - /api/v1/auth/password-reset/**
+    - /api/v1/artists/{artistPublicId}/sessions
 
 sing4u:
   server-url: http://localhost:8080
