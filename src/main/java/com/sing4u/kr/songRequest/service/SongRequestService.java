@@ -50,8 +50,7 @@ public class SongRequestService {
         String resolvedPlatformTrackId = createDto.getPlatformTrackId(); // 사용자가 제공한 플랫폼 ID
         String resolvedPlatformName = createDto.getMusicPlatformName();
 
-        if (resolvedPlatformName != null && !resolvedPlatformName.isBlank() &&
-                resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
+        if (resolvedPlatformName != null && !resolvedPlatformName.isBlank()) {
 
             Optional<MusicInterface> selectedServiceOpt = musicPlatformFactory.getService(resolvedPlatformName);
 
