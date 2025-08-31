@@ -47,34 +47,34 @@ public class SongRequestService {
     private SongInfo determineSongInfo(SongRequestCreateDto createDto) {
         String title = createDto.getSongTitle();
         String artistName = createDto.getArtistName();
-        String resolvedPlatformTrackId = createDto.getPlatformTrackId(); // 사용자가 제공한 플랫폼 ID
-        String resolvedPlatformName = createDto.getMusicPlatformName();
+        String resolvedPlatformTrackId = createDto.getPlatformTrackId(); // 사용자가 제공한 트랙 ID
+        String resolvedPlatformName = createDto.getMusicPlatformName(); // 사용자가 제공한 플랫폼 이름
 
-        if (resolvedPlatformName != null && !resolvedPlatformName.isBlank()) {
-
-            Optional<MusicInterface> selectedServiceOpt = musicPlatformFactory.getService(resolvedPlatformName);
-
-            if (selectedServiceOpt.isPresent()) {
-                MusicInterface platformService = selectedServiceOpt.get();
-                log.info("'{}' 플랫폼의 트랙 ID '{}'로 정보 조회를 시도합니다.", resolvedPlatformName, resolvedPlatformTrackId);
+        // 플랫폼 트랙 ID가 존재할 경우에만 외부 API 호출
+        if (resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
+            Optional<MusicInterface> optionalService = musicPlatformFactory.getService(resolvedPlatformName);
+            if (optionalService.isPresent()) {
+                MusicInterface platformService = optionalService.get();
+                log.info("'{}' 플랫폼의 트랙 ID '{}'로 정보 조회를 시도합니다.",
+                        resolvedPlatformName, resolvedPlatformTrackId);
 
                 try {
                     TrackDto trackDetails = platformService.getTrackDetails(resolvedPlatformTrackId);
-
                     if (trackDetails != null) {
-                        if(trackDetails.getTitle() != null && !trackDetails.getTitle().isBlank()) {
+                        if (trackDetails.getTitle() != null && !trackDetails.getTitle().isBlank()) {
                             title = trackDetails.getTitle();
                         }
-                        if(trackDetails.getArtistName() != null && !trackDetails.getArtistName().isBlank()) {
+                        if (trackDetails.getArtistName() != null && !trackDetails.getArtistName().isBlank()) {
                             artistName = trackDetails.getArtistName();
                         }
                         resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
                         resolvedPlatformName = trackDetails.getPlatformName();
+
                         log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})",
                                 resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
                     } else {
                         log.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.",
-                                createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+                                resolvedPlatformName, resolvedPlatformTrackId);
                     }
                 } catch (Exception e) {
                     log.error("플랫폼 '{}'에서 트랙 ID '{}' 조회 중 예외 발생. 입력 정보로 계속 진행합니다.",
@@ -82,8 +82,11 @@ public class SongRequestService {
                 }
             }
         }
+
+        // 플랫폼 정보가 없거나 트랙 ID가 없는 경우 DTO 정보 그대로 사용
         return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName);
     }
+
 
     public SongRequestResponseDto createSongRequest(SongRequestCreateDto createDto) {
         log.info("곡 요청 처리 시작 - 입력된 곡 정보: '{}' - '{}', 플랫폼: {}, ID: {}",
