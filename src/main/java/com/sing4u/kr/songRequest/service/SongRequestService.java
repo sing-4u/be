@@ -69,12 +69,8 @@ public class SongRequestService {
                         if(trackDetails.getArtistName() != null && !trackDetails.getArtistName().isBlank()) {
                             artistName = trackDetails.getArtistName();
                         }
-                        if(trackDetails.getPlatformTrackId() != null && !trackDetails.getPlatformTrackId().isBlank()) {
-                            resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
-                        }
-                        if (resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
-                            resolvedPlatformName = trackDetails.getPlatformName();
-                        }
+                        resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
+                        resolvedPlatformName = trackDetails.getPlatformName();
                         log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})",
                                 resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
                     } else {
