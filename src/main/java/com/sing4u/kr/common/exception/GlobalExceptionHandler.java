@@ -102,9 +102,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {
             Exception400.class,
     })
-    public ResponseResult handleException400(ApiException e) {
-        log.error("", e);
-        return new ResponseResult<>(e.getCode(), e.getMessage(), null);
+//    public ResponseResult handleException400(ApiException e) {
+//        log.error("", e);
+//        return new ResponseResult<>(e.getCode(), e.getMessage(), null);
+//    }
+    public ResponseEntity<ResponseResult<?>> handleException400(Exception400 e) {
+        // 스로틀(1201)만 429, 나머지는 400
+        HttpStatus status = ResponseCode.PASSWORD_RESET_RESEND_THROTTLED.getCode().equals(e.getCode())
+                ? HttpStatus.TOO_MANY_REQUESTS   // 429
+                : HttpStatus.BAD_REQUEST;        // 400
+
+        return ResponseEntity.status(status)
+                .body(new ResponseResult<>(e.getCode(), e.getMessage(), null));
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)

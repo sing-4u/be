@@ -9,6 +9,8 @@ public interface PasswordResetTokenRepository {
     // 30초 재요청 제한
     boolean isThrottled(String email);
     void throttle(String email);
+    // 쿨다운 강제 해제
+    void clearThrottle(String email);
 
     // 리셋 토큰 (10분)
     void saveTicket(String email, String ticket);

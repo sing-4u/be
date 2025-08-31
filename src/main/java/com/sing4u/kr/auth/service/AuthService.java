@@ -5,6 +5,7 @@ import com.sing4u.kr.auth.entity.RefreshToken;
 import com.sing4u.kr.auth.dto.LoginDto;
 import com.sing4u.kr.auth.dto.request.LoginRequest;
 import com.sing4u.kr.auth.dto.response.TokenDto;
+import com.sing4u.kr.auth.event.PasswordResetCodeIssuedEvent;
 import com.sing4u.kr.auth.mail.PasswordResetMailer;
 import com.sing4u.kr.auth.repository.PasswordResetTokenRepository;
 import com.sing4u.kr.auth.repository.RefreshTokenRepository;
@@ -21,6 +22,7 @@ import com.sing4u.kr.user.entity.enums.SocialType;
 import com.sing4u.kr.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokens;        // Caffeine 저장소 (code/throttle/ticket)
     private final PasswordResetMailer passwordResetMailer;                               // SMTP 메일 발송
+    private final ApplicationEventPublisher publisher;
 
     // 프론트 타이머 표시용(값만 응답에 내려줌. 실제 TTL은 Caffeine Bean에서 관리)
     private static final int CODE_EXPIRES_SECONDS = 180;   // 3분
@@ -143,8 +146,8 @@ public class AuthService {
         passwordResetTokens.saveCode(email, code);
         passwordResetTokens.throttle(email);
 
-        // 메일 발송
-        passwordResetMailer.send(email, code);
+        // 메일 발송(비동기 이벤트)
+        publisher.publishEvent(new PasswordResetCodeIssuedEvent(email, code));
 
         return new SendCodeResponse(CODE_EXPIRES_SECONDS, RESEND_THROTTLE_SECONDS, maskEmail(email));
     }
