@@ -61,6 +61,9 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+      mail.smtp.connection timeout: 3000   # 서버 연결 시도 타임아웃
+      mail.smtp.timeout: 5000              # 읽기(응답 대기) 타임아웃
+      mail.smtp.write timeout: 5000        # 쓰기(전송) 타임아웃
 
 endpoints:
   public-api-list:
@@ -83,6 +86,7 @@ endpoints:
     - /api/v1/music/search
     - /api/v1/songRequests
     - /api/v1/auth/password-reset/**
+    - /api/v1/artists/{artistPublicId}/sessions
 
 sing4u:
   server-url: http://localhost:8080

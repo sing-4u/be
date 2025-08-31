@@ -32,6 +32,7 @@ public class CaffeinePasswordResetTokenRepository implements PasswordResetTokenR
 
     @Override public boolean isThrottled(String email) { return thr.getIfPresent(hk(email)) != null; }
     @Override public void throttle(String email) { thr.put(hk(email), "1"); }
+    @Override public void clearThrottle(String email) { thr.invalidate(hk(email)); }
 
     @Override public void saveTicket(String email, String ticket) { tkt.put(tk(email), ticket); }
     @Override public String getTicket(String email) { return tkt.getIfPresent(tk(email)); }
