@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -93,9 +95,9 @@ public class AuthController {
             """
     )
     @PostMapping("/password-reset/verify")
-    public ResponseResult<String> verify(@RequestBody @Valid PasswordResetVerifyRequest req) {
+    public ResponseResult<Map<String, String>> verify(@RequestBody @Valid PasswordResetVerifyRequest req) {
         String ticket = service.verifyPasswordResetCode(req.getEmail(), req.getCode());
-        return new ResponseResult<>(ResponseCode.SUCCESS, ticket);
+        return new ResponseResult<>(ResponseCode.SUCCESS, Map.of("resetToken", ticket));
     }
 
     @Operation(
