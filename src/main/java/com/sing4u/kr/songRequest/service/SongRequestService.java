@@ -63,10 +63,18 @@ public class SongRequestService {
                     TrackDto trackDetails = platformService.getTrackDetails(resolvedPlatformTrackId);
 
                     if (trackDetails != null) {
-                        title = trackDetails.getTitle();
-                        artistName = trackDetails.getArtistName();
-                        resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
-                        resolvedPlatformName = trackDetails.getPlatformName();
+                        if(trackDetails.getTitle() != null && !trackDetails.getTitle().isBlank()) {
+                            title = trackDetails.getTitle();
+                        }
+                        if(trackDetails.getArtistName() != null && !trackDetails.getArtistName().isBlank()) {
+                            artistName = trackDetails.getArtistName();
+                        }
+                        if(trackDetails.getPlatformTrackId() != null && !trackDetails.getPlatformTrackId().isBlank()) {
+                            resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
+                        }
+                        if (resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
+                            resolvedPlatformName = trackDetails.getPlatformName();
+                        }
                         log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})",
                                 resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
                     } else {
@@ -83,8 +91,16 @@ public class SongRequestService {
     }
 
     public SongRequestResponseDto createSongRequest(SongRequestCreateDto createDto) {
+        log.info("곡 요청 처리 시작 - 입력된 곡 정보: '{}' - '{}', 플랫폼: {}, ID: {}",
+                createDto.getSongTitle(), createDto.getArtistName(),
+                createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+
         // STEP 1: 외부 API 호출 등 트랜잭션이 불필요한 작업을 먼저 수행.
         SongInfo determinedSongInfo = determineSongInfo(createDto);
+
+        log.info("최종 결정된 곡 정보: '{}' - '{}', 플랫폼: {}, ID: {}",
+                determinedSongInfo.title(), determinedSongInfo.artistName(),
+                determinedSongInfo.platformName(), determinedSongInfo.platformTrackId());
 
         // STEP 2: 순수 DB 작업만 처리하는 트랜잭션 메서드를 호출.
         return createAndSaveSongRequestInTx(createDto, determinedSongInfo);
