@@ -2,23 +2,30 @@ package com.sing4u.kr.session.controller;
 
 import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
+import com.sing4u.kr.common.exception.ApiException;
+import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.service.SessionService;
 import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/artists")
 @RequiredArgsConstructor
+@Slf4j
 public class SessionController {
 
     private final SessionService sessionService;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "세션 시작", description = "아티스트가 신청곡 받기를 시작합니다.")
     @PostMapping("/{artistPublicId}/sessions")
@@ -48,7 +55,12 @@ public class SessionController {
             @Parameter(description = "세션 정보를 조회할 아티스트의 공개 ID", example = "user_public_id_1")
             @PathVariable String artistPublicId) {
         Long artistId = userService.getUserIdByPublicId(artistPublicId);
-        CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId);
+
+        User user = userRepository.findByUserPublicIdAndDeletedAtIsNull(artistPublicId)
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다."));
+        Boolean sessionOpenClose =  user.isOpen();
+
+        CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId, sessionOpenClose);
 
         if (currentSession == null) {
             return new ResponseResult<>(ResponseCode.SUCCESS, "오픈된 세션이 없습니다.", null);

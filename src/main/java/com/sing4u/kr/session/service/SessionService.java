@@ -62,11 +62,13 @@ public class SessionService {
         return SessionResponseDto.from(session);
     }
 
-    public CurrentSessionResponseDto getArtistOpenSession(Long artistId) {
+    public CurrentSessionResponseDto getArtistOpenSession(Long artistId, Boolean sessionOpenClose) {
         userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
 
-        return sessionRepository.findByArtistIdAndStatus(artistId, SessionStatus.OPEN)
+        SessionStatus status = Boolean.TRUE.equals(sessionOpenClose) ? SessionStatus.OPEN : SessionStatus.CLOSE;
+
+        return sessionRepository.findByArtistIdAndStatus(artistId, status)
                 .map(CurrentSessionResponseDto::from)
                 .orElse(null);
     }
