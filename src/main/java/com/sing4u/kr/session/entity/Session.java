@@ -34,10 +34,10 @@ public class Session {
     private SessionStatus status;
 
     @CreationTimestamp
-    @Column(name = "started_at", nullable =false, updatable = false)
+    @Column(name = "started_at", nullable =false, updatable = false, columnDefinition = "datetime default current_timestamp")
     private LocalDateTime startedAt;
 
-    @Column(name = "closed_at")
+    @Column(name = "closed_at", columnDefinition = "datetime default current_timestamp")
     private LocalDateTime closedAt;
 
     @OneToMany(mappedBy = "session", fetch = FetchType.LAZY)
