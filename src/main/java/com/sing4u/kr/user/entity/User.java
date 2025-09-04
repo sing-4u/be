@@ -63,14 +63,14 @@ public class User {
     private UserRole role;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, columnDefinition = "datetime default current_timestamp")
+    @Column(name = "created_at", updatable = false, columnDefinition = "datetime")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", columnDefinition = "datetime default current_timestamp")
+    @Column(name = "updated_at", columnDefinition = "datetime")
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at", columnDefinition = "datetime default current_timestamp")
+    @Column(name = "deleted_at", columnDefinition = "datetime")
     private LocalDateTime deletedAt;
 
     @Column(name = "is_open", nullable = false)

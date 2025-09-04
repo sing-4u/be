@@ -24,7 +24,7 @@ public class RefreshToken {
     private String token;
 
     @CreationTimestamp
-    @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
+    @Column(nullable = false, columnDefinition = "datetime")
     private LocalDateTime createdAt;
 
     public static RefreshToken of(Long userId, String token) {

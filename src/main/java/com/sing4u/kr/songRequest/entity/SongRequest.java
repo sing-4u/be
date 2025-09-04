@@ -39,7 +39,7 @@ public class SongRequest {
     private String songArtistName; // 노래의 아티스트명
 
     @CreationTimestamp
-    @Column(name = "requested_at", nullable = false, updatable = false, columnDefinition = "datetime default current_timestamp")
+    @Column(name = "requested_at", nullable = false, updatable = false, columnDefinition = "datetime")
     private LocalDateTime requestedAt;
 
 }
