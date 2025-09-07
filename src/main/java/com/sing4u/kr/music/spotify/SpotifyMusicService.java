@@ -106,7 +106,7 @@ public class SpotifyMusicService implements MusicInterface {
     @Override
     public List<TrackDto> searchTracks(String query, int limit, int offset, String market) {
         try {
-            SearchTracksRequest.Builder builder = spotifyApi.searchTracks(query).limit(limit).offset(offset);
+            SearchTracksRequest.Builder builder = spotifyApi.searchTracks(query).limit(limit).offset(offset).setHeader("Accept-Language", "ko-KR,ko;q=0.9");
 
             CountryCode code = CountryCode.KR; // 기본값 KR
             if (market != null && !market.isBlank()) {
