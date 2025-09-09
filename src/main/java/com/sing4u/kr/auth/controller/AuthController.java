@@ -36,7 +36,6 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final AuthService service;
 
     @PostMapping("/login/email")
     public ResponseResult<LoginResponse> emailLogin(@RequestBody LoginRequest request,
@@ -87,7 +86,7 @@ public class AuthController {
     })
     @PostMapping("/password-reset/code")
     public ResponseEntity<ResponseResult<SendCodeResponse>> sendCode(@RequestBody @Valid PasswordResetSendCodeRequest req) {
-        SendCodeResponse data = service.sendPasswordResetCode(req.getEmail());
+        SendCodeResponse data = authService.sendPasswordResetCode(req.getEmail());
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED) // 202
                 .body(new ResponseResult<>(ResponseCode.SUCCESS, data));
@@ -107,7 +106,7 @@ public class AuthController {
     )
     @PostMapping("/password-reset/verify")
     public ResponseResult<Map<String, String>> verify(@RequestBody @Valid PasswordResetVerifyRequest req) {
-        String ticket = service.verifyPasswordResetCode(req.getEmail(), req.getCode());
+        String ticket = authService.verifyPasswordResetCode(req.getEmail(), req.getCode());
         return new ResponseResult<>(ResponseCode.SUCCESS, Map.of("resetToken", ticket));
     }
 
@@ -122,7 +121,7 @@ public class AuthController {
     )
     @PostMapping("/password-reset/confirm")
     public ResponseResult<Void> confirm(@RequestBody @Valid PasswordResetConfirmRequest req) {
-        service.confirmPasswordReset(req.getEmail(), req.getResetToken(), req.getNewPassword());
+        authService.confirmPasswordReset(req.getEmail(), req.getResetToken(), req.getNewPassword());
         return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 }

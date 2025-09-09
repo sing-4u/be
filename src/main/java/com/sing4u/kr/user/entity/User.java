@@ -93,6 +93,7 @@ public class User {
                 .password(password)
                 .userType(userType)
                 .role(role)
+                .socialType(SocialType.LOCAL)
                 .isOpen(false)
                 .build();
     }
