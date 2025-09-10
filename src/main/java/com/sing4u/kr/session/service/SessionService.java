@@ -46,6 +46,9 @@ public class SessionService {
         Session newSession = Session.create(artist);
         Session savedSession = sessionRepository.save(newSession);
 
+        // 아티스트 상태도 함께 오픈 처리
+        artist.updateIsOpen(true);
+
         return SessionResponseDto.from(savedSession);
     }
 

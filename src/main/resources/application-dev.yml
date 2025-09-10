@@ -24,7 +24,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -89,8 +89,8 @@ endpoints:
     - /api/v1/artists/{artistPublicId}/sessions
 
 sing4u:
-  server-url: http://localhost:8080
-#  server-url: https://dev-api.sing4u.kr
+  #server-url: http://localhost:8080
+  server-url: https://dev-api.sing4u.kr
   file-url: https://image.sing4u.kr/
   oauth-redirect-url: http://localhost:3000/auth/callback
 
