@@ -41,11 +41,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final S3Service s3Service;
 
-    @Cacheable(
-            value = "homeArtists",
-            key = "'page=' + #request.page + ',size=' + #request.pageSize",
-            condition = "#request.keyword == null || #request.keyword.trim().isEmpty()"
-    )
+//    @Cacheable(
+//            value = "homeArtists",
+//            key = "'page=' + #request.page + ',size=' + #request.pageSize",
+//            condition = "#request.keyword == null || #request.keyword.trim().isEmpty()"
+//    )
     @Transactional(readOnly = true)
     public PagingResponse<UserListResponse> getArtistList(HomeRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getPageSize());
@@ -55,11 +55,11 @@ public class UserService {
         return PagingResponse.of(responseSlice);
     }
 
-    @CacheEvict(
-            value = "homeArtists",
-            allEntries = true,
-            condition = "#request.userType == T(com.sing4u.kr.user.entity.enums.UserType).ARTIST"
-    )
+//    @CacheEvict(
+//            value = "homeArtists",
+//            allEntries = true,
+//            condition = "#request.userType == T(com.sing4u.kr.user.entity.enums.UserType).ARTIST"
+//    )
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
         User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
@@ -80,7 +80,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @CacheEvict(value = "homeArtists", allEntries = true)
+    //@CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public UserProfileResponse updateProfile(Long id, UserUpdateProfileRequest request) {
         User user = getEntityOrThrow(id);
@@ -145,7 +145,7 @@ public class UserService {
         //return UserUpdatePasswordResponse.from(user);
     }
 
-    @CacheEvict(value = "homeArtists", allEntries = true)
+    //@CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public void deleteUser(Long id) {
         User user = getEntityOrThrow(id);
@@ -158,7 +158,7 @@ public class UserService {
                 .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
     }
 
-    @CacheEvict(value = "homeArtists", allEntries = true)
+    //@CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public UserUpdateProfileImageResponse updateUserProfileImage(Long id, MultipartFile file) {
         User user = this.getEntityOrThrow(id);
@@ -181,7 +181,7 @@ public class UserService {
         return user.getId();
     }
 
-    @CacheEvict(value = "homeArtists", allEntries = true)
+    //@CacheEvict(value = "homeArtists", allEntries = true)
     @Transactional
     public void deleteUserProfileImage(Long id) {
         User user = this.getEntityOrThrow(id);
