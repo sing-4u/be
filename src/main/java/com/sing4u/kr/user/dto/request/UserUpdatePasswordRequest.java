@@ -21,7 +21,7 @@ public class UserUpdatePasswordRequest {
             regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,16}$",
             message = "비밀번호는 영문자, 숫자, 특수문자, 숫자를 포함해 8~16자여야 합니다."
     )
-    private String password;
+    private String currentPassword;
 
     @Schema(description = "새로운 비밀번호", example = "new_password456!")
     @NotBlank(message = "비밀번호는 필수입니다.")
