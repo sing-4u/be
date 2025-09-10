@@ -172,6 +172,8 @@ public class SongRequestService {
                             .collect(Collectors.toList());
                     return SessionSongsDto.from(session, songDetails);
                 })
+                // 아무것도 없는 신청곡은 제외
+                .filter(dto -> dto.getSongs() != null && !dto.getSongs().isEmpty())
                 .collect(Collectors.toList());
     }
 }
