@@ -26,6 +26,7 @@ public class SongRequest {
     @Column(name = "fan_email", length = 50)
     private String fanEmail;
 
+    @Builder.Default
     @Column(name = "music_platform_name", length = 20) // 예: "SPOTIFY",
     private String musicPlatformName = "SPOTIFY";
 
