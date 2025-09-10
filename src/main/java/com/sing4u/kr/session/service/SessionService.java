@@ -54,13 +54,16 @@ public class SessionService {
 
     @Transactional
     public SessionResponseDto closeSession(Long artistId, Long sessionId) {
-        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+        User artist = userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
 
         Session session = sessionRepository.findByIdAndArtistId(sessionId, artistId)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "해당 아티스트의 세션을 찾을 수 없습니다. Session ID: " + sessionId));
 
         session.close();
+
+        // 아티스트 상태도 함께 처리
+        artist.updateIsOpen(false);
 
         return SessionResponseDto.from(session);
     }
