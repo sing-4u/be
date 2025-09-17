@@ -58,9 +58,10 @@ public class SessionController {
 
         User user = userRepository.findByUserPublicIdAndDeletedAtIsNull(artistPublicId)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다."));
-        Boolean sessionOpenClose =  user.isOpen();
+//        Boolean sessionOpenClose =  user.isOpen();
 
-        CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId, sessionOpenClose);
+//        CurrentSessionResponseDto currentSession = sessionService.getArtistOpenSession(artistId, sessionOpenClose);
+        CurrentSessionResponseDto currentSession = sessionService.getArtistSessionStatus(artistId);
 
         if (currentSession == null) {
             return new ResponseResult<>(ResponseCode.SUCCESS, "오픈된 세션이 없습니다.", null);
