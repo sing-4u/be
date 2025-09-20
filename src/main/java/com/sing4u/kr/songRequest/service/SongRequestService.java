@@ -24,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -152,9 +149,15 @@ public class SongRequestService {
 
         List<Session> sessions = sessionRepository.findAllWithSongRequestsByArtist(artistId);
 
-        return sessions.stream()
+        // 현재 오픈된 세션 (없을 수도 있음)
+        Optional<Session> openSession = sessions.stream()
+                .filter(s -> s.getStatus() == SessionStatus.OPEN)
+                .max(Comparator.comparing(Session::getStartedAt));
+
+        // DTO 변환
+        List<SessionSongsDto> dtos = sessions.stream()
                 .map(session -> {
-                    // step 1 곡 제목 :: 아티스트이름 으로 그룹핑
+                // step 1 곡제목 :: 아티스트 이름으로 그룹핑
                     Map<String, List<SongRequest>> grouped = session.getSongRequests().stream()
                             .collect(Collectors.groupingBy(
                                     req -> req.getSongTitle() + "::" + req.getSongArtistName()
@@ -170,10 +173,30 @@ public class SongRequestService {
                             })
                             .sorted(Comparator.comparing(SongDetailDto::getRequestedAt))
                             .collect(Collectors.toList());
+
                     return SessionSongsDto.from(session, songDetails);
                 })
-                // 아무것도 없는 신청곡은 제외
-                .filter(dto -> dto.getSongs() != null && !dto.getSongs().isEmpty())
+                .filter(dto -> {
+                    // 오픈된 세션은 무조건 포함
+                    if (openSession.isPresent() && dto.getSessionId().equals(openSession.get().getId())) {
+                        return true;
+                    }
+                    // 나머지는 곡이 있어야만 포함
+                    return dto.getSongs() != null && !dto.getSongs().isEmpty();
+                })
                 .collect(Collectors.toList());
+
+        // 정렬: 현재 오픈된 세션을 list[0]으로 보장
+        if (openSession.isPresent()) {
+            dtos.sort((a, b) -> {
+                if (a.getSessionId().equals(openSession.get().getId())) return -1;
+                if (b.getSessionId().equals(openSession.get().getId())) return 1;
+                return b.getStartedAt().compareTo(a.getStartedAt()); // 최신순 정렬
+            });
+        } else {
+            dtos.sort(Comparator.comparing(SessionSongsDto::getStartedAt).reversed());
+        }
+
+        return dtos;
     }
 }
