@@ -85,7 +85,7 @@ public class SessionService {
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
 
         // 세션 상태 조회 (OPEN이든 CLOSE든 가장 최신 세션 가져오기)
-        return sessionRepository.findTopByArtistIdOrderByCreatedAtDesc(artistId)
+        return sessionRepository.findTopByArtistIdOrderByStartedAtDesc(artistId)
                 .map(CurrentSessionResponseDto::from)
                 .orElse(null);
     }
