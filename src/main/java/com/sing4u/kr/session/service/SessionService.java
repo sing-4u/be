@@ -68,15 +68,25 @@ public class SessionService {
         return SessionResponseDto.from(session);
     }
 
-    public CurrentSessionResponseDto getArtistOpenSession(Long artistId, Boolean sessionOpenClose) {
+//    public CurrentSessionResponseDto getArtistOpenSession(Long artistId, Boolean sessionOpenClose) {
+//        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+//                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
+//
+//        SessionStatus status = Boolean.TRUE.equals(sessionOpenClose) ? SessionStatus.OPEN : SessionStatus.CLOSE;
+//
+//        return sessionRepository.findByArtistIdAndStatus(artistId, status)
+//                .map(CurrentSessionResponseDto::from)
+//                .orElse(null);
+//    }
+
+    public CurrentSessionResponseDto getArtistSessionStatus(Long artistId) {
+        // 아티스트 존재 확인
         userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
 
-        SessionStatus status = Boolean.TRUE.equals(sessionOpenClose) ? SessionStatus.OPEN : SessionStatus.CLOSE;
-
-        return sessionRepository.findByArtistIdAndStatus(artistId, status)
+        // 세션 상태 조회 (OPEN이든 CLOSE든 가장 최신 세션 가져오기)
+        return sessionRepository.findTopByArtistIdOrderByCreatedAtDesc(artistId)
                 .map(CurrentSessionResponseDto::from)
                 .orElse(null);
     }
-
 }

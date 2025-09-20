@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,6 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     List<Session> findAllWithSongRequestsByArtist(@Param("artistId") Long artistId);
 
     Optional<Session> findByArtistIdAndStatus(Long artistId, SessionStatus status);
+
+    Optional<Session> findTopByArtistIdOrderByCreatedAtDesc(Long artistId);
 }
