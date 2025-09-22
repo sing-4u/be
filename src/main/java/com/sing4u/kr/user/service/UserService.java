@@ -1,6 +1,7 @@
 package com.sing4u.kr.user.service;
 
 import com.sing4u.kr.common.dto.ResponseResult;
+import com.sing4u.kr.common.exception.Exception409;
 import com.sing4u.kr.file.service.S3Service;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
@@ -9,6 +10,7 @@ import com.sing4u.kr.home.dto.request.HomeRequest;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.SocialType;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.entity.UserActivityPlatform;
@@ -126,10 +128,26 @@ public class UserService {
     @Transactional
     public UserUpdateEmailResponse updateEmail(Long id, UserUpdateEmailRequest request) {
         User user = getEntityOrThrow(id);
+
+        //소셜 로그인 계정 차단
+        if (!user.getSocialType().equals(SocialType.LOCAL)) {
+            throw new Exception409(ResponseCode.PASSWORD_RESET_SOCIAL_ACCOUNT, "소셜 로그인 계정은 이메일을 변경할 수 없습니다.");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new Exception400("비밀번호가 일치하지 않습니다.", ResponseCode.ERROR_PASSWORD_MISMATCH);
         }
-        user.updateEmail(request.getNewEmail());
+
+        //이메일 검증
+        String newEmail = request.getNewEmail();
+        if (user.getEmail() != null && user.getEmail().equalsIgnoreCase(newEmail)) {
+            throw new Exception400("현재 이메일과 동일합니다.", ResponseCode.ERROR_DATA_EXISTED);
+        }
+        if (userRepository.existsByEmailIgnoreCase(newEmail)) {
+            throw new Exception409(ResponseCode.ERROR_ALREADY_EXIST_USER, "이미 사용 중인 이메일입니다.");
+        }
+
+        user.updateEmail(newEmail);
         userRepository.save(user);
         return UserUpdateEmailResponse.from(user);
     }
