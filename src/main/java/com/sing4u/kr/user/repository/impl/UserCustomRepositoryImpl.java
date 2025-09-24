@@ -1,6 +1,8 @@
 package com.sing4u.kr.user.repository.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,7 +23,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<User> findArtistsWithKeywordAndRandomOrder(String keyword, Pageable pageable) {
+    public Slice<User> findArtistsWithKeywordAndRandomOrder(String keyword, String seed, Pageable pageable) {
         QUser user = QUser.user;
 
         BooleanBuilder condition = new BooleanBuilder()
@@ -31,12 +33,14 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
             condition.and(user.nickname.containsIgnoreCase(keyword));
         }
 
-        NumberTemplate<Double> rand = Expressions.numberTemplate(Double.class, "RAND()");
+        OrderSpecifier<String> stableRand =
+                new OrderSpecifier<>(Order.ASC,
+                        Expressions.stringTemplate("MD5(CONCAT({0}, '-', {1}))", seed, user.id));
 
         List<User> result = queryFactory
                 .selectFrom(user)
                 .where(condition)
-                .orderBy(user.isOpen.desc(), rand.asc())
+                .orderBy(user.isOpen.desc(), stableRand, user.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
