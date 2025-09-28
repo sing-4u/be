@@ -21,9 +21,9 @@ public class UserUpdateEmailRequest {
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String newEmail;
 
-    @Schema(description = "사용자 닉네임 (현재 로직에선 미사용)", example = "테스트유저")
-    @NotBlank(message = "닉네임은 필수입니다.")
-    private String nickname;
+//    @Schema(description = "사용자 닉네임 (현재 로직에선 미사용)", example = "테스트유저")
+//    @NotBlank(message = "닉네임은 필수입니다.")
+//    private String nickname;
 
     @Schema(description = "현재 비밀번호 (본인 확인용)", example = "password123!")
     @NotBlank(message = "비밀번호는 필수입니다.")
