@@ -10,6 +10,7 @@ import lombok.*;
 public class HomeRequest {
     private String keyword;
     private int page;
+    private String seed;
 
     @Builder.Default
     private int pageSize = 12;

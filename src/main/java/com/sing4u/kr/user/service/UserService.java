@@ -51,7 +51,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public PagingResponse<UserListResponse> getArtistList(HomeRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getPageSize());
-        Slice<User> userSlice = userRepository.findArtistsWithKeywordAndRandomOrder(request.getKeyword(), pageable);
+        Slice<User> userSlice = userRepository.findArtistsWithKeywordAndRandomOrder(request.getKeyword(), request.getSeed(), pageable);
 
         Slice<UserListResponse> responseSlice = userSlice.map(UserListResponse::from);
         return PagingResponse.of(responseSlice);

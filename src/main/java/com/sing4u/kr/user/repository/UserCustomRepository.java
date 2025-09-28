@@ -7,6 +7,6 @@ import org.springframework.data.domain.Slice;
 import java.util.List;
 
 public interface UserCustomRepository {
-    Slice<User> findArtistsWithKeywordAndRandomOrder(String keyword, Pageable pageable);
+    Slice<User> findArtistsWithKeywordAndRandomOrder(String keyword, String seed, Pageable pageable);
 }
 
