@@ -88,7 +88,6 @@ endpoints:
     - /api/v1/auth/password-reset/**
     - /api/v1/artists/{artistPublicId}/sessions
     - /api/v1/users/platform/**
-    - /api/v1/users/platform/**
     - /api/v1/users/platform/{userPublicId}/activity-platform
 
 
