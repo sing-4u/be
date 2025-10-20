@@ -33,7 +33,7 @@ public class UserPlatformController {
 
     @Operation(summary = "userPublicId로 특정 사용자 활동 플랫폼 조회", description = "userPublicId 특정 사용자의 활동 플랫폼 조회")
     @GetMapping("/{userPublicId}/activity-platform")
-    public ResponseResult<UserActivityPlatformResponse> getActivityPlatformByPublicId(@PathVariable String publicId) {
+    public ResponseResult<UserActivityPlatformResponse> getActivityPlatformByPublicId(@PathVariable("userPublicId") String publicId) {
         Long userId = userService.getUserIdByPublicId(publicId);
         return new ResponseResult<>(ResponseCode.SUCCESS, userService.getActivityPlatform(userId));
     }
