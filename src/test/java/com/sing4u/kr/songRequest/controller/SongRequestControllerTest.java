@@ -140,7 +140,7 @@ class SongRequestControllerTest {
         mockMvc.perform(get(BASE_URL + "/artists/{artistPublicId}", ARTIST_PUBLIC_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value("0001"))
                 .andExpect(jsonPath("$.data").isArray());
     }
 
