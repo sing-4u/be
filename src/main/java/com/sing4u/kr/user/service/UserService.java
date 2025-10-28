@@ -64,7 +64,12 @@ public class UserService {
 //    )
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request) {
-        User user = User.of(request.getNickname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getUserType());
+        String email = request.getEmail();
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new Exception409(ResponseCode.ERROR_ALREADY_EXIST_USER, "이미 사용 중인 이메일입니다.");
+        }
+
+        User user = User.of(request.getNickname(), email, passwordEncoder.encode(request.getPassword()), request.getUserType());
         return UserCreateResponse.from(userRepository.save(user));
     }
 
