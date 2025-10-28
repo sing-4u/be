@@ -7,6 +7,7 @@ import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
 import com.sing4u.kr.common.response.PagingResponse;
 import com.sing4u.kr.home.dto.request.HomeRequest;
+import com.sing4u.kr.session.service.SessionService;
 import com.sing4u.kr.user.dto.request.*;
 import com.sing4u.kr.user.dto.response.*;
 import com.sing4u.kr.user.entity.User;
@@ -42,6 +43,7 @@ public class UserService {
     private final UserActivityPlatformRepository userActivityPlatformRepository;
     private final PasswordEncoder passwordEncoder;
     private final S3Service s3Service;
+    private final SessionService sessionService;
 
 //    @Cacheable(
 //            value = "homeArtists",
@@ -172,6 +174,12 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = getEntityOrThrow(id);
+
+        // 아티스트라면 열린 세션 정리
+        if (user.getUserType() == UserType.ARTIST) {
+            sessionService.closeAllOpenByArtist(user.getId());
+        }
+
         user.delete();
         userRepository.save(user);
     }

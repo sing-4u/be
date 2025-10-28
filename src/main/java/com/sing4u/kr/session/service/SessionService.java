@@ -89,4 +89,13 @@ public class SessionService {
                 .map(CurrentSessionResponseDto::from)
                 .orElse(null);
     }
+
+    @Transactional
+    public void closeAllOpenByArtist(Long artistId) {
+        sessionRepository.findAllByArtistIdAndStatus(artistId, SessionStatus.OPEN)
+                .forEach(Session::close);
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+                .ifPresent(artist -> artist.updateIsOpen(false));
+    }
+
 }
