@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class SongRequestCreateDto {
     @NotNull(message = "아티스트 ID는 필수입니다.")
@@ -33,4 +35,13 @@ public class SongRequestCreateDto {
 
     @Size(max = 100, message = "가수명은 최대 100자까지 가능합니다.")
     @Schema(description = "직접 입력할 가수명 (플랫폼 ID 없을 시 사용)", example = "NewJeans")
-    private String artistName;}
+    private String artistName;
+
+    @Size(max = 10, message = "태그는 최대 10개까지 가능합니다.")
+    @Schema(description = "곡 요청에 첨부할 태그 목록 (최대 10개, # 포함)", example = "[\"#발라드\", \"#감성\", \"#겨울\"]")
+    private List<@Size(max = 20, message = "각 태그는 최대 20자까지 가능합니다.") String> tags;
+
+    @Size(max = 500, message = "URL은 최대 500자까지 가능합니다.")
+    @Schema(description = "곡 신청과 관련된 URL (선택 사항, 예: YouTube 링크)", example = "https://www.youtube.com/watch?v=BaoS8SMl5kg&list=RDBaoS8SMl5kg&start_radio=1")
+    private String url;
+}

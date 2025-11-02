@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -17,10 +18,10 @@ public class SongDetailDto {
     private String email;  // 신청자 이메일 (fanEmail)
     private String spotifyTrackId;
     private LocalDateTime requestedAt;
-
     private Long count;
+    private List<String> tags;
+    private String url;
 
-//
 
     public static SongDetailDto from(SongRequest songRequest, Long count) {
         if (songRequest == null) {
@@ -35,6 +36,8 @@ public class SongDetailDto {
                 .spotifyTrackId(songRequest.getPlatformTrackId())
                 .requestedAt(songRequest.getRequestedAt())
                 .count(count)
+                .tags(songRequest.getTags())
+                .url(songRequest.getUrl())
                 .build();
     }
 }
