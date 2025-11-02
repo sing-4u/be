@@ -52,6 +52,19 @@ public class SongRequest {
     @Column(name = "requested_at", nullable = false, updatable = false, columnDefinition = "datetime")
     private LocalDateTime requestedAt;
 
+    @Builder.Default
+    @Column(nullable=false)
+    private long likeCount = 0L;
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0)
+            this.likeCount--;
+    }
+
 }
 
 
