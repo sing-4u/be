@@ -6,6 +6,7 @@ import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
+import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.service.SessionService;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.repository.UserRepository;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
