@@ -10,6 +10,8 @@ import com.sing4u.kr.session.repository.SessionRepository;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,4 +91,13 @@ public class SessionService {
                 .map(CurrentSessionResponseDto::from)
                 .orElse(null);
     }
+
+    public Page<Session> getSessionsByArtist(Long artistId, Pageable pageable) {
+        // 아티스트 존재 확인
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
+
+        return sessionRepository.findByArtistIdOrderByStartedAtDesc(artistId, pageable);
+    }
+
 }

@@ -3,6 +3,8 @@ package com.sing4u.kr.session.repository;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +29,6 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findByArtistIdAndStatus(Long artistId, SessionStatus status);
 
     Optional<Session> findTopByArtistIdOrderByStartedAtDesc(Long artistId);
+
+    Page<Session> findByArtistIdOrderByStartedAtDesc(Long artistId, Pageable pageable);
 }
