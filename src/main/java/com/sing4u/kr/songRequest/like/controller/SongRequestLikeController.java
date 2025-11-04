@@ -52,7 +52,7 @@ public class SongRequestLikeController {
     })
     @PostMapping
     public ResponseResult<SongRequestLikeResponse> like(
-            @PathVariable Long requestId,
+            @PathVariable Long songRequestId,
             @LoginUserId Long userId) {
         return new ResponseResult<>(service.like(requestId, userId));
     }
@@ -88,7 +88,7 @@ public class SongRequestLikeController {
     })
     @DeleteMapping
     public ResponseResult<SongRequestLikeResponse> unlike(
-            @PathVariable Long requestId,
+            @PathVariable Long songRequestId,
             @LoginUserId Long userId) {
         return new ResponseResult<>(service.unlike(requestId, userId));
     }
@@ -123,7 +123,7 @@ public class SongRequestLikeController {
     })
     @GetMapping
     public ResponseResult<SongRequestLikeResponse> status(
-            @PathVariable Long requestId,
+            @PathVariable Long songRequestId,
             @LoginUserId Long userId) {
         return new ResponseResult<>(service.getStatus(requestId, userId));
     }
