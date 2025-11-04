@@ -54,7 +54,7 @@ public class SongRequestLikeController {
     public ResponseResult<SongRequestLikeResponse> like(
             @PathVariable Long songRequestId,
             @LoginUserId Long userId) {
-        return new ResponseResult<>(service.like(requestId, userId));
+        return new ResponseResult<>(service.like(songRequestId, userId));
     }
 
     @Operation(
@@ -90,7 +90,7 @@ public class SongRequestLikeController {
     public ResponseResult<SongRequestLikeResponse> unlike(
             @PathVariable Long songRequestId,
             @LoginUserId Long userId) {
-        return new ResponseResult<>(service.unlike(requestId, userId));
+        return new ResponseResult<>(service.unlike(songRequestId, userId));
     }
 
     @Operation(
@@ -125,6 +125,6 @@ public class SongRequestLikeController {
     public ResponseResult<SongRequestLikeResponse> status(
             @PathVariable Long songRequestId,
             @LoginUserId Long userId) {
-        return new ResponseResult<>(service.getStatus(requestId, userId));
+        return new ResponseResult<>(service.getStatus(songRequestId, userId));
     }
 }
