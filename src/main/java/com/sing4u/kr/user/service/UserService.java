@@ -1,7 +1,9 @@
 package com.sing4u.kr.user.service;
 
 import com.sing4u.kr.common.dto.ResponseResult;
+import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.Exception409;
+import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.file.service.S3Service;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.Exception400;
@@ -194,7 +196,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public Long getUserIdByPublicId(String publicId) {
         User user = userRepository.findByUserPublicIdAndDeletedAtIsNull(publicId)
-                .orElseThrow(() -> new Exception400("사용자를 찾을 수 없습니다.", ResponseCode.ERROR_NO_DATA));
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + publicId));
 
         return user.getId();
     }
