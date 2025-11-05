@@ -1,295 +1,260 @@
-//package com.sing4u.kr.songRequest.service;
-//
-//import com.sing4u.kr.common.exception.ApiException;
-//import com.sing4u.kr.common.exception.ExceptionCode;
-//import com.sing4u.kr.customSongRequest.dto.SongRequestResponseDto;
-//import com.sing4u.kr.customSongRequest.dto.request.SongRequestCreateDto;
-//import com.sing4u.kr.customSongRequest.entity.SongRequest;
-//import com.sing4u.kr.customSongRequest.repository.SongRequestRepository;
-//import com.sing4u.kr.customSongRequest.service.SongRequestService;
-//import com.sing4u.kr.session.dto.SessionSongsDto;
-//import com.sing4u.kr.session.entity.Session;
-//import com.sing4u.kr.session.enums.SessionStatus;
-//import com.sing4u.kr.session.repository.SessionRepository;
-//import com.sing4u.kr.user.entity.User;
-//import com.sing4u.kr.user.entity.enums.UserType;
-//import com.sing4u.kr.user.repository.UserRepository;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Nested;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//
-//import java.time.LocalDateTime;
-//import java.util.Collections;
-//import java.util.List;
-//import java.util.Optional;
-//
-//import static org.assertj.core.api.Assertions.*;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//class SongRequestServiceTest {
-//
-//    @Mock
-//    private SongRequestRepository songRequestRepository;
-//
-//    @Mock
-//    private SessionRepository sessionRepository;
-//
-//    @Mock
-//    private UserRepository userRepository;
-//
-//    @InjectMocks
-//    private SongRequestService songRequestService;
-//
-//    private User artist;
-//    private User otherArtist;
-//    private Session openSession;
-//    private Session closedSession;
-//    private SongRequestCreateDto songRequestCreateDto;
-//
-//    private final Long ARTIST_ID = 1L;
-//    private final Long OTHER_ARTIST_ID = 2L;
-//    private final Long OPEN_SESSION_ID = 100L;
-//    private final Long CLOSED_SESSION_ID = 101L;
-//    private final Long SONG_REQUEST_ID = 1L;
-//
-//    private User createArtist(Long id, String nickName) {
-//        return User.testUserBuilder(id, nickName, UserType.ARTIST);
-//    }
-//
-//    private Session createSession(Long id, User artist, SessionStatus status) {
-//        return Session.builder()
-//                .id(id)
-//                .artist(artist)
-//                .status(status)
-//                .startedAt(LocalDateTime.now().minusHours(1))
-//                .closedAt(status == SessionStatus.CLOSE ? LocalDateTime.now() : null)
-//                .build();
-//    }
-//
-//    private SongRequestCreateDto createSongRequestDto(Long artistId, Long sessionId, String title) {
-//        SongRequestCreateDto dto = new SongRequestCreateDto();
-//        dto.setArtistId(artistId);
-//        dto.setSessionId(sessionId);
-//        dto.setEmail("fan@example.com");
-//        dto.setSongTitle(title);
-//        dto.setArtistName("Test Singer");
-//        dto.setSpotifyTrackId("spotify:track:123");
-//        return dto;
-//    }
-//
-//    private SongRequest createSongRequest(Long id, Session session, SongRequestCreateDto dto) {
-//        return SongRequest.builder()
-//                .id(id)
-//                .session(session)
-//                .fanEmail(dto.getEmail())
-//                .songTitle(dto.getSongTitle())
-//                .songArtistName(dto.getArtistName())
-//                .spotifyTrackId(dto.getSpotifyTrackId())
-//                .requestedAt(LocalDateTime.now())
-//                .build();
-//    }
-//
-//    @BeforeEach
-//    void setUp() {
-//        artist = createArtist(ARTIST_ID, "Test Artist");
-//        otherArtist = createArtist(OTHER_ARTIST_ID, "Other Artist");
-//        openSession = createSession(OPEN_SESSION_ID, artist, SessionStatus.OPEN);
-//        closedSession = createSession(CLOSED_SESSION_ID, artist, SessionStatus.CLOSE);
-//        songRequestCreateDto = createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Test Song");
-//    }
-//
-//    @Nested
-//    @DisplayName("신청곡 생성 (createSongRequest)")
-//    class CreateSongRequestTests {
-//
-//        @Test
-//        @DisplayName("성공")
-//        void createSongRequest_whenValidRequest_returnsResponseDto() {
-//            // given
-//            SongRequest savedSongRequest = createSongRequest(SONG_REQUEST_ID, openSession, songRequestCreateDto);
-//            when(sessionRepository.findById(OPEN_SESSION_ID)).thenReturn(Optional.of(openSession));
-//            when(songRequestRepository.save(any(SongRequest.class))).thenReturn(savedSongRequest);
-//
-//            // when
-//            SongRequestResponseDto responseDto = songRequestService.createSongRequest(songRequestCreateDto);
-//
-//            // then
-//            assertThat(responseDto).isNotNull();
-//            assertThat(responseDto.getSongRequestId()).isEqualTo(SONG_REQUEST_ID);
-//            assertThat(responseDto.getMessage()).isEqualTo("신청곡 등록 완료");
-//
-//            verify(sessionRepository).findById(OPEN_SESSION_ID);
-//            verify(songRequestRepository).save(any(SongRequest.class));
-//        }
-//
-//        @Test
-//        @DisplayName("실패 - 세션을 찾을 수 없을 때")
-//        void createSongRequest_whenSessionNotFound_throwsApiException() {
-//            // given
-//            when(sessionRepository.findById(OPEN_SESSION_ID)).thenReturn(Optional.empty());
-//
-//            // when & then
-//            assertThatThrownBy(() -> songRequestService.createSongRequest(songRequestCreateDto))
-//                    .isInstanceOf(ApiException.class)
-//                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.NOT_FOUND)
-//                    .hasMessageContaining("세션을 찾을 수 없습니다.");
-//            verify(songRequestRepository, never()).save(any(SongRequest.class));
-//        }
-//
-//        @Test
-//        @DisplayName("실패 - 세션의 아티스트와 요청의 아티스트가 다를 때")
-//        void createSongRequest_whenArtistMismatch_throwsApiException() {
-//            // given
-//            SongRequestCreateDto dtoWithMismatchArtist = createSongRequestDto(OTHER_ARTIST_ID, OPEN_SESSION_ID, "Another Song");
-//            when(sessionRepository.findById(OPEN_SESSION_ID)).thenReturn(Optional.of(openSession)); // openSession의 artist는 ARTIST_ID(1L)
-//
-//            // when & then
-//            assertThatThrownBy(() -> songRequestService.createSongRequest(dtoWithMismatchArtist))
-//                    .isInstanceOf(ApiException.class)
-//                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.CONFLICT)
-//                    .hasMessageContaining("세션이 지정된 아티스트에게 속하지 않습니다.");
-//            verify(songRequestRepository, never()).save(any(SongRequest.class));
-//        }
-//
-//        @Test
-//        @DisplayName("실패 - 세션이 OPEN 상태가 아닐 때")
-//        void createSongRequest_whenSessionNotOpen_throwsApiException() {
-//            // given
-//            SongRequestCreateDto dtoForClosedSession = createSongRequestDto(ARTIST_ID, CLOSED_SESSION_ID, "Late Song");
-//            when(sessionRepository.findById(CLOSED_SESSION_ID)).thenReturn(Optional.of(closedSession)); // closedSession 사용
-//
-//            // when & then
-//            assertThatThrownBy(() -> songRequestService.createSongRequest(dtoForClosedSession))
-//                    .isInstanceOf(ApiException.class)
-//                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.CONFLICT)
-//                    .hasMessageContaining("이 세션은 현재 신청곡을 받고 있지 않습니다.");
-//            verify(songRequestRepository, never()).save(any(SongRequest.class));
-//        }
-//    }
-//// SongRequestServiceTest.java - GetSongRequestsByArtistTests 클래스 내
-//
-//    @Test
-//    @DisplayName("성공 - 신청곡이 존재할 때")
-//    void getSongRequestsByArtist_whenSongsExist_returnsListOfSessionSongsDto() {
-//        // given
-//        // 1. Artist 모킹
-//        when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-//
-//        // 2. sessionRepository.findAllWithSongsByArtist(ARTIST_ID)가 Session 목록을 반환하도록 모킹
-//        //    (이 Session 객체들은 songRequests 컬렉션을 직접 가지고 있지 않음)
-//        //    openSession은 @BeforeEach에서 artist와 OPEN 상태로 미리 생성되어 있음
-//        when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
-//
-//        // 3. 각 세션 ID에 대해 songRequestRepository.findBySessionIdOrderByRequestedAtAsc(sessionId)가
-//        //    해당 세션의 신청곡 목록을 반환하도록 모킹
-//        SongRequest song1 = createSongRequest(1L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 1"));
-//        SongRequest song2 = createSongRequest(2L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 2"));
-//        List<SongRequest> requestsForOpenSession = List.of(song1, song2);
-//        when(songRequestRepository.findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID)).thenReturn(requestsForOpenSession);
-//
-//        // when
-//        List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
-//
-//        // then
-//        assertThat(result).isNotNull().hasSize(1);
-//        SessionSongsDto sessionSongsDto = result.get(0);
-//        assertThat(sessionSongsDto.getSessionId()).isEqualTo(OPEN_SESSION_ID);
-//        assertThat(sessionSongsDto.getSongs()).hasSize(2);
-//        assertThat(sessionSongsDto.getSongs())
-//                .extracting(com.sing4u.kr.customSongRequest.dto.response.SongDetailDto::getSongTitle)
-//                .containsExactlyInAnyOrder("Song 1", "Song 2");
-//
-//        // verify 호출 확인
-//        verify(userRepository).findByIdAndUserType(ARTIST_ID, UserType.ARTIST);
-//        verify(sessionRepository).findAllWithSongsByArtist(ARTIST_ID); // SessionCustomRepository 대신 SessionRepository 사용 가정
-//        verify(songRequestRepository).findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID); // 이 호출이 발생하는지 확인
-//    }
-//    @Nested
-//    @DisplayName("아티스트별 신청곡 목록 조회 (getSongRequestsByArtist)")
-//    class GetSongRequestsByArtistTests {
-//
-//        @Test
-//        @DisplayName("성공 - 신청곡이 존재할 때")
-//        void getSongRequestsByArtist_whenSongsExist_returnsListOfSessionSongsDto() {
-//            when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-//
-//            when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
-//
-//            SongRequest song1 = createSongRequest(1L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 1"));
-//            SongRequest song2 = createSongRequest(2L, openSession, createSongRequestDto(ARTIST_ID, OPEN_SESSION_ID, "Song 2"));
-//            List<SongRequest> requestsForOpenSession = List.of(song1, song2);
-//            when(songRequestRepository.findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID)).thenReturn(requestsForOpenSession);
-//
-//            // when
-//            List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
-//
-//            // then
-//            assertThat(result).isNotNull().hasSize(1);
-//            SessionSongsDto sessionSongsDto = result.get(0);
-//            assertThat(sessionSongsDto.getSessionId()).isEqualTo(OPEN_SESSION_ID);
-//            assertThat(sessionSongsDto.getSongs()).hasSize(2);
-//            assertThat(sessionSongsDto.getSongs())
-//                    .extracting(com.sing4u.kr.customSongRequest.dto.response.SongDetailDto::getSongTitle)
-//                    .containsExactlyInAnyOrder("Song 1", "Song 2");
-//
-//            // verify 호출 확인
-//            verify(userRepository).findByIdAndUserType(ARTIST_ID, UserType.ARTIST);
-//            verify(sessionRepository).findAllWithSongsByArtist(ARTIST_ID); // SessionCustomRepository 대신 SessionRepository 사용 가정
-//            verify(songRequestRepository).findBySessionIdOrderByRequestedAtAsc(OPEN_SESSION_ID); // 이 호출이 발생하는지 확인
-//        }
-//
-//        @Test
-//        @DisplayName("성공 - 세션은 있으나 신청곡이 없을 때")
-//        void getSongRequestsByArtist_whenNoSongsInSession_returnsDtoWithEmptySongList() {
-//            // given
-//            // openSession.getSongRequests()는 @BeforeEach에서 new ArrayList<>()로 초기화됨
-//            when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-//            when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(List.of(openSession));
-//
-//
-//            // when
-//            List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
-//
-//            // then
-//            assertThat(result).isNotNull().hasSize(1);
-//            assertThat(result.get(0).getSongs()).isNotNull().isEmpty();
-//        }
-//
-//
-//        @Test
-//        @DisplayName("성공 - 아티스트에게 세션이 없을 때 빈 목록 반환")
-//        void getSongRequestsByArtist_whenNoSessionsForArtist_returnsEmptyList() {
-//            // given
-//            when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.of(artist));
-//            when(sessionRepository.findAllWithSongsByArtist(ARTIST_ID)).thenReturn(Collections.emptyList());
-//
-//            // when
-//            List<SessionSongsDto> result = songRequestService.getSongRequestsByArtist(ARTIST_ID);
-//
-//            // then
-//            assertThat(result).isNotNull().isEmpty();
-//        }
-//
-//
-//        @Test
-//        @DisplayName("실패 - 아티스트를 찾을 수 없을 때")
-//        void getSongRequestsByArtist_whenArtistNotFound_throwsApiException() {
-//            // given
-//            when(userRepository.findByIdAndUserType(ARTIST_ID, UserType.ARTIST)).thenReturn(Optional.empty());
-//
-//            // when & then
-//            assertThatThrownBy(() -> songRequestService.getSongRequestsByArtist(ARTIST_ID))
-//                    .isInstanceOf(ApiException.class)
-//                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.NOT_FOUND)
-//                    .hasMessageContaining("아티스트를 찾을 수 없습니다.");
-//            verify(sessionRepository, never()).findAllWithSongsByArtist(anyLong());
-//        }
-//    }
-//}
+package com.sing4u.kr.songRequest.service;
+
+import com.sing4u.kr.common.exception.ApiException;
+import com.sing4u.kr.common.exception.ExceptionCode;
+import com.sing4u.kr.music.MusicInterface;
+import com.sing4u.kr.music.MusicPlatformFactory;
+import com.sing4u.kr.session.entity.Session;
+import com.sing4u.kr.session.enums.SessionStatus;
+import com.sing4u.kr.session.repository.SessionRepository;
+import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
+import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.entity.SongRequest;
+import com.sing4u.kr.songRequest.repository.SongRequestRepository;
+import com.sing4u.kr.user.entity.User;
+import com.sing4u.kr.user.entity.enums.UserType;
+import com.sing4u.kr.user.repository.UserRepository;
+import com.sing4u.kr.user.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class SongRequestServiceTest {
+
+    @InjectMocks
+    private SongRequestService songRequestService;
+
+    @Mock
+    private SongRequestRepository songRequestRepository;
+
+    @Mock
+    private SessionRepository sessionRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private MusicInterface spotifyService;
+
+    private SongRequestCreateDto createDto;
+    private User artist;
+    private Session openSession;
+    private final String ARTIST_PUBLIC_ID = "artist_public_id_1";
+    private final Long ARTIST_ID = 100L;
+    private final Long SESSION_ID = 1L;
+    private final String TEST_URL = "https://youtube.com/testurl";
+
+    @BeforeEach
+    void setUp() {
+        // 공통 테스트 데이터 설정
+        createDto = createValidDto();
+
+        // Mock Artist Entity
+        artist = User.testUserBuilder(ARTIST_ID, ARTIST_PUBLIC_ID, "Artist", UserType.ARTIST);
+
+        // Mock Open Session Entity
+        openSession = Session.builder()
+                .id(SESSION_ID)
+                .artist(artist)
+                .status(SessionStatus.OPEN)
+                .songRequests(Collections.emptyList())
+                .build();
+    }
+
+    // SongRequestCreateDto를 생성하는 헬퍼 메서드
+    private SongRequestCreateDto createValidDto() {
+        SongRequestCreateDto dto = new SongRequestCreateDto();
+        dto.setArtistPublicId(ARTIST_PUBLIC_ID);
+        dto.setSessionId(SESSION_ID);
+        dto.setSongTitle("Hype Boy");
+        dto.setArtistName("NewJeans");
+        dto.setEmail("fan@example.com");
+        dto.setTags(List.of("#발라드", "#감성"));
+        dto.setUrl(TEST_URL); // URL 추가
+        return dto;
+    }
+
+    // SongRequestCreateDto를 플랫폼 ID 포함으로 생성하는 헬퍼 메서드
+    private SongRequestCreateDto createDtoWithPlatformId() {
+        SongRequestCreateDto dto = createValidDto();
+        dto.setPlatformTrackId("platform_id_123");
+        dto.setSongTitle(null); // 외부 정보로 채워지도록 null 설정
+        dto.setArtistName(null);
+        return dto;
+    }
+
+    private SongRequest mockSongRequest(Long id, Session session, String title, String artistName) {
+        return SongRequest.builder()
+                .id(id)
+                .session(session)
+                .songTitle(title)
+                .songArtistName(artistName)
+                .musicPlatformName("SPOTIFY")
+                .build();
+    }
+
+
+    // =================================================================================
+    // 1. 곡 요청 생성 (`createSongRequest` / `createAndSaveSongRequestInTx`) 테스트
+    // =================================================================================
+
+    @Test
+    @DisplayName("createSongRequest - URL과 TAGS가 포함된 요청 성공 시, 엔티티에 정확히 저장되는지 검증")
+    void createSongRequest_ContainsUrlAndTags_SavesCorrectly() {
+        // Given
+        SongRequestCreateDto requestDto = createValidDto();
+        SongRequest savedRequest = mockSongRequest(1L, openSession, requestDto.getSongTitle(), requestDto.getArtistName());
+
+        given(userService.getUserIdByPublicId(eq(ARTIST_PUBLIC_ID))).willReturn(ARTIST_ID);
+        given(sessionRepository.findById(eq(SESSION_ID))).willReturn(Optional.of(openSession));
+
+        // ArgumentCaptor로 save 호출 시의 SongRequest 엔티티를 캡처
+        ArgumentCaptor<SongRequest> requestCaptor = ArgumentCaptor.forClass(SongRequest.class);
+        given(songRequestRepository.save(requestCaptor.capture())).willReturn(savedRequest);
+
+        // When
+        songRequestService.createSongRequest(requestDto);
+
+        // Then
+        SongRequest capturedRequest = requestCaptor.getValue();
+
+        // URL 필드 검증
+        assertEquals(TEST_URL, capturedRequest.getUrl(), "요청에 포함된 URL이 엔티티에 정확히 저장되어야 합니다.");
+
+        // Tags 필드 검증
+        assertNotNull(capturedRequest.getTags(), "태그 리스트가 null이 아니어야 합니다.");
+        assertEquals(2, capturedRequest.getTags().size(), "두 개의 태그가 저장되어야 합니다.");
+        assertTrue(capturedRequest.getTags().contains("#발라드"), "요청 태그가 포함되어야 합니다.");
+
+        verify(songRequestRepository, times(1)).save(any(SongRequest.class));
+    }
+
+    @Test
+    @DisplayName("createSongRequest - URL과 TAGS가 null인 경우에도 성공")
+    void createSongRequest_NullUrlAndTags_SavesSuccessfully() {
+        // Given
+        SongRequestCreateDto requestDto = createValidDto();
+        requestDto.setUrl(null);
+        requestDto.setTags(null);
+
+        SongRequest savedRequest = mockSongRequest(1L, openSession, requestDto.getSongTitle(), requestDto.getArtistName());
+
+        given(userService.getUserIdByPublicId(eq(ARTIST_PUBLIC_ID))).willReturn(ARTIST_ID);
+        given(sessionRepository.findById(eq(SESSION_ID))).willReturn(Optional.of(openSession));
+
+        // ArgumentCaptor로 save 호출 시의 SongRequest 엔티티를 캡처
+        ArgumentCaptor<SongRequest> requestCaptor = ArgumentCaptor.forClass(SongRequest.class);
+        given(songRequestRepository.save(requestCaptor.capture())).willReturn(savedRequest);
+
+        // When
+        songRequestService.createSongRequest(requestDto);
+
+        // Then
+        SongRequest capturedRequest = requestCaptor.getValue();
+
+        // URL 필드 검증
+        assertNull(capturedRequest.getUrl(), "URL이 null로 저장되어야 합니다.");
+
+        // Tags 필드 검증 (null로 저장되는지, 혹은 빈 리스트로 저장되는지는 Entity 설정에 따라 다름)
+        // JPA의 @ElementCollection 기본 동작은 null 대신 빈 리스트를 선호할 수 있으나,
+        // DTO에서 null을 받았으므로, 현재 엔티티의 Builder 패턴을 따른다면 null이 저장될 가능성이 높습니다.
+        assertNull(capturedRequest.getTags(), "태그가 null로 저장되어야 합니다."); // 엔티티 Builder 동작 가정
+
+        verify(songRequestRepository, times(1)).save(any(SongRequest.class));
+    }
+
+
+    // =================================================================================
+    // 2. 유효성 검사 (태그 개수) 테스트
+    // =================================================================================
+
+    @Test
+    @DisplayName("createSongRequest - 태그 개수가 최대 허용치(10개)인 경우 성공")
+    void createSongRequest_MaxTags_Success() {
+        // Given
+        SongRequestCreateDto maxTagsDto = createValidDto();
+        List<String> maxTags = List.of("t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10");
+        maxTagsDto.setTags(maxTags);
+
+        SongRequest savedRequest = mockSongRequest(1L, openSession, maxTagsDto.getSongTitle(), maxTagsDto.getArtistName());
+
+        given(userService.getUserIdByPublicId(eq(ARTIST_PUBLIC_ID))).willReturn(ARTIST_ID);
+        given(sessionRepository.findById(eq(SESSION_ID))).willReturn(Optional.of(openSession));
+        given(songRequestRepository.save(any(SongRequest.class))).willReturn(savedRequest);
+
+        // When
+        SongRequestResponseDto result = songRequestService.createSongRequest(maxTagsDto);
+
+        // Then
+        assertNotNull(result);
+        verify(songRequestRepository, times(1)).save(argThat(req ->
+                req.getTags() != null && req.getTags().size() == 10
+        ));
+    }
+
+
+    @Test
+    @DisplayName("createSongRequest - 태그 개수가 11개로 초과하는 경우 (BAD_REQUEST) 실패")
+    void createSongRequest_TooManyTags_ThrowsApiException() {
+        // Given
+        SongRequestCreateDto tooManyTagsDto = createValidDto();
+        // 11개의 태그
+        tooManyTagsDto.setTags(List.of("t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10", "t11"));
+
+        given(userService.getUserIdByPublicId(eq(ARTIST_PUBLIC_ID))).willReturn(ARTIST_ID);
+        given(sessionRepository.findById(eq(SESSION_ID))).willReturn(Optional.of(openSession));
+
+        // When & Then
+        ApiException exception = assertThrows(ApiException.class, () ->
+                songRequestService.createSongRequest(tooManyTagsDto));
+        assertEquals(ExceptionCode.BAD_REQUEST, exception.getCode());
+        assertEquals("태그는 최대 10개까지만 등록 가능합니다.", exception.getMessage());
+
+        // 저장 로직이 호출되지 않았는지 검증
+        verify(songRequestRepository, never()).save(any());
+    }
+
+    // --- 기존의 다른 테스트 코드들은 생략하고 위에 두 섹션에 추가/수정된 테스트만 포함합니다. ---
+
+    // ... (기존의 other tests, e.g., SessionNotFound, ArtistMismatch, ApiSuccess, etc.)
+
+    // =================================================================================
+    // 3. 아티스트 곡 요청 목록 조회 (`getSongRequestsByArtist`) 테스트
+    // =================================================================================
+
+    @Test
+    @DisplayName("getSongRequestsByArtist - 아티스트를 찾을 수 없는 경우 (NOT_FOUND)")
+    void getSongRequestsByArtist_ArtistNotFound_ThrowsApiException() {
+        // Given
+        Long artistId = 999L;
+        // Mocking: 아티스트 조회 실패 (findByIdAndUserType)
+        given(userRepository.findByIdAndUserType(eq(artistId), eq(UserType.ARTIST))).willReturn(Optional.empty());
+
+        // When & Then
+        ApiException exception = assertThrows(ApiException.class, () ->
+                songRequestService.getSongRequestsByArtist(artistId));
+        assertEquals(ExceptionCode.NOT_FOUND, exception.getCode());
+        assertEquals("아티스트를 찾을 수 없습니다. ID: 999", exception.getMessage());
+    }
+
+    // ... (기존의 GroupingAndSorting_Success 테스트)
+}

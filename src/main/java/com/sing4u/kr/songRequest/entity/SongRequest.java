@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,9 +40,30 @@ public class SongRequest {
     @Column(name = "song_artist_name", length = 100)
     private String songArtistName; // 노래의 아티스트명
 
+    @ElementCollection
+    @CollectionTable(name = "song_request_tags", joinColumns = @JoinColumn(name = "song_request_id"))
+    @Column(name = "tag", length = 20)
+    private List<String> tags;
+
+    @Column(name = "url", length = 255)
+    private String url;
+
     @CreationTimestamp
     @Column(name = "requested_at", nullable = false, updatable = false, columnDefinition = "datetime")
     private LocalDateTime requestedAt;
+
+    @Builder.Default
+    @Column(nullable=false)
+    private long likeCount = 0L;
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0)
+            this.likeCount--;
+    }
 
 }
 

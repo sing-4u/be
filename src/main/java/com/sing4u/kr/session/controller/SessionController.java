@@ -7,6 +7,7 @@ import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.common.response.PagingResponse;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
+import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.service.SessionService;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.repository.UserRepository;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

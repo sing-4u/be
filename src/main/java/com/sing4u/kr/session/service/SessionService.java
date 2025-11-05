@@ -99,5 +99,13 @@ public class SessionService {
 
         return sessionRepository.findByArtistIdOrderByStartedAtDesc(artistId, pageable);
     }
+  
+    @Transactional
+    public void closeAllOpenByArtist(Long artistId) {
+        sessionRepository.findAllByArtistIdAndStatus(artistId, SessionStatus.OPEN)
+                .forEach(Session::close);
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+                .ifPresent(artist -> artist.updateIsOpen(false));
+    }
 
 }

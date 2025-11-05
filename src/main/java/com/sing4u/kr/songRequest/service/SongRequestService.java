@@ -86,9 +86,24 @@ public class SongRequestService {
 
 
     public SongRequestResponseDto createSongRequest(SongRequestCreateDto createDto) {
-        log.info("곡 요청 처리 시작 - 입력된 곡 정보: '{}' - '{}', 플랫폼: {}, ID: {}",
-                createDto.getSongTitle(), createDto.getArtistName(),
-                createDto.getMusicPlatformName(), createDto.getPlatformTrackId());
+        // 1. Tags 리스트를 쉼표로 구분된 문자열로 안전하게 변환합니다. (null 처리 포함)
+        String tagString = Optional.ofNullable(createDto.getTags())
+                .filter(tags -> !tags.isEmpty())
+                .map(tags -> String.join(", ", tags))
+                .orElse("N/A"); // 태그 리스트가 null이거나 비어있으면 "N/A"로 대체
+
+        // 2. URL이 null일 경우 "N/A"로 대체합니다.
+        String urlString = Optional.ofNullable(createDto.getUrl())
+                .orElse("N/A");
+
+        log.info("곡 요청 처리 시작 - 입력된 곡 정보: '{}' - '{}', 플랫폼: {}, ID: {}, 태그: {}, URL: {}",
+                createDto.getSongTitle(),
+                createDto.getArtistName(),
+                createDto.getMusicPlatformName(),
+                createDto.getPlatformTrackId(),
+                tagString, // 변환된 태그 문자열 사용
+                urlString  // null 처리된 URL 문자열 사용
+        );
 
         // STEP 1: 외부 API 호출 등 트랜잭션이 불필요한 작업을 먼저 수행.
         SongInfo determinedSongInfo = determineSongInfo(createDto);
@@ -117,6 +132,10 @@ public class SongRequestService {
         Long artistId = userService.getUserIdByPublicId(createDto.getArtistPublicId());
         validateSession(session, artistId);
 
+        if (createDto.getTags() != null && createDto.getTags().size() > 10) {
+            throw new ApiException(ExceptionCode.BAD_REQUEST, "태그는 최대 10개까지만 등록 가능합니다.");
+        }
+        
         // DB 작업: 엔티티 생성 및 저장
         SongRequest songRequest = SongRequest.builder()
                 .session(session)
@@ -125,12 +144,14 @@ public class SongRequestService {
                 .songArtistName(songInfo.artistName())
                 .musicPlatformName(songInfo.platformName())
                 .platformTrackId(songInfo.platformTrackId())
+                .tags(createDto.getTags())
+                .url(createDto.getUrl())
                 .build();
 
         SongRequest savedSongRequest = songRequestRepository.save(songRequest);
-        log.info("신청곡 등록 완료: ID {}, 제목: {}", savedSongRequest.getId(), savedSongRequest.getSongTitle());
+        log.info("신청곡 추천 등록 완료: ID {}, 제목: {}", savedSongRequest.getId(), savedSongRequest.getSongTitle());
 
-        return new SongRequestResponseDto(savedSongRequest.getId(), "신청곡 등록 완료");
+        return new SongRequestResponseDto(savedSongRequest.getId(), "신청곡 추천 등록 완료");
     }
 
     private void validateSession(Session session, Long requestArtistId) {

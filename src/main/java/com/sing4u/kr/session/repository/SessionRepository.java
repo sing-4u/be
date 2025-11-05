@@ -31,4 +31,6 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findTopByArtistIdOrderByStartedAtDesc(Long artistId);
 
     Page<Session> findByArtistIdOrderByStartedAtDesc(Long artistId, Pageable pageable);
+    
+    Iterable<Session> findAllByArtistIdAndStatus(Long artistId, SessionStatus sessionStatus);
 }
