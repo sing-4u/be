@@ -4,6 +4,7 @@ import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
+import com.sing4u.kr.common.response.PagingResponse;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.enums.SessionStatus;
@@ -15,6 +16,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +57,7 @@ public class SessionController {
     }
 
     @Operation(summary = "현재 오픈된 세션 조회", description = "아티스트의 현재 진행 중인 세션 정보를 조회합니다.")
-    @GetMapping("/{artistPublicId}/sessions")
+    @GetMapping("/{artistPublicId}/sessions/open")
     public ResponseResult<CurrentSessionResponseDto> getArtistCurrentOpenSession(
             @Parameter(description = "세션 정보를 조회할 아티스트의 공개 ID", example = "user_public_id_1")
             @PathVariable String artistPublicId) {
@@ -70,5 +75,25 @@ public class SessionController {
         }
 
         return new ResponseResult<>(ResponseCode.SUCCESS, currentSession);
+    }
+
+    @GetMapping("/{artistPublicId}/sessions")
+    @Operation(summary = "아티스트의 세션 목록 조회",
+            description = "page/pageSize로 페이지네이션, 최신 순으로 정렬")
+    public ResponseEntity<PagingResponse<SessionResponseDto>> getSessions(
+            @Parameter(description = "세션 목록을 조회할 아티스트의 공개 ID", example = "user_public_id_1") @PathVariable String artistPublicId,
+            @Parameter(description = "현재 페이지(0-base)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        Long artistId = userService.getUserIdByPublicId(artistPublicId);
+
+        // 정렬: 최신 시작 시각
+        var pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "startedAt"));
+
+        Page<SessionResponseDto> dtoPage = sessionService
+                .getSessionsByArtist(artistId, pageable)
+                .map(SessionResponseDto::from);
+
+        return ResponseEntity.ok(PagingResponse.of(dtoPage));
     }
 }
