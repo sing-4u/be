@@ -92,8 +92,8 @@ endpoints:
 
 
 sing4u:
-  #server-url: http://localhost:8080
-  server-url: https://dev-api.sing4u.kr
+  server-url: http://localhost:8080
+  #server-url: https://dev-api.sing4u.kr
   file-url: https://image.sing4u.kr/
 #  oauth-redirect-url: http://localhost:3000/auth/callback
   oauth-redirect-url: https://next.sing4u.kr/
@@ -105,6 +105,8 @@ cors:
     - "http://localhost:5173"
     - "https://localhost:5173"
     - "https://dev-api.sing4u.kr"
+    - "https://www.sing4u.kr"
+    - "https://sing4u.kr"
 
 springdoc:
   api-docs:
