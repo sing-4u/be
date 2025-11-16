@@ -5,6 +5,7 @@ import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
 import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.songRequest.entity.SongRequest;
 import com.sing4u.kr.songRequest.repository.SongRequestRepository;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -37,7 +39,7 @@ public class SongRequestService {
     private final UserRepository userRepository;
     private final MusicPlatformFactory musicPlatformFactory;
 
-    private record SongInfo(String title, String artistName, String platformTrackId, String platformName){}
+    private record SongInfo(String title, String artistName, String platformTrackId, String platformName, String albumImageUrl){}
 
     private final UserService userService;
 
@@ -46,6 +48,7 @@ public class SongRequestService {
         String artistName = createDto.getArtistName();
         String resolvedPlatformTrackId = createDto.getPlatformTrackId(); // 사용자가 제공한 트랙 ID
         String resolvedPlatformName = createDto.getMusicPlatformName(); // 사용자가 제공한 플랫폼 이름
+        String albumImageUrl = null;
 
         // 플랫폼 트랙 ID가 존재할 경우에만 외부 API 호출
         if (resolvedPlatformTrackId != null && !resolvedPlatformTrackId.isBlank()) {
@@ -66,6 +69,7 @@ public class SongRequestService {
                         }
                         resolvedPlatformTrackId = trackDetails.getPlatformTrackId();
                         resolvedPlatformName = trackDetails.getPlatformName();
+                        albumImageUrl = trackDetails.getAlbumImageUrl();
 
                         log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})",
                                 resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
@@ -81,7 +85,7 @@ public class SongRequestService {
         }
 
         // 플랫폼 정보가 없거나 트랙 ID가 없는 경우 DTO 정보 그대로 사용
-        return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName);
+        return new SongInfo(title, artistName, resolvedPlatformTrackId, resolvedPlatformName, albumImageUrl);
     }
 
 
@@ -146,6 +150,7 @@ public class SongRequestService {
                 .platformTrackId(songInfo.platformTrackId())
                 .tags(createDto.getTags())
                 .url(createDto.getUrl())
+                .albumImageUrl(songInfo.albumImageUrl())
                 .build();
 
         SongRequest savedSongRequest = songRequestRepository.save(songRequest);
@@ -190,7 +195,7 @@ public class SongRequestService {
                                 List<SongRequest> requests = entry.getValue();
                                 SongRequest latest = requests.get(requests.size() - 1);
 
-                                return SongDetailDto.from(latest, (long) requests.size());
+                                return SongDetailDto.from(latest);
                             })
                             .sorted(Comparator.comparing(SongDetailDto::getRequestedAt))
                             .collect(Collectors.toList());
@@ -220,4 +225,93 @@ public class SongRequestService {
 
         return dtos;
     }
+
+    @Transactional(readOnly = true)
+    public ArtistSongRequestsResponse getArtistSongRequests(
+            Long artistId,
+            Long sessionId,
+            String keyword,
+            String sort,
+            int page,
+            int pageSize
+    ) {
+        // 1) 아티스트의 모든 세션 + 신청곡 로딩
+        List<Session> sessions = sessionRepository.findAllWithSongRequestsByArtist(artistId);
+
+        // 2) SongRequest 평탄화
+        Stream<SongRequest> stream = sessions.stream()
+                .flatMap(session -> session.getSongRequests().stream());
+
+        // 3) sessionId 필터링
+        if (sessionId != null) {
+            stream = stream.filter(req -> req.getSession().getId().equals(sessionId));
+        }
+
+        // 4) keyword 필터링 (제목 / 가수명 / 태그 검색)
+        if (keyword != null && !keyword.isBlank()) {
+            String lower = keyword.toLowerCase(Locale.ROOT);
+
+            stream = stream.filter(req -> {
+                boolean titleMatch =
+                        req.getSongTitle() != null &&
+                                req.getSongTitle().toLowerCase(Locale.ROOT).contains(lower);
+
+                boolean artistMatch =
+                        req.getSongArtistName() != null &&
+                                req.getSongArtistName().toLowerCase(Locale.ROOT).contains(lower);
+
+                boolean tagMatch = false;
+                if (req.getTags() != null) {
+                    tagMatch = req.getTags().stream()
+                            .filter(Objects::nonNull)
+                            .anyMatch(tag -> tag.toLowerCase(Locale.ROOT).contains(lower));
+                }
+
+                return titleMatch || artistMatch || tagMatch;
+            });
+        }
+
+        // 5) 정렬
+        Comparator<SongRequest> comparator;
+
+        if ("POPULAR".equalsIgnoreCase(sort)) {
+            // 인기순: 좋아요 많은 순
+            comparator = Comparator.comparing(SongRequest::getLikeCount).reversed();
+        } else {
+            // 기본 = 최신순
+            comparator = Comparator.comparing(SongRequest::getRequestedAt).reversed();
+        }
+
+        List<SongDetailDto> all = stream
+                .sorted(comparator)
+                .map(SongDetailDto::from)
+                .toList();
+
+        // 6) 페이징
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(pageSize, 1);
+
+        int from = safePage * safeSize;
+        if (from >= all.size()) {
+            return ArtistSongRequestsResponse.builder()
+                    .songs(Collections.emptyList())
+                    .hasNext(false)
+                    .page(safePage)
+                    .pageSize(safeSize)
+                    .build();
+        }
+
+        int to = Math.min(from + safeSize, all.size());
+        boolean hasNext = to < all.size();
+
+        List<SongDetailDto> resultPage = all.subList(from, to);
+
+        return ArtistSongRequestsResponse.builder()
+                .songs(resultPage)
+                .hasNext(hasNext)
+                .page(safePage)
+                .pageSize(safeSize)
+                .build();
+    }
+
 }

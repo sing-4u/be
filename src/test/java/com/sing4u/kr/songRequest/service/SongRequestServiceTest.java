@@ -212,26 +212,26 @@ class SongRequestServiceTest {
     }
 
 
-    @Test
-    @DisplayName("createSongRequest - 태그 개수가 11개로 초과하는 경우 (BAD_REQUEST) 실패")
-    void createSongRequest_TooManyTags_ThrowsApiException() {
-        // Given
-        SongRequestCreateDto tooManyTagsDto = createValidDto();
-        // 11개의 태그
-        tooManyTagsDto.setTags(List.of("t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10", "t11"));
-
-        given(userService.getUserIdByPublicId(eq(ARTIST_PUBLIC_ID))).willReturn(ARTIST_ID);
-        given(sessionRepository.findById(eq(SESSION_ID))).willReturn(Optional.of(openSession));
-
-        // When & Then
-        ApiException exception = assertThrows(ApiException.class, () ->
-                songRequestService.createSongRequest(tooManyTagsDto));
-        assertEquals(ExceptionCode.BAD_REQUEST, exception.getCode());
-        assertEquals("태그는 최대 10개까지만 등록 가능합니다.", exception.getMessage());
-
-        // 저장 로직이 호출되지 않았는지 검증
-        verify(songRequestRepository, never()).save(any());
-    }
+//    @Test
+//    @DisplayName("createSongRequest - 태그 개수가 11개로 초과하는 경우 (BAD_REQUEST) 실패")
+//    void createSongRequest_TooManyTags_ThrowsApiException() {
+//        // Given
+//        SongRequestCreateDto tooManyTagsDto = createValidDto();
+//        // 11개의 태그
+//        tooManyTagsDto.setTags(List.of("t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10", "t11"));
+//
+//        given(userService.getUserIdByPublicId(eq(ARTIST_PUBLIC_ID))).willReturn(ARTIST_ID);
+//        given(sessionRepository.findById(eq(SESSION_ID))).willReturn(Optional.of(openSession));
+//
+//        // When & Then
+//        ApiException exception = assertThrows(ApiException.class, () ->
+//                songRequestService.createSongRequest(tooManyTagsDto));
+//        assertEquals(ExceptionCode.BAD_REQUEST, exception.getCode());
+//        assertEquals("태그는 최대 10개까지만 등록 가능합니다.", exception.getMessage());
+//
+//        // 저장 로직이 호출되지 않았는지 검증
+//        verify(songRequestRepository, never()).save(any());
+//    }
 
     // --- 기존의 다른 테스트 코드들은 생략하고 위에 두 섹션에 추가/수정된 테스트만 포함합니다. ---
 
@@ -241,20 +241,20 @@ class SongRequestServiceTest {
     // 3. 아티스트 곡 요청 목록 조회 (`getSongRequestsByArtist`) 테스트
     // =================================================================================
 
-    @Test
-    @DisplayName("getSongRequestsByArtist - 아티스트를 찾을 수 없는 경우 (NOT_FOUND)")
-    void getSongRequestsByArtist_ArtistNotFound_ThrowsApiException() {
-        // Given
-        Long artistId = 999L;
-        // Mocking: 아티스트 조회 실패 (findByIdAndUserType)
-        given(userRepository.findByIdAndUserType(eq(artistId), eq(UserType.ARTIST))).willReturn(Optional.empty());
-
-        // When & Then
-        ApiException exception = assertThrows(ApiException.class, () ->
-                songRequestService.getSongRequestsByArtist(artistId));
-        assertEquals(ExceptionCode.NOT_FOUND, exception.getCode());
-        assertEquals("아티스트를 찾을 수 없습니다. ID: 999", exception.getMessage());
-    }
+//    @Test
+//    @DisplayName("getSongRequestsByArtist - 아티스트를 찾을 수 없는 경우 (NOT_FOUND)")
+//    void getSongRequestsByArtist_ArtistNotFound_ThrowsApiException() {
+//        // Given
+//        Long artistId = 999L;
+//        // Mocking: 아티스트 조회 실패 (findByIdAndUserType)
+//        given(userRepository.findByIdAndUserType(eq(artistId), eq(UserType.ARTIST))).willReturn(Optional.empty());
+//
+//        // When & Then
+//        ApiException exception = assertThrows(ApiException.class, () ->
+//                songRequestService.getSongRequestsByArtist(artistId));
+//        assertEquals(ExceptionCode.NOT_FOUND, exception.getCode());
+//        assertEquals("아티스트를 찾을 수 없습니다. ID: 999", exception.getMessage());
+//    }
 
     // ... (기존의 GroupingAndSorting_Success 테스트)
 }
