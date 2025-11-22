@@ -40,7 +40,7 @@ public class SongRequest {
     @Column(name = "song_artist_name", length = 100)
     private String songArtistName; // 노래의 아티스트명
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "song_request_tags", joinColumns = @JoinColumn(name = "song_request_id"))
     @Column(name = "tag", length = 20)
     private List<String> tags;
@@ -64,6 +64,9 @@ public class SongRequest {
         if (this.likeCount > 0)
             this.likeCount--;
     }
+
+    @Column(name = "album_image_url")
+    private String albumImageUrl;
 
 }
 

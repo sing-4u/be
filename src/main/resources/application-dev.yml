@@ -89,6 +89,7 @@ endpoints:
     - /api/v1/artists/{artistPublicId}/sessions
     - /api/v1/users/platform/**
     - /api/v1/users/platform/{userPublicId}/activity-platform
+    - /api/v1/songRequests/artists/{artistPublicId}
 
 
 sing4u:

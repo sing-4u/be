@@ -4,6 +4,7 @@ import com.sing4u.kr.common.dto.ResponseResult;
 import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
 import com.sing4u.kr.songRequest.service.SongRequestService;
 import com.sing4u.kr.session.dto.SessionSongsDto;
 import com.sing4u.kr.user.service.UserService;
@@ -32,13 +33,36 @@ public class SongRequestController {
         return new ResponseResult<>(ResponseCode.SUCCESS, responseDto);
     }
 
-    @Operation(summary = "아티스트 곡 요청 목록 조회", description = "특정 아티스트에게 요청된 커스텀 곡 요청 목록을 조회")
+//    @Operation(summary = "아티스트 곡 요청 목록 조회", description = "특정 아티스트에게 요청된 커스텀 곡 요청 목록을 조회")
+//    @GetMapping("/artists/{artistPublicId}")
+//    public ResponseResult<List<SessionSongsDto>> getArtistSongRequests(
+//            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 공개 ID", example = "user_public_id_1")
+//            @PathVariable String artistPublicId) {
+//        Long artistId = userService.getUserIdByPublicId(artistPublicId);
+//        List<SessionSongsDto> songRequests = songRequestService.getSongRequestsByArtist(artistId);
+//        return new ResponseResult<>(ResponseCode.SUCCESS, songRequests);
+//    }
+
+    @Operation(
+            summary = "아티스트 신청곡 조회",
+            description = "아티스트에게 들어온 신청곡 목록을 조회합니다. sessionId, keyword, sort(LATEST/OLDEST), page, pageSize"
+    )
     @GetMapping("/artists/{artistPublicId}")
-    public ResponseResult<List<SessionSongsDto>> getArtistSongRequests(
-            @Parameter(description = "곡 요청 목록을 조회할 아티스트의 공개 ID", example = "user_public_id_1")
-            @PathVariable String artistPublicId) {
+    public ResponseResult<ArtistSongRequestsResponse> getArtistSongRequests(
+            @PathVariable String artistPublicId,
+            @RequestParam(required = false) Long sessionId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "LATEST") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+
         Long artistId = userService.getUserIdByPublicId(artistPublicId);
-        List<SessionSongsDto> songRequests = songRequestService.getSongRequestsByArtist(artistId);
-        return new ResponseResult<>(ResponseCode.SUCCESS, songRequests);
+
+        ArtistSongRequestsResponse result =
+                songRequestService.getArtistSongRequests(artistId, sessionId, keyword, sort, page, pageSize);
+
+        return new ResponseResult<>(ResponseCode.SUCCESS, result);
     }
+
 }

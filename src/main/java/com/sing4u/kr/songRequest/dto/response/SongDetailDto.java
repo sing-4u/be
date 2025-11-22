@@ -18,12 +18,13 @@ public class SongDetailDto {
     private String email;  // 신청자 이메일 (fanEmail)
     private String spotifyTrackId;
     private LocalDateTime requestedAt;
-    private Long count;
+    private Long likeCount;
+    private String albumImageUrl;
     private List<String> tags;
     private String url;
 
 
-    public static SongDetailDto from(SongRequest songRequest, Long count) {
+    public static SongDetailDto from(SongRequest songRequest) {
         if (songRequest == null) {
             return null;
         }
@@ -35,7 +36,8 @@ public class SongDetailDto {
                 .email(songRequest.getFanEmail()) // 그룹 기준에서는 신청자 정보는 의미 없음
                 .spotifyTrackId(songRequest.getPlatformTrackId())
                 .requestedAt(songRequest.getRequestedAt())
-                .count(count)
+                .likeCount(songRequest.getLikeCount())
+                .albumImageUrl(songRequest.getAlbumImageUrl())
                 .tags(songRequest.getTags())
                 .url(songRequest.getUrl())
                 .build();
