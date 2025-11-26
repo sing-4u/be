@@ -151,6 +151,7 @@ public class SongRequestService {
                 .tags(createDto.getTags())
                 .url(createDto.getUrl())
                 .albumImageUrl(songInfo.albumImageUrl())
+                .likeCount(0)
                 .build();
 
         SongRequest savedSongRequest = songRequestRepository.save(songRequest);
