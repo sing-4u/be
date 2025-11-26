@@ -45,7 +45,7 @@ public class SongRequestController {
 
     @Operation(
             summary = "아티스트 신청곡 조회",
-            description = "아티스트에게 들어온 신청곡 목록을 조회합니다. sessionId, keyword, sort(LATEST/OLDEST), page, pageSize"
+            description = "아티스트에게 들어온 신청곡 목록을 조회합니다. sessionId, keyword, sort(LATEST/POPULAR), page, pageSize"
     )
     @GetMapping("/artists/{artistPublicId}")
     public ResponseResult<ArtistSongRequestsResponse> getArtistSongRequests(
