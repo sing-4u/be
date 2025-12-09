@@ -5,11 +5,13 @@ import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
+import com.sing4u.kr.songRequest.enums.SortType;
 import com.sing4u.kr.songRequest.service.SongRequestService;
 import com.sing4u.kr.session.dto.SessionSongsDto;
 import com.sing4u.kr.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,7 +54,7 @@ public class SongRequestController {
             @PathVariable String artistPublicId,
             @RequestParam(required = false) Long sessionId,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, defaultValue = "LATEST") String sort,
+            @RequestParam(required = false, defaultValue = "LATEST") @Parameter(description = "정렬 기준", schema = @Schema(implementation = SortType.class)) SortType sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize
     ) {

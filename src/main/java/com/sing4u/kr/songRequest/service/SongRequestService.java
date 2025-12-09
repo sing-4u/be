@@ -8,6 +8,7 @@ import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
 import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.songRequest.entity.SongRequest;
+import com.sing4u.kr.songRequest.enums.SortType;
 import com.sing4u.kr.songRequest.repository.SongRequestRepository;
 import com.sing4u.kr.music.MusicInterface;
 import com.sing4u.kr.music.MusicPlatformFactory;
@@ -232,7 +233,7 @@ public class SongRequestService {
             Long artistId,
             Long sessionId,
             String keyword,
-            String sort,
+            SortType sort,
             int page,
             int pageSize
     ) {
@@ -275,7 +276,7 @@ public class SongRequestService {
         // 5) 정렬
         Comparator<SongRequest> comparator;
 
-        if ("POPULAR".equalsIgnoreCase(sort)) {
+        if (sort == SortType.POPULAR) {
             // 인기순: 좋아요 많은 순
             comparator = Comparator.comparing(SongRequest::getLikeCount).reversed();
         } else {
