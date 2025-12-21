@@ -4,12 +4,16 @@ import com.sing4u.kr.session.entity.Session;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class) // 업데이트 처리를 위해 추가
 @Setter // Builder 사용 시 일부 필드 수정을 위해
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,13 +52,17 @@ public class SongRequest {
     @Column(name = "url", length = 255)
     private String url;
 
-    @CreationTimestamp
-    @Column(name = "requested_at", nullable = false, updatable = false, columnDefinition = "datetime")
+    @CreatedDate
+    @Column(name = "requested_at", nullable = false, updatable = false)
     private LocalDateTime requestedAt;
 
     @Builder.Default
     @Column(nullable=false)
     private long likeCount = 0L;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public void increaseLikeCount() {
         this.likeCount++;
@@ -68,6 +76,17 @@ public class SongRequest {
     @Column(name = "album_image_url")
     private String albumImageUrl;
 
+    @Column(name = "saved_yn", length = 1, nullable = false)
+    @Builder.Default
+    private String savedYn = "N";
+
+    public void markSaved() {
+        this.savedYn = "Y";
+    }
+
+    public void unmarkSaved() {
+        this.savedYn = "N";
+    }
 }
 
 

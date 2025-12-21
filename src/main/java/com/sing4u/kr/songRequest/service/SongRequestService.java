@@ -316,4 +316,19 @@ public class SongRequestService {
                 .build();
     }
 
+    @Transactional
+    public void changeSaveStatus(Long songRequestId, boolean saved) {
+        SongRequest songRequest = songRequestRepository.findById(songRequestId)
+                .orElseThrow(() ->
+                        new ApiException(ExceptionCode.NOT_FOUND, "신청곡을 찾을 수 없습니다. ID: " + songRequestId)
+                );
+
+        if (saved) {
+            songRequest.markSaved();     // savedYn = Y
+        } else {
+            songRequest.unmarkSaved();   // savedYn = N
+        }
+        // updatedAt은 Auditing으로 *저장 순 조회가 가능하도록 자동 갱신
+    }
+
 }

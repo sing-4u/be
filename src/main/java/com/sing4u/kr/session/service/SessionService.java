@@ -1,5 +1,6 @@
 package com.sing4u.kr.session.service;
 
+import com.sing4u.kr.application.utils.SecurityContextUtils;
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
@@ -7,6 +8,9 @@ import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.repository.SessionRepository;
+import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
+import com.sing4u.kr.songRequest.repository.SongRequestRepository;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserRepository;
@@ -24,6 +28,7 @@ import java.util.Optional;
 public class SessionService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
+    private final SongRequestRepository songRequestRepository;
 
     @Transactional
     public SessionResponseDto createSession(Long artistId){
@@ -106,6 +111,31 @@ public class SessionService {
                 .forEach(Session::close);
         userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .ifPresent(artist -> artist.updateIsOpen(false));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SongDetailDto> getRecommendHistorySessions(
+            String artistPublicId,
+            Pageable pageable
+    ) {
+        // 1. 아티스트 ID 조회 (존재 검증 포함)
+        User artist = userRepository.findByUserPublicIdAndDeletedAtIsNull(artistPublicId)
+                .orElseThrow(() -> new ApiException(
+                        ExceptionCode.NOT_FOUND,
+                        "아티스트를 찾을 수 없습니다."
+                ));
+
+        // 2. 현재 로그인한 사용자 이메일 찾기
+        String email = SecurityContextUtils.getEmail();
+
+
+        // 3. 추천 히스토리 세션 조회
+        return songRequestRepository
+                .findRecommendHistorySongRequests(
+                        artist.getId(),
+                        email,
+                        pageable
+                );
     }
 
 }

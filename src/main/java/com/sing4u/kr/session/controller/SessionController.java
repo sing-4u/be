@@ -9,6 +9,8 @@ import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.service.SessionService;
+import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.repository.UserRepository;
 import com.sing4u.kr.user.service.UserService;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -96,4 +99,29 @@ public class SessionController {
 
         return ResponseEntity.ok(PagingResponse.of(dtoPage));
     }
+
+    @GetMapping("/{artistPublicId}/sessions/recommend-history")
+    @Operation(
+            summary = "아티스트 추천 히스토리 조회",
+            description = "현재 로그인 사용자가 해당 아티스트에게 추천했던 세션 목록 조회"
+    )
+    public ResponseEntity<PagingResponse<SongDetailDto>> getRecommendHistorySessions(
+            @Parameter(description = "아티스트 공개 ID", example = "user_public_id_1")
+            @PathVariable String artistPublicId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                pageSize,
+                Sort.by(Sort.Direction.DESC, "startedAt")
+        );
+
+        Page<SongDetailDto> result =
+                sessionService.getRecommendHistorySessions(artistPublicId, pageable);
+
+        return ResponseEntity.ok(PagingResponse.of(result));
+    }
+
+
 }

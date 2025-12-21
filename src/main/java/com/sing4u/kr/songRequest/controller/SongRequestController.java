@@ -67,4 +67,15 @@ public class SongRequestController {
         return new ResponseResult<>(ResponseCode.SUCCESS, result);
     }
 
+    @Operation(summary = "신청곡 저장 상태 변경", description = "신청곡 저장 여부를 변경합니다.")
+    @PatchMapping("/{songRequestId}/save")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseResult<Void> changeSaveStatus(
+            @PathVariable Long songRequestId,
+            @RequestParam boolean saved
+    ) {
+        songRequestService.changeSaveStatus(songRequestId, saved);
+        return new ResponseResult<>(ResponseCode.SUCCESS);
+    }
+
 }

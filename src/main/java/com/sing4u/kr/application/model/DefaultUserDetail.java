@@ -55,9 +55,10 @@ public class DefaultUserDetail implements UserDetails, Serializable {
         return true;
     }
 
-    public static DefaultUserDetail of(Long id, Collection<GrantedAuthority> authorities) {
+    public static DefaultUserDetail of(Long id, String email, Collection<GrantedAuthority> authorities) {
         return DefaultUserDetail.builder()
                 .id(id)
+                .email(email)
                 .authorities(authorities)
                 .build();
     }
