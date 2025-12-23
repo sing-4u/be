@@ -28,4 +28,12 @@ public class ArtistSessionResponseDto {
     @Schema(description = "세션 당 추천곡 수 합계", example = "128")
     private Long songRequestCount;
 
+    //JPQL용
+    public ArtistSessionResponseDto(Long sessionId, SessionStatus status, LocalDateTime startedAt, LocalDateTime closedAt, Long songRequestCount) {
+        this.sessionId = sessionId;
+        this.status = status;
+        this.startedAt = startedAt;
+        this.closedAt = closedAt;
+        this.songRequestCount = songRequestCount;
+    }
 }

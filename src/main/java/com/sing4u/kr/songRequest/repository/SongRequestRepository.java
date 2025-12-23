@@ -18,7 +18,7 @@ public interface SongRequestRepository extends JpaRepository<SongRequest, Long> 
     // TODO: songTitle/songArtistName 표기 차이(직접 입력한 곡과 스포티파이 검색 곡 차이)로 동일 곡이 분리 집계될 수 있을 것 같아서 해결방안 생각해야 함
     @Query(
             value = """
-                SELECT new com.sing4u.kr.songRequest.dto.response.SongRequestManageResponse(
+                SELECT new com.sing4u.kr.songRequest.dto.response.SongRequestManageItemDto(
                     MIN(sr.id),
                     sr.songTitle,
                     sr.songArtistName,
