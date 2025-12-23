@@ -6,7 +6,7 @@ spring:
     activate:
         on-profile: dev
     import:
-        - aws-parameterstore:/config/api/application_dev/
+        - optional:aws-parameterstore:/config/api/application_${spring.profiles.active}/
 
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
