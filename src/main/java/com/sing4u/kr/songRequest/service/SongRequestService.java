@@ -3,10 +3,12 @@ package com.sing4u.kr.songRequest.service;
 
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
+import com.sing4u.kr.songRequest.dto.response.SongRequestManageItemDto;
 import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
 import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
+import com.sing4u.kr.songRequest.dto.response.SongRequestManageResponseDto;
 import com.sing4u.kr.songRequest.entity.SongRequest;
 import com.sing4u.kr.songRequest.enums.SortType;
 import com.sing4u.kr.songRequest.repository.SongRequestRepository;
@@ -23,6 +25,8 @@ import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -314,6 +318,28 @@ public class SongRequestService {
                 .page(safePage)
                 .pageSize(safeSize)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public SongRequestManageResponseDto getArtistSongRequestsForManage(
+            Long artistId,
+            int page,
+            int pageSize,
+            String keyword
+    ) {
+        // 1) 아티스트 존재 확인
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
+
+        // 2) 페이징
+        var pageable = PageRequest.of(page, pageSize);
+
+        // 3) 집계 조회
+        Page<SongRequestManageItemDto> pageResult =
+                songRequestRepository.findArtistSongRequestsForManage(artistId, keyword, pageable);
+
+        // 4) 명세 형태로 응답 래핑
+        return SongRequestManageResponseDto.of(pageResult);
     }
 
 }
