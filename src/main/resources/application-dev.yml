@@ -1,6 +1,13 @@
 spring:
   application:
     name: api
+
+  config:
+    activate:
+        on-profile: dev
+    import:
+        - aws-parameterstore:/config/api/application_dev/
+
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USER}

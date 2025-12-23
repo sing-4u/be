@@ -1,5 +1,8 @@
 package com.sing4u.kr.songRequest.controller;
 
+import com.sing4u.kr.common.dto.ResponseResult;
+import com.sing4u.kr.common.enums.ResponseCode;
+import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
 import com.sing4u.kr.songRequest.dto.response.SongRequestManageResponseDto;
 import com.sing4u.kr.songRequest.service.SongRequestService;
 import com.sing4u.kr.user.service.UserService;
@@ -21,7 +24,7 @@ public class SongRequestManageController {
             description = "추천 데이터 탭에서 신청곡을 집계(총 좋아요 수, 총 추천 수)하여 조회합니다. (keyword는 optional)"
     )
     @GetMapping("/artists/{artistPublicId}/song-requests/manage")
-    public SongRequestManageResponseDto getArtistSongRequestsManage(
+    public ResponseResult<SongRequestManageResponseDto> getArtistSongRequestsManage(
             @Parameter(description = "아티스트 공개 ID", example = "user_public_id_1")
             @PathVariable String artistPublicId,
             @RequestParam(defaultValue = "0") int page,
@@ -29,6 +32,10 @@ public class SongRequestManageController {
             @RequestParam(required = false) String keyword
     ) {
         Long artistId = userService.getUserIdByPublicId(artistPublicId);
-        return songRequestService.getArtistSongRequestsForManage(artistId, page, pageSize, keyword);
+
+        SongRequestManageResponseDto result =
+                songRequestService.getArtistSongRequestsForManage(artistId, page, pageSize, keyword);
+
+        return new ResponseResult<>(ResponseCode.SUCCESS, result);
     }
 }
