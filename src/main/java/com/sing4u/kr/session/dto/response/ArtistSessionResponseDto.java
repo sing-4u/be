@@ -12,14 +12,11 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SessionResponseDto {
+public class ArtistSessionResponseDto {
     @Schema(description = "세션 ID", example = "1")
     private Long sessionId;
 
-    @Schema(description = "세션의 아티스트 ID", example = "user_public_id_1")
-    private String artistId;
-
-    @Schema(description = "세션 상태", example = "OPEN", implementation = SessionStatus.class)
+    @Schema(description = "세션 상태", example = "OPEN",implementation = SessionStatus.class)
     private SessionStatus status;
 
     @Schema(description = "세션 시작 시각", example = "2025-06-16T10:00:00")
@@ -28,13 +25,7 @@ public class SessionResponseDto {
     @Schema(description = "세션 종료 시각 (종료되지 않았으면 null)", example = "2025-06-16T12:00:00")
     private LocalDateTime closedAt;
 
-    public static SessionResponseDto from(Session session) {
-        return SessionResponseDto.builder()
-                .sessionId(session.getId())
-                .artistId(session.getArtist().getUserPublicId())
-                .status(session.getStatus())
-                .startedAt(session.getStartedAt())
-                .closedAt(session.getClosedAt())
-                .build();
-    }
+    @Schema(description = "세션 당 추천곡 수 합계", example = "128")
+    private Long songRequestCount;
+
 }

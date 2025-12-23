@@ -5,6 +5,7 @@ import com.sing4u.kr.common.enums.ResponseCode;
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.common.response.PagingResponse;
+import com.sing4u.kr.session.dto.response.ArtistSessionResponseDto;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.enums.SessionStatus;
@@ -96,4 +97,28 @@ public class SessionController {
 
         return ResponseEntity.ok(PagingResponse.of(dtoPage));
     }
+
+    @GetMapping("/{artistPublicId}/sessions/manage")
+    @Operation(
+            summary = "세션 목록 조회(아티스트용)",
+            description = "세션별 신청곡 수를 포함한 아티스트 관리용 세션 목록 조회"
+    )
+    public ResponseEntity<PagingResponse<ArtistSessionResponseDto>> getArtistSessionsForManage(
+            @Parameter(description = "아티스트 공개 ID", example = "user_public_id_1")
+            @PathVariable String artistPublicId,
+            @Parameter(description = "현재 페이지(0-base)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기")
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        Long artistId = userService.getUserIdByPublicId(artistPublicId);
+
+        var pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "startedAt"));
+
+        Page<ArtistSessionResponseDto> dtoPage =
+                sessionService.getArtistSessionsForManage(artistId, pageable);
+
+        return ResponseEntity.ok(PagingResponse.of(dtoPage));
+    }
+
 }
