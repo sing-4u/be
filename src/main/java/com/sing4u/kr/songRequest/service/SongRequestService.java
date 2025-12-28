@@ -76,8 +76,8 @@ public class SongRequestService {
                         resolvedPlatformName = trackDetails.getPlatformName();
                         albumImageUrl = trackDetails.getAlbumImageUrl();
 
-                        log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {})",
-                                resolvedPlatformName, title, artistName, resolvedPlatformTrackId);
+                        log.info("'{}' 플랫폼 정보로 곡 정보를 설정했습니다: '{}' - '{}' (ID: {}), image: {}",
+                                resolvedPlatformName, title, artistName, resolvedPlatformTrackId, albumImageUrl);
                     } else {
                         log.warn("'{}' 플랫폼에서 트랙 ID '{}'에 대한 정보를 가져오지 못했습니다. DTO에 입력된 곡 정보를 우선 사용합니다.",
                                 resolvedPlatformName, resolvedPlatformTrackId);
