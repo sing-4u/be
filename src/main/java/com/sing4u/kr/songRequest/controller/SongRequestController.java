@@ -7,7 +7,6 @@ import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
 import com.sing4u.kr.songRequest.enums.SortType;
 import com.sing4u.kr.songRequest.service.SongRequestService;
-import com.sing4u.kr.session.dto.SessionSongsDto;
 import com.sing4u.kr.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/songRequests") // API 명세서 기준 Endpoint
@@ -46,7 +44,7 @@ public class SongRequestController {
 //    }
 
     @Operation(
-            summary = "아티스트 신청곡 조회",
+            summary = "아티스트 신청곡 조회(추천 리스트)",
             description = "아티스트에게 들어온 신청곡 목록을 조회합니다. sessionId, keyword, sort(LATEST/POPULAR), page, pageSize"
     )
     @GetMapping("/artists/{artistPublicId}")

@@ -87,6 +87,7 @@ public class SpotifyMusicService implements MusicInterface {
                     .title(track.getName())
                     .artistName(artistNames)
                     .platformName(PLATFORM_IDENTIFIER)
+                    .albumImageUrl(getCoverUrl(track))
                     .build();
         } catch (SpotifyWebApiException e) {
             logger.error("Spotify API 오류 (트랙 ID: {}): {}", platformTrackId, e.getMessage());
