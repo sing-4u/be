@@ -1,5 +1,6 @@
 package com.sing4u.kr.session.repository;
 
+import com.sing4u.kr.session.dto.response.ArtistSessionResponseDto;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.user.entity.User;
@@ -10,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,4 +33,20 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     Page<Session> findByArtistIdOrderByStartedAtDesc(Long artistId, Pageable pageable);
     
     Iterable<Session> findAllByArtistIdAndStatus(Long artistId, SessionStatus sessionStatus);
+
+    @Query("""
+        SELECT NEW com.sing4u.kr.session.dto.response.ArtistSessionResponseDto(
+            s.id,
+            s.status,
+            s.startedAt,
+            s.closedAt,
+            count(sr.id)
+        )
+        FROM Session s
+        LEFT JOIN SongRequest sr ON sr.session = s
+        WHERE s.artist.id = :artistId
+        GROUP BY s.id, s.status, s.startedAt, s.closedAt
+        ORDER BY s.startedAt desc
+    """)
+    Page<ArtistSessionResponseDto> findArtistSessionsForManage(@Param("artistId") Long artistId, Pageable pageable);
 }

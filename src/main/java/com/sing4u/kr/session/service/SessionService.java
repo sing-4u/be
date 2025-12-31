@@ -3,6 +3,7 @@ package com.sing4u.kr.session.service;
 import com.sing4u.kr.application.utils.SecurityContextUtils;
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
+import com.sing4u.kr.session.dto.response.ArtistSessionResponseDto;
 import com.sing4u.kr.session.dto.response.CurrentSessionResponseDto;
 import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.entity.Session;
@@ -138,4 +139,11 @@ public class SessionService {
                 );
     }
 
+    public Page<ArtistSessionResponseDto> getArtistSessionsForManage(Long artistId, Pageable pageable) {
+        // 아티스트 존재 확인
+        userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "아티스트를 찾을 수 없습니다. ID: " + artistId));
+
+        return sessionRepository.findArtistSessionsForManage(artistId, pageable);
+    }
 }

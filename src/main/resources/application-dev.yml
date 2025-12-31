@@ -1,6 +1,13 @@
 spring:
   application:
     name: api
+
+  config:
+    activate:
+        on-profile: dev
+    import:
+        - optional:aws-parameterstore:/config/api/application_${spring.profiles.active}/
+
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USER}
