@@ -18,6 +18,7 @@ import com.sing4u.kr.user.enums.UserRole;
 public class JwtToken {
     private Long userId;
     private Date expiredAt;
+    private String email;
     private List<UserRole> roles;
     private String nickName;
     private String userName;

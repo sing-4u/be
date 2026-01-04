@@ -37,6 +37,7 @@ public class JwtTokenProvider {
     private final String USER_NAME = "user_name";
     private final String NICK_NAME = "nick_name";
     private static final String AUTHORITIES = "authorities";
+    private static final String EMAIL = "email";
 
     @PostConstruct
     public void init() {
@@ -44,21 +45,22 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(String email) {
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
+//    public String generateAccessToken(String email) {
+//        return Jwts.builder()
+//                .setSubject(email)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
+//                .signWith(secretKey, SignatureAlgorithm.HS256)
+//                .compact();
+//    }
 
     public String generateAccessToken(Long accountId,
+                                      String email,
                                       List<UserRole> roles,
                                       String nickName) {
         ZonedDateTime now = ZonedDateTime.now();
 
-        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName);
+        Map<String, Object> claims = getClaimsForCreation(accountId, email, roles, nickName);
 
         ZonedDateTime expiration = now.plusSeconds(accessTokenValidity);
         Date expirationDate = Date.from(expiration.toInstant());
@@ -67,11 +69,13 @@ public class JwtTokenProvider {
     }
 
     private Map<String, Object> getClaimsForCreation(Long accountId,
+                                                     String email,
                                                      List<UserRole> roles,
                                                      String nickName) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(ACCOUNT_ID, accountId);
+        claims.put(EMAIL, email);
         claims.put(AUTHORITIES, roles);
         claims.put(USER_NAME, getUserName(roles, accountId));
         claims.put(NICK_NAME, nickName);
@@ -100,6 +104,7 @@ public class JwtTokenProvider {
         return JwtToken.of(
                 claims.get(ACCOUNT_ID, Long.class),
                 claims.getExpiration(),
+                claims.get(EMAIL, String.class),
                 roles,
                 claims.get(NICK_NAME, String.class),
                 claims.get(USER_NAME, String.class)
@@ -122,11 +127,12 @@ public class JwtTokenProvider {
     }
 
     public String generateRefreshToken(Long accountId,
+                                      String email,
                                       List<UserRole> roles,
                                       String nickName) {
         ZonedDateTime now = ZonedDateTime.now();
 
-        Map<String, Object> claims = getClaimsForCreation(accountId, roles, nickName);
+        Map<String, Object> claims = getClaimsForCreation(accountId, email, roles, nickName);
 
         ZonedDateTime expiration = now.plusSeconds(refreshTokenValidity);
         Date expirationDate = Date.from(expiration.toInstant());

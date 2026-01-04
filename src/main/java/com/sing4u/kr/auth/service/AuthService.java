@@ -60,12 +60,14 @@ public class AuthService {
 
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
+                user.getEmail(),
                 List.of(user.getRole()),
                 user.getNickname()
         );
 
         String refreshTokenValue = jwtTokenProvider.generateRefreshToken(
                 user.getId(),
+                user.getEmail(),
                 List.of(user.getRole()),
                 user.getNickname()
         );
@@ -100,11 +102,13 @@ public class AuthService {
         // 4. 새로운 Access Token과 Refresh Token 생성
         String newAccessToken = jwtTokenProvider.generateAccessToken(
                 jwt.getUserId(),
+                jwt.getEmail(),
                 jwt.getRoles(),
                 jwt.getNickName()
         );
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(
                 jwt.getUserId(),
+                jwt.getEmail(),
                 jwt.getRoles(),
                 jwt.getNickName()
         );

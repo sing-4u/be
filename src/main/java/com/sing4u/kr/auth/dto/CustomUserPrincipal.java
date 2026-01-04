@@ -64,6 +64,8 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
     // 우리 시스템 내부에서 사용할 userId를 가져오는 커스텀 메소드
     public Long getUserId() { return user.getId();}
 
+    public String getEmail() { return user.getEmail();}
+
     public String getNickname() {
         return user.getNickname();
     }

@@ -144,7 +144,7 @@ public class SongRequestService {
         if (createDto.getTags() != null && createDto.getTags().size() > 10) {
             throw new ApiException(ExceptionCode.BAD_REQUEST, "태그는 최대 10개까지만 등록 가능합니다.");
         }
-        
+
         // DB 작업: 엔티티 생성 및 저장
         SongRequest songRequest = SongRequest.builder()
                 .session(session)
@@ -333,6 +333,9 @@ public class SongRequestService {
             songRequest.unmarkSaved();   // savedYn = N
         }
         // updatedAt은 Auditing으로 *저장 순 조회가 가능하도록 자동 갱신
+
+    }
+
     @Transactional(readOnly = true)
     public SongRequestManageResponseDto getArtistSongRequestsForManage(
             Long artistId,
