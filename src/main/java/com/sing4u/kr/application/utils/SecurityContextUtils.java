@@ -21,7 +21,7 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 @UtilityClass
 @Slf4j
 public class SecurityContextUtils {
-    public static void setSecurityContext(Long accountId,String email, List<UserRole> roles) {
+    public static void setSecurityContext(Long accountId, String email, List<UserRole> roles) {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         for (UserRole role : emptyIfNull(roles)) {
@@ -31,7 +31,7 @@ public class SecurityContextUtils {
 
         log.info("setSecurityContext: accountId={}, roles={}", accountId, authorities);
 
-        DefaultUserDetail userDetail = DefaultUserDetail.of(accountId,email, authorities);
+        DefaultUserDetail userDetail = DefaultUserDetail.of(accountId, email, authorities);
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());

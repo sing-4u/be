@@ -11,6 +11,7 @@ import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.repository.SessionRepository;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
 import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
+import com.sing4u.kr.songRequest.enums.SortType;
 import com.sing4u.kr.songRequest.repository.SongRequestRepository;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
@@ -114,9 +115,24 @@ public class SessionService {
                 .ifPresent(artist -> artist.updateIsOpen(false));
     }
 
+    // 회원용
+    public Page<SongDetailDto> getRecommendHistoryForMember(
+            String artistPublicId, String keyword, SortType sort, Pageable pageable
+    ) {
+        String email = SecurityContextUtils.getEmail();
+        return getRecommendHistoryInternal(artistPublicId, email, keyword, sort, pageable);
+    }
+
+    // 비회원용
+    public Page<SongDetailDto> getRecommendHistoryForGuest(
+            String artistPublicId, String email, String keyword, SortType sort, Pageable pageable
+    ) {
+        return getRecommendHistoryInternal(artistPublicId, email, keyword, sort, pageable);
+    }
+
     @Transactional(readOnly = true)
-    public Page<SongDetailDto> getRecommendHistorySessions(
-            String artistPublicId,
+    public Page<SongDetailDto> getRecommendHistoryInternal(
+            String artistPublicId, String email, String keyword, SortType sort,
             Pageable pageable
     ) {
         // 1. 아티스트 ID 조회 (존재 검증 포함)
@@ -126,17 +142,23 @@ public class SessionService {
                         "아티스트를 찾을 수 없습니다."
                 ));
 
-        // 2. 현재 로그인한 사용자 이메일 찾기
-        String email = SecurityContextUtils.getEmail();
+        // 2. 추천 히스토리 세션 조회
+        if (sort == SortType.POPULAR) {
+            return songRequestRepository.findRecommendHistoryPopular(
+                    artist.getId(),
+                    email,
+                    keyword,
+                    pageable
+            );
+        }
 
-
-        // 3. 추천 히스토리 세션 조회
-        return songRequestRepository
-                .findRecommendHistorySongRequests(
-                        artist.getId(),
-                        email,
-                        pageable
-                );
+        // 기본값 = 최신순
+        return songRequestRepository.findRecommendHistoryLatest(
+                artist.getId(),
+                email,
+                keyword,
+                pageable
+        );
     }
 
     public Page<ArtistSessionResponseDto> getArtistSessionsForManage(Long artistId, Pageable pageable) {

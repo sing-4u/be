@@ -3,6 +3,7 @@ package com.sing4u.kr.songRequest.repository;
 import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
 import com.sing4u.kr.songRequest.dto.response.SongRequestManageItemDto;
 import com.sing4u.kr.songRequest.entity.SongRequest;
+import com.sing4u.kr.songRequest.enums.SortType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,24 +19,76 @@ public interface SongRequestRepository extends JpaRepository<SongRequest, Long> 
 
     @Query(
             value = """
-        SELECT sr FROM SongRequest sr
+        SELECT DISTINCT sr FROM SongRequest sr
         JOIN sr.session s
+        LEFT JOIN sr.tags t
         WHERE s.artist.id = :artistId
           AND sr.fanEmail = :email
+          AND (
+            :keyword IS NULL OR :keyword = '' OR
+            sr.songTitle LIKE CONCAT('%', :keyword, '%') OR
+            sr.songArtistName LIKE CONCAT('%', :keyword, '%') OR
+            t LIKE CONCAT('%', :keyword, '%')
+          )
         ORDER BY sr.requestedAt DESC
     """,
             countQuery = """
-        SELECT COUNT(sr.id) FROM SongRequest sr
+        SELECT COUNT(DISTINCT sr.id) FROM SongRequest sr
         JOIN sr.session s
+        LEFT JOIN sr.tags t
         WHERE s.artist.id = :artistId
           AND sr.fanEmail = :email
+          AND (
+            :keyword IS NULL OR :keyword = '' OR
+            sr.songTitle LIKE CONCAT('%', :keyword, '%') OR
+            sr.songArtistName LIKE CONCAT('%', :keyword, '%') OR
+            t LIKE CONCAT('%', :keyword, '%')
+          )
     """
     )
-    Page<SongDetailDto> findRecommendHistorySongRequests(
+    Page<SongDetailDto> findRecommendHistoryLatest(
             @Param("artistId") Long artistId,
             @Param("email") String email,
+            @Param("keyword") String keyword,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+        SELECT DISTINCT sr FROM SongRequest sr
+        JOIN sr.session s
+        LEFT JOIN sr.tags t
+        WHERE s.artist.id = :artistId
+          AND sr.fanEmail = :email
+          AND (
+            :keyword IS NULL OR :keyword = '' OR
+            sr.songTitle LIKE CONCAT('%', :keyword, '%') OR
+            sr.songArtistName LIKE CONCAT('%', :keyword, '%') OR
+            t LIKE CONCAT('%', :keyword, '%')
+          )
+        ORDER BY sr.likeCount DESC, sr.requestedAt DESC
+    """,
+            countQuery = """
+        SELECT COUNT(DISTINCT sr.id) FROM SongRequest sr
+        JOIN sr.session s
+        LEFT JOIN sr.tags t
+        WHERE s.artist.id = :artistId
+          AND sr.fanEmail = :email
+          AND (
+            :keyword IS NULL OR :keyword = '' OR
+            sr.songTitle LIKE CONCAT('%', :keyword, '%') OR
+            sr.songArtistName LIKE CONCAT('%', :keyword, '%') OR
+            t LIKE CONCAT('%', :keyword, '%')
+          )
+    """
+    )
+    Page<SongDetailDto> findRecommendHistoryPopular(
+            @Param("artistId") Long artistId,
+            @Param("email") String email,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
 
     // TODO: songTitle/songArtistName 표기 차이(직접 입력한 곡과 스포티파이 검색 곡 차이)로 동일 곡이 분리 집계될 수 있을 것 같아서 해결방안 생각해야 함
     @Query(
