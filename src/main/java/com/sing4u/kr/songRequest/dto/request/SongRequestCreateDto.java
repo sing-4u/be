@@ -38,7 +38,7 @@ public class SongRequestCreateDto {
     private String artistName;
 
     @Size(max = 10, message = "태그는 최대 10개까지 가능합니다.")
-    @Schema(description = "곡 요청에 첨부할 태그 목록 (최대 10개, # 포함)", example = "[\"#발라드\", \"#감성\", \"#겨울\"]")
+    @Schema(description = "곡 요청에 첨부할 태그 목록 (최대 10개)", example = "[\"발라드\", \"감성\", \"겨울\"]")
     private List<@Size(max = 20, message = "각 태그는 최대 20자까지 가능합니다.") String> tags;
 
     @Size(max = 500, message = "URL은 최대 500자까지 가능합니다.")
