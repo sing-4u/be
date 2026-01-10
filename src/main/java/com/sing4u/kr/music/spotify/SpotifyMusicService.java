@@ -77,7 +77,7 @@ public class SpotifyMusicService implements MusicInterface {
         }
 
         try {
-            Track track = spotifyApi.getTrack(platformTrackId).build().execute();
+            Track track = spotifyApi.getTrack(platformTrackId).setHeader("Accept-Language", "ko-KR,ko;q=0.9").build().execute();
             String artistNames = Arrays.stream(track.getArtists())
                     .map(ArtistSimplified::getName)
                     .collect(Collectors.joining(", "));
