@@ -21,7 +21,7 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 @UtilityClass
 @Slf4j
 public class SecurityContextUtils {
-    public static void setSecurityContext(Long accountId, List<UserRole> roles) {
+    public static void setSecurityContext(Long accountId, String email, List<UserRole> roles) {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         for (UserRole role : emptyIfNull(roles)) {
@@ -31,7 +31,7 @@ public class SecurityContextUtils {
 
         log.info("setSecurityContext: accountId={}, roles={}", accountId, authorities);
 
-        DefaultUserDetail userDetail = DefaultUserDetail.of(accountId, authorities);
+        DefaultUserDetail userDetail = DefaultUserDetail.of(accountId, email, authorities);
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
@@ -70,6 +70,18 @@ public class SecurityContextUtils {
 
         DefaultUserDetail customUserDetail = DefaultUserDetail.class.cast(authentication.getPrincipal());
         return customUserDetail.getId();
+    }
+
+    public String getEmail() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null ||
+                !(authentication.getPrincipal() instanceof DefaultUserDetail userDetail)) {
+            throw new ApiException(ResponseCode.ERROR_NO_AUTHORIZED);
+        }
+
+        return userDetail.getEmail();
     }
 
 }

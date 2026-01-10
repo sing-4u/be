@@ -1,5 +1,6 @@
 package com.sing4u.kr.session.service;
 
+import com.sing4u.kr.application.utils.SecurityContextUtils;
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
 import com.sing4u.kr.session.dto.response.ArtistSessionResponseDto;
@@ -8,6 +9,10 @@ import com.sing4u.kr.session.dto.response.SessionResponseDto;
 import com.sing4u.kr.session.entity.Session;
 import com.sing4u.kr.session.enums.SessionStatus;
 import com.sing4u.kr.session.repository.SessionRepository;
+import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
+import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
+import com.sing4u.kr.songRequest.enums.SortType;
+import com.sing4u.kr.songRequest.repository.SongRequestRepository;
 import com.sing4u.kr.user.entity.User;
 import com.sing4u.kr.user.entity.enums.UserType;
 import com.sing4u.kr.user.repository.UserRepository;
@@ -25,6 +30,7 @@ import java.util.Optional;
 public class SessionService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
+    private final SongRequestRepository songRequestRepository;
 
     @Transactional
     public SessionResponseDto createSession(Long artistId){
@@ -107,6 +113,52 @@ public class SessionService {
                 .forEach(Session::close);
         userRepository.findByIdAndUserTypeAndDeletedAtIsNull(artistId, UserType.ARTIST)
                 .ifPresent(artist -> artist.updateIsOpen(false));
+    }
+
+    // 회원용
+    public Page<SongDetailDto> getRecommendHistoryForMember(
+            String artistPublicId, String keyword, SortType sort, Pageable pageable
+    ) {
+        String email = SecurityContextUtils.getEmail();
+        return getRecommendHistoryInternal(artistPublicId, email, keyword, sort, pageable);
+    }
+
+    // 비회원용
+    public Page<SongDetailDto> getRecommendHistoryForGuest(
+            String artistPublicId, String email, String keyword, SortType sort, Pageable pageable
+    ) {
+        return getRecommendHistoryInternal(artistPublicId, email, keyword, sort, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SongDetailDto> getRecommendHistoryInternal(
+            String artistPublicId, String email, String keyword, SortType sort,
+            Pageable pageable
+    ) {
+        // 1. 아티스트 ID 조회 (존재 검증 포함)
+        User artist = userRepository.findByUserPublicIdAndDeletedAtIsNull(artistPublicId)
+                .orElseThrow(() -> new ApiException(
+                        ExceptionCode.NOT_FOUND,
+                        "아티스트를 찾을 수 없습니다."
+                ));
+
+        // 2. 추천 히스토리 세션 조회
+        if (sort == SortType.POPULAR) {
+            return songRequestRepository.findRecommendHistoryPopular(
+                    artist.getId(),
+                    email,
+                    keyword,
+                    pageable
+            );
+        }
+
+        // 기본값 = 최신순
+        return songRequestRepository.findRecommendHistoryLatest(
+                artist.getId(),
+                email,
+                keyword,
+                pageable
+        );
     }
 
     public Page<ArtistSessionResponseDto> getArtistSessionsForManage(Long artistId, Pageable pageable) {

@@ -58,6 +58,7 @@ public class SwaggerService {
 
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
+                user.getEmail(),
                 List.of(mainRole),
                 user.getNickname()
         );

@@ -59,13 +59,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         String nickname = principal.getNickname();
-
+        String email = principal.getEmail();
         // 최종적으로 안전하게 변환된 userRole 사용
         List<UserRole> roles = List.of(userRole);
 
         // Access Token과 Refresh Token 생성 (userId 기반)
-        String accessToken = jwtTokenProvider.generateAccessToken(userId, roles, nickname);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(userId, roles, nickname);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, email, roles, nickname);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userId, email, roles, nickname);
 
         // Refresh Token을 DB에 저장
         refreshTokenRepository.save(RefreshToken.of(userId, refreshToken));

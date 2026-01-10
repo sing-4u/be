@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             JwtToken token = jwtTokenProvider.getAllClaimsFromToken(accessToken);
-            SecurityContextUtils.setSecurityContext(token.getUserId(), token.getRoles());
+            SecurityContextUtils.setSecurityContext(token.getUserId(), token.getEmail(), token.getRoles());
         } catch (ExpiredJwtException e) {
             response.setHeader(HEADER_EXCEPTION_CODE, ERROR_EXPIRED_TOKEN.getCode());
             throw new ExpiredTokenException();
@@ -63,11 +63,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-//    private String getAccessTokenFromHeader(HttpServletRequest request) {
-//        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-//        if (bearer != null && bearer.startsWith("Bearer ")) {
-//            return StringUtils.replaceIgnoreCase(bearer, "bearer", "").trim();
-//        }
-//        return null;
-//    }
 }
