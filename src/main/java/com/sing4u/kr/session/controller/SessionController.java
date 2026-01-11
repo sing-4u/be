@@ -108,7 +108,7 @@ public class SessionController {
             summary = "아티스트 추천 히스토리 조회(회원용)",
             description = "현재 로그인 사용자가 해당 아티스트에게 추천했던 세션 목록 조회"
     )
-    public ResponseEntity<PagingResponse<SongDetailDto>> getRecommendHistorySessions(
+    public ResponseResult<PagingResponse<SongDetailDto>> getRecommendHistorySessions(
             @Parameter(description = "아티스트 공개 ID", example = "user_public_id_1")
             @PathVariable String artistPublicId,
             @RequestParam(defaultValue = "0") int page,
@@ -123,7 +123,10 @@ public class SessionController {
         Page<SongDetailDto> result =
                 sessionService.getRecommendHistoryForMember(artistPublicId, keyword, sort, pageable);
 
-        return ResponseEntity.ok(PagingResponse.of(result));
+        return new ResponseResult<>(
+                ResponseCode.SUCCESS,
+                PagingResponse.of(result)
+        );
     }
 
     @GetMapping("/{artistPublicId}/sessions/recommend-history/guest")
@@ -131,7 +134,7 @@ public class SessionController {
             summary = "아티스트 추천 히스토리 조회(비회원용)",
             description = "비회원이 이메일을 통해 해당 아티스트에게 추천했던 세션 목록 조회"
     )
-    public ResponseEntity<PagingResponse<SongDetailDto>> getGuestRecommendHistorySessions(
+    public ResponseResult<PagingResponse<SongDetailDto>> getGuestRecommendHistorySessions(
             @Parameter(description = "아티스트 공개 ID", example = "user_public_id_1")
             @PathVariable String artistPublicId,
             @RequestParam String email,
@@ -147,7 +150,10 @@ public class SessionController {
         Page<SongDetailDto> result =
                 sessionService.getRecommendHistoryForGuest(artistPublicId, email, keyword, sort, pageable);
 
-        return ResponseEntity.ok(PagingResponse.of(result));
+        return new ResponseResult<>(
+                ResponseCode.SUCCESS,
+                PagingResponse.of(result)
+        );
     }
 
     @GetMapping("/{artistPublicId}/sessions/manage")
