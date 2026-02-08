@@ -87,6 +87,14 @@ public class SongRequest {
     public void unmarkSaved() {
         this.savedYn = "N";
     }
+
+    @Column(name = "called_yn", length = 1, nullable = false)
+    @Builder.Default
+    private String calledYn = "N";
+
+    public void markCalled() {
+        this.calledYn = "Y";
+    }
 }
 
 

@@ -3,12 +3,9 @@ package com.sing4u.kr.songRequest.service;
 
 import com.sing4u.kr.common.exception.ApiException;
 import com.sing4u.kr.common.exception.ExceptionCode;
-import com.sing4u.kr.songRequest.dto.response.SongRequestManageItemDto;
+import com.sing4u.kr.songRequest.dto.response.*;
 import com.sing4u.kr.songRequest.dto.request.SongRequestCreateDto;
 import com.sing4u.kr.songRequest.dto.SongRequestResponseDto;
-import com.sing4u.kr.songRequest.dto.response.ArtistSongRequestsResponse;
-import com.sing4u.kr.songRequest.dto.response.SongDetailDto;
-import com.sing4u.kr.songRequest.dto.response.SongRequestManageResponseDto;
 import com.sing4u.kr.songRequest.entity.SongRequest;
 import com.sing4u.kr.songRequest.enums.SortType;
 import com.sing4u.kr.songRequest.repository.SongRequestRepository;
@@ -248,6 +245,9 @@ public class SongRequestService {
         Stream<SongRequest> stream = sessions.stream()
                 .flatMap(session -> session.getSongRequests().stream());
 
+        // 불러준 곡 제외
+        stream = stream.filter(req -> !"Y".equals(req.getCalledYn()));
+
         // 3) sessionId 필터링
         if (sessionId != null) {
             stream = stream.filter(req -> req.getSession().getId().equals(sessionId));
@@ -358,4 +358,17 @@ public class SongRequestService {
         return SongRequestManageResponseDto.of(pageResult);
     }
 
+    @Transactional
+    public SongRequestCalledResponse markSongRequestCalled(Long artistId, Long songRequestId) {
+        SongRequest songRequest = songRequestRepository
+                .findByIdAndSession_Artist_Id(songRequestId, artistId)
+                .orElseThrow(() -> new ApiException(ExceptionCode.NOT_FOUND, "신청곡을 찾을 수 없습니다. ID: " + songRequestId));
+        // or 권한 예외로 분리해도 됨
+
+        if (!"Y".equals(songRequest.getCalledYn())) {
+            songRequest.markCalled();
+        }
+
+        return new SongRequestCalledResponse(songRequest.getId(), songRequest.getCalledYn());
+    }
 }
