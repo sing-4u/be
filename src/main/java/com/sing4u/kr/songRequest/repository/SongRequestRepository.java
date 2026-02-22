@@ -134,4 +134,40 @@ public interface SongRequestRepository extends JpaRepository<SongRequest, Long> 
     );
 
     Optional<SongRequest> findByIdAndSession_Artist_Id(Long id, Long artistId);
+
+    @Query(
+            value = """
+            SELECT DISTINCT sr FROM SongRequest sr
+            JOIN sr.session s
+            LEFT JOIN sr.tags t
+            WHERE s.artist.id = :artistId
+              AND sr.savedYn = 'Y'
+              AND sr.calledYn = 'N'
+              AND (
+                :keyword IS NULL OR :keyword = '' OR
+                LOWER(sr.songTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                LOWER(sr.songArtistName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                LOWER(t) LIKE LOWER(CONCAT('%', :keyword, '%'))
+              )
+        """,
+            countQuery = """
+            SELECT COUNT(DISTINCT sr.id) FROM SongRequest sr
+            JOIN sr.session s
+            LEFT JOIN sr.tags t
+            WHERE s.artist.id = :artistId
+              AND sr.savedYn = 'Y'
+              AND sr.calledYn = 'N'
+              AND (
+                :keyword IS NULL OR :keyword = '' OR
+                LOWER(sr.songTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                LOWER(sr.songArtistName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                LOWER(t) LIKE LOWER(CONCAT('%', :keyword, '%'))
+              )
+        """
+    )
+    Page<SongRequest> findSavedArtistSongRequests(
+            @Param("artistId") Long artistId,
+            @Param("keyword") String keyword, // sessionId 파라미터 제거됨
+            Pageable pageable
+    );
 }

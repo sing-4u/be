@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -370,5 +371,52 @@ public class SongRequestService {
         }
 
         return new SongRequestCalledResponse(songRequest.getId(), songRequest.getCalledYn());
+    }
+
+    @Transactional(readOnly = true)
+    public ArtistSongRequestsResponse getSavedArtistSongRequests(
+            Long artistId,
+            String keyword,
+            SortType sort,
+            int page,
+            int pageSize
+    ) {
+        // 1. 안전한 페이징 설정
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(pageSize, 1);
+
+        // 2. 정렬 조건(Pageable) 생성
+        org.springframework.data.domain.Sort pageSort;
+        if (sort == SortType.POPULAR) {
+            // 인기순: 좋아요 내림차순, 동일하면 보관일시 내림차순
+            pageSort = org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Direction.DESC, "likeCount", "savedAt"
+            );
+        } else {
+            // 최신순: 보관일시 내림차순
+            pageSort = org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Direction.DESC, "savedAt"
+            );
+        }
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, pageSort);
+
+        // 3. 레포지토리 조회
+        Page<SongRequest> savedPage = songRequestRepository.findSavedArtistSongRequests(
+                artistId, keyword, pageable
+        );
+
+        // 4. Entity -> DTO 변환
+        List<SongDetailDto> songDetailDtos = savedPage.getContent().stream()
+                .map(SongDetailDto::from)
+                .toList();
+
+        // 5. 응답 반환
+        return ArtistSongRequestsResponse.builder()
+                .songs(songDetailDtos)
+                .hasNext(savedPage.hasNext()) // Page 객체가 다음 페이지 존재 여부를 자동으로 알려줍니다
+                .page(safePage)
+                .pageSize(safeSize)
+                .build();
     }
 }
