@@ -76,4 +76,25 @@ public class SongRequestController {
         return new ResponseResult<>(ResponseCode.SUCCESS);
     }
 
+    @Operation(
+            summary = "아티스트 보관함 조회(저장한 신청곡 리스트)",
+            description = "아티스트가 보관(저장)한 신청곡 목록을 조회합니다. 정렬 기준의 LATEST는 '저장한 시간(savedAt)' 기준 최신순입니다. sessionId, keyword, sort(LATEST/POPULAR), page, pageSize"
+    )
+    @GetMapping("/artists/{artistPublicId}/saved")
+    public ResponseResult<ArtistSongRequestsResponse> getSavedArtistSongRequests(
+            @PathVariable String artistPublicId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "LATEST") @Parameter(description = "정렬 기준", schema = @Schema(implementation = SortType.class)) SortType sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+
+        Long artistId = userService.getUserIdByPublicId(artistPublicId);
+
+        ArtistSongRequestsResponse result =
+                songRequestService.getSavedArtistSongRequests(artistId, keyword, sort, page, pageSize);
+
+        return new ResponseResult<>(ResponseCode.SUCCESS, result);
+    }
+
 }

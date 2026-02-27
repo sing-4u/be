@@ -76,16 +76,22 @@ public class SongRequest {
     @Column(name = "album_image_url")
     private String albumImageUrl;
 
+
     @Column(name = "saved_yn", length = 1, nullable = false)
     @Builder.Default
     private String savedYn = "N";
 
+    @Column(name = "saved_at")
+    private LocalDateTime savedAt;
+
     public void markSaved() {
         this.savedYn = "Y";
+        this.savedAt = LocalDateTime.now();
     }
 
     public void unmarkSaved() {
         this.savedYn = "N";
+        this.savedAt = null;
     }
 
     @Column(name = "called_yn", length = 1, nullable = false)
