@@ -22,6 +22,7 @@ public class SongDetailDto {
     private String albumImageUrl;
     private List<String> tags;
     private String url;
+    private Boolean isSaved;
 
 
     public static SongDetailDto from(SongRequest songRequest) {
@@ -40,6 +41,7 @@ public class SongDetailDto {
                 .albumImageUrl(songRequest.getAlbumImageUrl())
                 .tags(songRequest.getTags())
                 .url(songRequest.getUrl())
+                .isSaved("Y".equals(songRequest.getSavedYn()))
                 .build();
     }
 }
